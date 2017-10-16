@@ -23,7 +23,7 @@ const mem_template = @@"
  <memory type=\"ram\" start=\"0x20000000\" length=\"0x%x\"/>
  <memory type=\"ram\" start=\"0x40000000\" length=\"0x1fffffff\"/>
  <memory type=\"ram\" start=\"0xe0000000\" length=\"0x1fffffff\"/>
- <memory type=\"flash\" start=\"0xfe00000\" length=\"0x10000\">
+ <memory type=\"flash\" start=\"0x0fe00000\" length=\"0x10000\">
    <property name=\"blocksize\">0x800</property>
  </memory>
  </memory-map>";
@@ -115,6 +115,7 @@ function main()
     case 72 : //  EFM32GG EFM32 Giant Gecko Device Family
         printf("Silabs Giant Gecko - EFM32GG%d\n", partValue);
         devApi.target("cortex-m3");
+        require("silabs/EFM32GGx.script");
         break;
     case 73 : //  EFM32TG EFM32 Tiny Gecko Device Family
         printf("Silabs Tiny Gecko - EFM32TG%d\n", partValue);
@@ -176,7 +177,7 @@ function main()
     // Get the MEM_INFO_RAM
     result = itrfApi.readMem32(0x0FE081FA);
     local ramSize = itrfApi.value32 & 0xFFFF;
-    printf("Detected RAM   %d Kbyte\n", ramSize);        require("silabs/EFR32xG1.script");
+    printf("Detected RAM   %d Kbyte\n", ramSize);
 
     // Build the XML memory map and set it active.
     devApi.memmap( format( mem_template,  flashSize*1024, pageSize,

@@ -1,10 +1,33 @@
 /////////////////////////////////////////////////////
 //
-//     The EFR32xG1 flashing scripts according
+//     The EFM32GGx flashing scripts according
 //     Silabs reference manual
 //
 //  Copyright(C) Gerard Zagema
 //
+
+/*
+    The offset register address is relative to the registers base address (0x400C0000).
+
+Offset Name Type Description
+0x000 MSC_CTRL RW Memory System Control Register
+0x004 MSC_READCTRL RW Read Control Register
+0x008 MSC_WRITECTRL RW Write Control Register
+0x00C MSC_WRITECMD W1 Write Command Register
+0x010 MSC_ADDRB RW Page Erase/Write Address Buffer
+0x018 MSC_WDATA RW Write Data Register
+0x01C MSC_STATUS R Status Register
+0x02C MSC_IF R Interrupt Flag Register
+0x030 MSC_IFS W1 Interrupt Flag Set Register
+0x034 MSC_IFC W1 Interrupt Flag Clear Register
+0x038 MSC_IEN RW Interrupt Enable Register
+0x03C MSC_LOCK RW Configuration Lock Register
+0x040 MSC_CMD W1 Command Register
+0x044 MSC_CACHEHITS R Cache Hits Performance Counter
+0x048 MSC_CACHEMISSES R Cache Misses Performance Counter
+0x050 MSC_TIMEBASE RW Flash Write and Erase Timebase
+0x054 MSC_MASSLOCK RW Mass Erase Lock Register
+*/
 
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -15,17 +38,19 @@ function flash_start()
 {
     local result;
 
+printf("start flash\n");
+
      // Be sure that the core is halted
     result = targetApi.halt();
     if(result<0) return result;
 
     // Unlock MSC
-    result = itrfApi.writeMem32(0x400E0040, 0x1B71);
+    result = itrfApi.writeMem32(0x400C003C, 0x1B71);
     if(result<0) return result;
 
     // Enable WREN in  MSC_WRITECTRL
     itrfApi.readMem32(0x400E0008);
-    result = itrfApi.writeMem32(0x400E0008, itrfApi.value32 | 0x01 );
+    result = itrfApi.writeMem32(0x400C0008, itrfApi.value32 | 0x01 );
 
     return result;
 }
@@ -40,20 +65,20 @@ function flash_erase(sector, address)
     local result;
 
     //MSC->ADDRB = address;
-    result = itrfApi.writeMem32(0x400E0010, address);
+    result = itrfApi.writeMem32(0x400C0010, address);
     if(result<0) return result;
 
     // MSC->WRITECMD = MSC_WRITECMD_LADDRIM;
-    result = itrfApi.writeMem32(0x400E000C, 0x01);
+    result = itrfApi.writeMem32(0x400C000C, 0x01);
     if(result<0) return result;
 
     //MSC->WRITECMD = MSC_WRITECMD_ERASEPAGE;
-    result = itrfApi.writeMem32(0x400E000C, 0x02);
+    result = itrfApi.writeMem32(0x400C000C, 0x02);
     if(result<0) return result;
 
     //while ( MSC->STATUS & MSC_STATUS_BUSY );
     do{
-         result = itrfApi.readMem32(0x400E001C);
+         result = itrfApi.readMem32(0x400C001C);
     }while ( (result >= 0) && (itrfApi.value32 &  0x01 ) );
 
     return result;
@@ -72,15 +97,15 @@ function flash_write(sector, address, buffer)
 
     //while ( MSC->STATUS & MSC_STATUS_BUSY );
     do{
-         result = itrfApi.readMem32(0x400E001C);
+         result = itrfApi.readMem32(0x400C001C);
     }while ( (result >= 0) && (itrfApi.value32 &  0x01 ) );
 
     // Write the destination address in MSC_ADDRB
-   result = itrfApi.writeMem32(0x400E0010, address);
-   if(result<0) return result;
+    result = itrfApi.writeMem32(0x400C0010, address);
+    if(result<0) return result;
 
     // MSC->WRITECMD = MSC_WRITECMD_LADDRIM;
-    result = itrfApi.writeMem32(0x400E000C, 0x01);
+    result = itrfApi.writeMem32(0x400C000C, 0x01);
     if(result<0) return result;
 
     // Write the flash content and use the auto address increment
@@ -88,19 +113,15 @@ function flash_write(sector, address, buffer)
     while( idx < buffer.byteLength )
     {
         // Write word to MSC_DATA
-        result = itrfApi.writeMem32( 0x400E0018, buffer.un32(idx) ) ;
+        result = itrfApi.writeMem32( 0x400C0018, buffer.un32(idx) ) ;
         if(result<0) return result;
 
         // Initiate write with auto increment, 1 to WRITETRIG in MSC_WRITECMD
-        result = itrfApi.writeMem32(0x400E000C, 0x10);
+        result = itrfApi.writeMem32(0x400C000C, 0x10);
         if(result<0) return result;
         idx += 4;
     }
 
-    //while ( MSC->STATUS & MSC_STATUS_BUSY );
-    do{
-         result = itrfApi.readMem32(0x400E001C);
-    }while ( (result >= 0) && (itrfApi.value32 &  0x01 ) );
 
     // End writing  MSC->WRITECMD = MSC_WRITECMD_WRITEEND;
     result = itrfApi.writeMem32(0x400E000C, 0x04);
@@ -118,16 +139,16 @@ function flash_done()
 
     //while ( MSC->STATUS & MSC_STATUS_BUSY );
     do{
-         result = itrfApi.readMem32(0x400E001C);
+         result = itrfApi.readMem32(0x400C001C);
     }while ( (result >= 0) && (itrfApi.value32 &  0x01 ) );
 
     // Disable flash writing WREN in MSC_WRITECTRL
     //itrfApi.readMem32(0x400E0008);
-    result = itrfApi.writeMem32(0x400E0008, 0 ); //itrfApi.value32 & 0xFFFFFFFE );
+    result = itrfApi.writeMem32(0x400C0008, 0 ); //itrfApi.value32 & 0xFFFFFFFE );
     if(result<0) return result;
 
     // Lock MSC
-    result = itrfApi.writeMem32(0x400E0040, 0x0 );
+    result = itrfApi.writeMem32(0x400C003C, 0x0 );
 
     return result;
 }
@@ -148,17 +169,17 @@ function flash_erase_chip()
     if(result<0) return result;
 
     // MSC->MASSLOCK = MSC_MASSLOCK_LOCKKEY_UNLOCK
-    result = itrfApi.writeMem32(0x400E0054, 0x631A);
+    result = itrfApi.writeMem32(0x400C0054, 0x631A);
     if(result<0) return result;
 
     // Erase first 512K block
     //MSC->WRITECMD = MSC_WRITECMD_ERASEMAIN0;
-    result = itrfApi.writeMem32(0x400E000C, 0x100);
+    result = itrfApi.writeMem32(0x400C000C, 0x100);
     if(result<0) return result;
 
     //while ( MSC->STATUS & MSC_STATUS_BUSY );
     do{
-         result = itrfApi.readMem32(0x400E001C);
+         result = itrfApi.readMem32(0x400C001C);
          if(result<0) return result;
     }while ( itrfApi.value32 &  0x01 );
 
@@ -166,12 +187,12 @@ function flash_erase_chip()
     if( flashSize > 512 )
     {
        //MSC->WRITECMD = MSC_WRITECMD_ERASEMAIN1;
-       result = itrfApi.writeMem32(0x400E000C, 0x200);
+       result = itrfApi.writeMem32(0x400C000C, 0x200);
        if(result<0) return result;
 
        //while ( MSC->STATUS & MSC_STATUS_BUSY );
        do{
-            result = itrfApi.readMem32(0x400E001C);
+            result = itrfApi.readMem32(0x400C001C);
             if(result<0) return result;
         }while ( itrfApi.value32 &  0x01 );
     }
