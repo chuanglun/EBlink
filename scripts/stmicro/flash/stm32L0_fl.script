@@ -1,0 +1,142 @@
+/////////////////////////////////////////////////////////////////////////////////
+//
+//                   STM32L0_fl flash loader
+//
+//  Copyright(C) Gerard Zagema
+
+
+/////////////////////////////////////////////////////////////////////////////////
+//
+//   Unlock the flash
+//
+function flash_start()
+{
+    local targetApi = :: TargetAPI(); // Our interface to the target class
+    local result;
+
+    // Be sure that the core is halted
+    result = targetApi.halt(); if(result<0) return result;
+
+    // Read flash lock status
+    result = itrfApi.readMem32(0x40022004); if(result<0) return result;
+
+    // Check if it's locked by the FLASH_CR_LOCK flag
+    if( itrfApi.value32 & 0x03 )
+    {
+        // Unlock
+        result = itrfApi.writeMem32(0x4002200C,0x89ABCDEF); if(result<0) return result;
+        result = itrfApi.writeMem32(0x4002200C,0x02030405); if(result<0) return result;
+
+
+        // Read flash CR again to check FLASH_CR_LOCK if it's unlocked
+        result = itrfApi.readMem32(0x40022004); if(result<0) return result;
+        if( itrfApi.value32 & 0x01 )
+        {
+            errorf("Error: can't unlock flash!\n");
+            return -1;
+        }
+
+        // Unlock flash program
+        result = itrfApi.writeMem32(0x40022010,0x8C9DAEBF); if(result<0) return result;
+        result = itrfApi.writeMem32(0x40022010,0x13141516); if(result<0) return result;
+
+        // check pecr.prglock is cleared
+        result = itrfApi.readMem32(0x40022004); if(result<0) return result;
+        if( itrfApi.value32 & 0x02 )
+        {
+            errorf("Error unlocking flash!\n");
+            return -1;
+        }
+    }
+
+    return 0;
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////
+//
+//   Erase sequence according ST user manual
+//
+function flash_erase(sector, address)
+{
+    local result;
+
+    // (1) Set the ERASE and PROG bits in the FLASH_PECR register to enable page erasing
+    result = itrfApi.writeMem32(0x40022004, 0x0208 ); if(result<0) return result;
+
+    // (2) Write a 32-bit word value in an address of the selected page to start the erase sequence
+    result = itrfApi.writeMem32(address, 0 ); if(result<0) return result;
+
+    //  (3) Wait until the BSY bit is reset in the FLASH_SR register
+    do{
+         result = itrfApi.readMem32(0x40022018); if(result<0) return result;
+    }while ( itrfApi.value32 & 0x01);
+
+    //  (4) Check the EOP flag in the FLASH_SR register
+    if( itrfApi.value32 & 0x10)
+    {
+       errorf("ERROR: Failed erasing sector %d\n", sector);
+       return -1;
+    }
+
+    // (5) Clear EOP flag by software by writing EOP at 1
+    result = itrfApi.writeMem32(0x40022018, itrfApi.value32 | 0x10); if(result<0) return result;
+
+    //  (6) Reset the ERASE bits in the FLASH_PECR register to disable the page erase
+    result = itrfApi.writeMem32(0x40022004, 0x0008 ); if(result<0) return result;
+
+    return 0;
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////
+//
+//  The length is always equals to the page to be programmed in bytes.
+//  We don't use a flash loader here. We just write the pages word by word.
+//  Because every word needs to be transported by USB, we don't check the busy
+//  flag in between because we are not that fast.
+//
+function flash_write(sector, address, buffer)
+{
+    local result;
+
+    // (1) Enable the program  FPRG and PRG in FLASH_PECR
+    result = itrfApi.writeMem32( 0x40022004, 0x0408 ); if(result<0) return result;
+
+    // (2) Write buffer to flash space word by word. A block write goes too fast.
+    for(local count = 0; count < buffer.byteLength; count += 4)
+    {
+        itrfApi.writeMem32(address, buffer.un32(count) );
+        address += 4;
+    }
+
+    //  (3) Wait until the BSY bit is reset in the FLASH_SR register
+    do{
+         result = itrfApi.readMem32(0x40022018); if(result<0) return result;
+    }while ( itrfApi.value32 & 0x01 );
+
+    // (4) Disable the program flag FPRG in FLASH_PECR
+    itrfApi.writeMem32(0x40022004, 0x0008); if(result<0) return result;
+
+    return 0;
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+//
+//
+//
+function flash_done()
+{
+    local result
+
+    //  Locks the NVM by setting PELOCK in PECR
+    result = itrfApi.writeMem32(0x40022004, 0x01);
+    if(result<0)
+        return result;
+
+    return 0;
+}
+
+
+
+
