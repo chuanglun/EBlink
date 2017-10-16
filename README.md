@@ -2,9 +2,9 @@
 ARM Cortex-M GDB server with device squirrel scripting  support
 
 EBlink features:
-- GDB server with flash caching
+- GDB server with flash caching, with EmBitz live variables/expression support!
 - Stand alone flashing tool
-- Device support by squirrel scripting, flash algoritme, device reset strategy etc
+- Device support by squirrel scripting, flash algorithm, device reset strategy etc
 - Multiple interfaces (right now STlink)
 
 Usage: eblink \<options\>
