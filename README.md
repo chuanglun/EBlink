@@ -72,6 +72,7 @@ name: ST-link - STmicro V2 interface driver
         e.g.  -G S,nc
 
 Examples:
+
         Connect STmicro device with STlink on GDB server
         => eblink -I st-link -D stm32-auto -G
 
