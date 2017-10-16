@@ -9,14 +9,14 @@ EBlink features:
 
 Usage: eblink \<options\>
 
-    -h,           --help			Print this help
-    -g,           --nogui			No GUI message boxes
-    -v,           --verbose		    Specify generally verbose logging
-    -D <script>,  --device <script>	Select the device script <>.script
-    -T <options>, --target		    Select target(optional)
-    -I <options>, --interf		    Select interface
-    -F <options>, --flash <options>	Target image flashing
-    -G [options], --gdb <options>	Launch GDB server
+    -h,           --help            Print this help
+    -g,           --nogui           No GUI message boxes
+    -v,           --verbose         Specify generally verbose logging
+    -D <script>,  --device <script> Select the device script <>.script
+    -T <options>, --target          Select target(optional)
+    -I <options>, --interf          Select interface
+    -F <options>, --flash <options> Target image flashing
+    -G [options], --gdb <options>   Launch GDB server
 
   --device and --interf are mandatory, normally combined with --flash or/and --gdb
 
