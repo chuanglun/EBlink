@@ -71,3 +71,12 @@ name: ST-link - STmicro V2 interface driver
 
         e.g.  -G S,nc
 
+Examples:
+        Connect STmicro device with STlink on GDB server
+        => eblink -I st-link -D stm32-auto -G
+
+        Connect silabs device with STlink on bus 2:4 and launch the GDB server on port 4243:
+        => eblink -I st-link,device=2:4 -D silabs-auto -G port=4243
+
+        Flash STmicro device with STlink and run
+        => eblink -I st-link -D stm32-auto -F verify,run,file=release.elf,        
