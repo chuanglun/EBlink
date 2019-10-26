@@ -2,7 +2,7 @@
 //
 //                   STM32F7F4_flash (stm32F7xx and stm32F4xxx )
 //
-//  Copyright(C) Gerard Zagema
+//  Gerard Zagema
 //
 //
 // This script doesn't use an external flash loader but is writing directly

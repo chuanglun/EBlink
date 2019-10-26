@@ -2,7 +2,7 @@
 //
 //                   STM32HW_fl (Half word flash loader)
 //
-//  Copyright(C) Gerard Zagema
+//  Gerard Zagema
 
 dataStart <- 0;  // Global variable, pointer to the buffer in RAM
 

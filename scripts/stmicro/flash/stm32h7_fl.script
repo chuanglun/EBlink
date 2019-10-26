@@ -2,7 +2,7 @@
 //
 //                   STM32F7H7_flash
 //
-//  Copyright(C) Gerard Zagema
+//  Gerard Zagema
 //
 // This script is not yet capable of flashing <2.7V. Perhaps we need an external
 // loader for that. Example of script with external loader see stm32HW_fl.script.
