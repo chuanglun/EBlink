@@ -3,14 +3,14 @@ ARM Cortex-M GDB server with device squirrel scripting  support
 
 EBlink features:
 - GDB server with flash caching, with EmBitz live variables/expression support!
-- Stand alone flashing tool
+- Stand alone flashing tool (elf, ihex and srec) 
 - Device support by squirrel scripting, flash algorithm, device reset strategy etc
 - Multiple interfaces (right now STlink)
 
 Usage: eblink \<options\>
 
     -h,           --help            Print this help
-    -g,           --nogui           No GUI message boxes
+    -g,           --nogui           No GUI message boxes (Not for Linux)
     -v,           --verbose         Specify generally verbose logging
     -D <script>,  --device <script> Select the device script <>.script
     -T <options>, --target          Select target(optional)
@@ -49,7 +49,6 @@ name: ST-link - STmicro V2 interface driver
         run          : Start image after upload
         file=<file>  : Load the file, <file>.hex  = Intel HEX format
                                       <file>.srec = Motorola srec file format
-
                                       Default     = ELF file format
 
         e.g. -F file=test.elf
