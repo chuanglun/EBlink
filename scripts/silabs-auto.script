@@ -23,7 +23,7 @@ const mem_template = @@"
  <memory type=\"ram\" start=\"0x20000000\" length=\"0x%x\"/>
  <memory type=\"ram\" start=\"0x40000000\" length=\"0x1fffffff\"/>
  <memory type=\"ram\" start=\"0xe0000000\" length=\"0x1fffffff\"/>
- <memory type=\"flash\" start=\"0x0fe00000\" length=\"0x10000\">
+ <memory type=\"flash\" start=\"0x0fe00000\" length=\"0x14000\">
    <property name=\"blocksize\">0x800</property>
  </memory>
  </memory-map>";
@@ -108,6 +108,96 @@ function main()
         devApi.target("cortex-m4,fpu");
         require("silabs/EFR32xG1.script");
         break;
+    case 40 : //  EFR32MG13P EFR32 Mighty Gecko Family Series 1 Device Config 3
+        printf("Silabs EFR32 Mighty Gecko Family Series 1 Config 3 - EFR32MG13P%d\n", partValue);
+        devApi.target("cortex-m4,fpu");
+        require("silabs/EFR32xG13.script");
+        break;
+    case 41 : //  EFR32MG13B EFR32 Mighty Gecko Family Series 1 Device Config 3
+        printf("Silabs EFR32 Mighty Gecko Family Series 1 Config 3 - EFR32MG13B%d\n", partValue);
+        devApi.target("cortex-m4,fpu");
+        require("silabs/EFR32xG13.script");
+        break;
+    case 42 : //  EFR32MG13V EFR32 Mighty Gecko Family Series 1 Device Config 3
+        printf("Silabs EFR32 Mighty Gecko Family Series 1 Config 3 - EFR32MG13V%d\n", partValue);
+        devApi.target("cortex-m4,fpu");
+        require("silabs/EFR32xG13.script");
+        break;
+    case 43 : // EFR32BG13P EFR32 Blue Gecko Family Series 1 Device Config 3
+        printf("Silabs EFR32 Blue Gecko Family Series 1 Config 3 - EFR32BG13P%d\n", partValue);
+        devApi.target("cortex-m4,fpu");
+        require("silabs/EFR32xG13.script");
+        break;
+    case 44 : //  EFR32BG13B EFR32 Blue Gecko Family Series 1 Device Config 3
+        printf("Silabs EFR32 Blue Gecko Family Series 1 Config 3 - EFR32BG13B%d\n", partValue);
+        devApi.target("cortex-m4,fpu");
+        require("silabs/EFR32xG13.script");
+        break;
+    case 45 : // EFR32BG13V EFR32 Blue Gecko Family Series 1 Device Config 3
+        printf("Silabs EFR32 Blue Gecko Family Series 1 Config 3 - EFR32BG13V%d\n", partValue);
+        devApi.target("cortex-m4,fpu");
+        require("silabs/EFR32xG13.script");
+        break;
+    case 49 : // EFR32FG13P EFR32 Flex Gecko Family Series 1 Device Config 3
+        printf("Silabs EFR32 Flex Gecko Family Series 1 Config 3 - EFR32FG13P%d\n", partValue);
+        devApi.target("cortex-m4,fpu");
+        require("silabs/EFR32xG13.script");
+        break;
+    case 50 : // EFR32FG13B EFR32 Flex Gecko Family Series 1 Device Config 3
+        printf("Silabs EFR32 Flex Gecko Family Series 1 Config 3 - EFR32FG13B%d\n", partValue);
+        devApi.target("cortex-m4,fpu");
+        require("silabs/EFR32xG13.script");
+        break;
+    case 51 : // EFR32FG13V EFR32 Flex Gecko Family Series 1 Device Config 3
+        printf("Silabs EFR32 Flex Gecko Family Series 1 Config 3 - EFR32FG13V%d\n", partValue);
+        devApi.target("cortex-m4,fpu");
+        require("silabs/EFR32xG13.script");
+        break;
+    case 52 : //  EFR32MG14P EFR32 Mighty Gecko Family Series 1 Device Config 4
+        printf("Silabs EFR32 Mighty Gecko Family Series 1 Config 4 - EFR32MG14P%d\n", partValue);
+        devApi.target("cortex-m4,fpu");
+        require("silabs/EFR32xG14.script");
+        break;
+    case 53 : //  EFR32MG14B EFR32 Mighty Gecko Family Series 1 Device Config 4
+        printf("Silabs EFR32 Mighty Gecko Family Series 1 Config 4 - EFR32MG14B%d\n", partValue);
+        devApi.target("cortex-m4,fpu");
+        require("silabs/EFR32xG14.script");
+        break;
+    case 54 : //  EFR32MG14V EFR32 Mighty Gecko Family Series 1 Device Config 4
+        printf("Silabs EFR32 Mighty Gecko Family Series 1 Config 4 - EFR32MG14V%d\n", partValue);
+        devApi.target("cortex-m4,fpu");
+        require("silabs/EFR32xG14.script");
+        break;
+    case 55 : //  EFR32BG14P EFR32 Blue Gecko Family Series 1 Device Config 4
+        printf("Silabs EFR32 Blue Gecko Family Series 1 Config 4 - EFR32BG14P%d\n", partValue);
+        devApi.target("cortex-m4,fpu");
+        require("silabs/EFR32xG14.script");
+        break;
+    case 56 : //  EFR32BG14B EFR32 Blue Gecko Family Series 1 Device Config 4
+        printf("Silabs EFR32 Blue Gecko Family Series 1 Config 4 - EFR32BG14B%d\n", partValue);
+        devApi.target("cortex-m4,fpu");
+        require("silabs/EFR32xG14.script");
+        break;
+    case 57 : //  EFR32BG14V EFR32 Blue Gecko Family Series 1 Device Config 4
+        printf("Silabs EFR32 Blue Gecko Family Series 1 Config 4 - EFR32BG14V%d\n", partValue);
+        devApi.target("cortex-m4,fpu");
+        require("silabs/EFR32xG14.script");
+        break;
+    case 61 : //  EFR32FG14P EFR32 Flex Gecko Family Series 1 Device Config 4
+        printf("Silabs EFR32 Flex Gecko Family Series 1 Config 4 - EFR32FG14P%d\n", partValue);
+        devApi.target("cortex-m4,fpu");
+        require("silabs/EFR32xG14.script");
+        break;
+    case 62 : //  EFR32FG14B EFR32 Flex Gecko Family Series 1 Device Config 4
+        printf("Silabs EFR32 Flex Gecko Family Series 1 Config 4 - EFR32FG14B%d\n", partValue);
+        devApi.target("cortex-m4,fpu");
+        require("silabs/EFR32xG14.script");
+        break;
+    case 63 : //  EFR32FG14V EFR32 Flex Gecko Family Series 1 Device Config 4
+        printf("Silabs EFR32 Flex Gecko Family Series 1 Config 4 - EFR32FG14V%d\n", partValue);
+        devApi.target("cortex-m4,fpu");
+        require("silabs/EFR32xG14.script");
+        break;
     case 71 : //  EFM32G EFM32 Gecko Device Family
         printf("Silabs Gecko - EFM32G%d\n", partValue);
         devApi.target("cortex-m3");
@@ -158,6 +248,7 @@ function main()
         devApi.target("cortex-m0+");
         break;
 
+
     default:
         printf("\nError: Unknown family ID: %d\n       Please report this ID so that we can add it.\n", famId);
         errorf("Error unsupported Silabs fam ID: %d\n", famId);
@@ -169,14 +260,13 @@ function main()
     itrfApi.value32 = (itrfApi.value32 >> 24) & 0xFF;
     local pageSize = pow(2, ((itrfApi.value32+10) & 0xFF));
 
-    // Get the MEM_INFO_FLASH
+    // Get the MEM_INFO_FLASH and MEM_INFO_RAM
     result = itrfApi.readMem32(0x0FE081F8 );
+
     flashSize = itrfApi.value32 & 0xFFFF;
     printf("Detected FLASH %d Kbyte - Page %d bytes\n", flashSize, pageSize);
 
-    // Get the MEM_INFO_RAM
-    result = itrfApi.readMem32(0x0FE081FA);
-    local ramSize = itrfApi.value32 & 0xFFFF;
+    local ramSize = (itrfApi.value32 >> 16) & 0xFFFF;
     printf("Detected RAM   %d Kbyte\n", ramSize);
 
     // Build the XML memory map and set it active.
@@ -202,11 +292,11 @@ function  reset_post(resetType)
     if( resetType < 2)
     {
         // Set the Stack pointer according the Vector table entry
-        itrfApi.readMem32(0x00000000);
+        itrfApi.readMem32(0x08000000);
         targetApi.writeReg("SP", itrfApi.value32);
 
         // Set the Program pointer according the Vector table entry
-        itrfApi.readMem32(0x00000004);
+        itrfApi.readMem32(0x08000004);
         targetApi.writeReg("PC", itrfApi.value32);
     }
     return 0;

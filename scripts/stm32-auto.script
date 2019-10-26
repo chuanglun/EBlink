@@ -17,9 +17,16 @@ function main()
 {
     local result;
 
+    // Default device ID register
     result = itrfApi.readMem32(0xE0042000);
-    if(itrfApi.value32 == 0)
+
+    //Otherwise.. try Corex M0 DBGMCU_IDCODE register address
+    if( (result >=0) && (itrfApi.value32 == 0) )
         result = itrfApi.readMem32(0x40015800);
+
+    //Otherwise.. Perhaps H7
+    if( (result >=0) && (itrfApi.value32 == 0) )
+        result = itrfApi.readMem32(0x5C001000);
 
     if(  (result < 0 ) || (itrfApi.value32 == 0) )
     {
@@ -117,13 +124,18 @@ function set_target(deviceId)
     // Cortex M4
     case 0x415 : // CHIPID_STM32_L4
     case 0x435 : // CHIPID_STM32_L43X
-        require("stm32l4x.script");
+        require("stmicro/stm32l4x.script");
         break;
 
     // Cortex M7
     case 0x449 : // CHIPID_STM32_F7
-    case 0x451 : // CHIPID_STM32_F7XXXX
+    case 0x451 : // CHIPID_STM32_F7xx
+	case 0x452 : // CHIPID_STM32_F72x
         require("stmicro/stm32f7x.script");
+        break;
+
+	case 0x450 : // CHIPID_STM32H7
+	    require("stmicro/stm32h7x.script");
         break;
 
     default:
@@ -136,3 +148,35 @@ function set_target(deviceId)
     return stm32_device(deviceId);
 }
 
+
+/////////////////////////////////////////////////////////////////////////////////
+//
+// Additional commands after reset (optional)
+//
+// resetType
+//
+// O : System reset
+// 1 : Core reset
+// 2 : Jtag reset
+// 3 : User script reset
+//
+function  reset_post(resetType)
+{
+    local targetApi = :: TargetAPI(); // Our interface to the target class
+
+    // We don't use this if the reset is an user_script type. In that
+    // case, the user is responsible to initialize the chip and we don't
+    // gonna intervene with it.
+    if( resetType < 3)
+    {
+        // Set the Stack pointer according the Vector table entry
+        itrfApi.readMem32(0x08000000);
+        targetApi.writeReg("SP", itrfApi.value32);
+
+        // Set the Program pointer according the Vector table entry
+        itrfApi.readMem32(0x08000004);
+        targetApi.writeReg("PC", itrfApi.value32);
+    }
+
+    return 0;
+}

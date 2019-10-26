@@ -1,0 +1,100 @@
+/////////////////////////////////////////////////////
+//
+//     This is a virtual device for STM32 cortex's
+//     The real device type is checked by reading
+//     the device ID and include the corresponding
+//     device script's
+//
+//  Copyright(C) Gerard Zagema
+//
+
+/////////////////////////////////////////////////////
+//
+//   Memory map template of this device(s)
+//   Avoid unnecessary spaces. (we omit the DOCTYPE, GDB isn't using it. )
+//
+const mem_template_RT1064 = @@"
+<?xml version=\"1.0\"?>
+<memory-map>
+ <!-- ITC 128K bytes (alias RAM2) -->
+ <memory type=\"ram\" start=\"0x00000000\" length=\" 0x20000\"/>
+ 
+ <!-- DTC 128K bytes (alias RAM) -->
+ <memory type=\"ram\" start=\"0x20000000\" length=\"0x20000\"/>
+ 
+ <!-- 768K bytes (alias RAM3) -->
+ <memory type=\"ram\" start=\"0x20200000\" length=\"0xc0000\"/>
+
+ <!-- BOARD ram 32M bytes (alias RAM4) -->
+ <memory type=\"ram\" start=\"0x80000000\" length=\"0x2000000\"/>  
+  
+ <!-- 4M bytes (alias Flash) -->
+ <memory type=\"flash\" start=\"0x70000000\" length=\"0x400000\">
+  <property name=\"blocksize\">0x2000</property>
+  <property name=\"secstart\">0</property>
+ </memory>
+
+
+ <!-- peripheral regs -->
+ <memory type=\"ram\" start=\"0x40000000\" length=\"0x10000000\"/>
+ <!-- AHB3 Peripherals -->
+ <memory type=\"ram\" start=\"0x60000000\" length=\"0x10000000\"/>
+ <!-- cortex regs -->
+ <memory type=\"ram\" start=\"0xe0000000\" length=\"0x1fffffff\"/>
+
+</memory-map>";
+
+
+
+
+
+itrfApi <- InterfAPI();  // Global so that all included scripts files also have access
+targetApi <- TargetAPI();
+
+/////////////////////////////////////////////////////
+//
+//
+function main()
+{
+    local devApi = ::DeviceAPI();
+    local result;
+
+    result = itrfApi.readMem32(0xE000ED00);
+	printf("CPUID: 0x%X\n", itrfApi.value32);
+	
+	devApi.memmap( mem_template_RT1064, 0x10000);
+	devApi.target("armv7e-m,fpu");
+	
+	targetApi.halt();
+	return 0;
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////
+//
+// Additional commands after reset (optional)
+//
+//  resetType :  0 = Core
+//               1 = pin
+//               2 = user script
+//
+function  reset_post(resetType)
+{
+return 0;
+    // We don't use this if the reset is an user_script type. In that
+    // case, the user is responsible to initialize the chip and we don't
+    // gonna intervene with it.
+    if( resetType < 2)
+    {
+        // Set the Stack pointer according the Vector table entry
+        itrfApi.readMem32(0x00000000);
+        targetApi.writeReg("SP", itrfApi.value32);
+
+        // Set the Program pointer according the Vector table entry
+        itrfApi.readMem32(0x00000004);
+        targetApi.writeReg("PC", itrfApi.value32);
+    }
+    return 0;
+}
+
+

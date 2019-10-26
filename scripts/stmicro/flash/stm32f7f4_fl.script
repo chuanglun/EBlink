@@ -108,7 +108,7 @@ function flash_write(sector, address, buffer)
     result = itrfApi.writeMem32(0x40023c10, (2<<8) | 0x01 ); if(result<0) return result;
 
     // Write buffer to flash space directly
-    result = itrfApi.writeMem(address, buffer); if(result<0) return result;
+    result = itrfApi.writeBuf(address, buffer); if(result<0) return result;
 
     // Wait for ready
     do{
@@ -170,8 +170,17 @@ function flash_erase_chip()
          result = itrfApi.readMem32(0x40023c0C); if(result<0) return result;
     }while ( itrfApi.value32 &  0x10000 );
 
+	// Check for error
+	result = itrfApi.readMem32(0x40023c0C);
+
     // Disable the flash engine
     flash_done();
+
+	// Evaluate the result
+	if ((itrfApi.value32 & 0xF2) || !(itrfApi.value32 & 0x01)){
+	    printf("Flash: chip erase failed!\n");
+		return -1;
+	}
 
     printf("Flash: chip erased.\n");
     return 0;

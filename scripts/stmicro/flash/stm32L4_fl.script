@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////////
 //
-//                   STM32HW_fl (Half word flash loader)
+//                   STM32L4_fl (Half word flash loader)
 //
 //  Copyright(C) Gerard Zagema
 
@@ -25,8 +25,8 @@ function flash_start()
     if( itrfApi.value32 & 0x80 )
     {
         // Write flash KEYR
-        result = itrfApi.writeMem32(0x40022004,0x45670123); if(result<0) return result;
-        result = itrfApi.writeMem32(0x40022004,0xcdef89ab); if(result<0) return result;
+        result = itrfApi.writeMem32(0x40022008,0x45670123); if(result<0) return result;
+        result = itrfApi.writeMem32(0x40022008,0xcdef89ab); if(result<0) return result;
 
 
         // Read flash CR again to check FLASH_CR_LOCK if it's unlocked
@@ -40,14 +40,14 @@ function flash_start()
 
     // Pre load the Halfword flash loader at the start of RAM and save the loader size.
     // The return value is length of bytes loaded ( >0) or error (<0)
-    dataStart = itrfApi.loadBin("scripts/stmicro/flash/stm32HW_fl.bin", 0x20000000);
+    dataStart = itrfApi.loadBin("scripts/stmicro/flash/stm32L4_fl.bin", 0x20000000);
 
     // If dataStart is <0 = Error
     if(dataStart < 0 )
     {
        // Check if we already notified the user (< -1) otherwise, do so.
        if(dataStart < -1)
-           errorf("Script error loading flash loader: " + "scripts/stmicro/flash/stm32HW_fl.bin" );
+           errorf("Script error loading flash loader: " + "scripts/stmicro/flash/stm32L4_fl.bin" );
        return -1;
     }
 
@@ -67,32 +67,26 @@ function flash_erase(sector, address)
 {
     local result;
 
-    // (1) Set the PER bit in the FLASH_CR register to enable page erasing
-    result = itrfApi.writeMem32(0x40022010, 0x02 ); if(result<0) return result;
+    // (1) Check that no Flash memory operation is ongoing by checking the BSY bit in the Flash status register (FLASH_SR).
 
-    // (2) Program the FLASH_AR register to select a page to erase
-    result = itrfApi.writeMem32(0x40022014, address ); if(result<0) return result;
 
-    // (3) Set the STRT bit (keep PER set) in the FLASH_CR register to start the erasing
-    result = itrfApi.writeMem32(0x40022010,  0x42); if(result<0) return result;
+    // (2) Check and clear all error programming flags due to a previous programming. If not, PGSERR is set.
 
-    // (4) Wait until the BSY bit is reset in the FLASH_SR register
+
+    // (3) Set the PER bit and select the page you wish to erase (PNB) with the associated bank (BKER) in the Flash control register (FLASH_CR).
+
+    x |= (n << STM32L4_FLASH_CR_PNB);
+    x |= (1lu << STM32L4_FLASH_CR_PER);
+
+    result = itrfApi.writeMem32(0x40022014, 0x02 ); if(result<0) return result;
+
+    // (4) Set the STRT bit in the FLASH_CR register.
+    result = itrfApi.writeMem32(0x40022014,  0x42); if(result<0) return result;
+
+    // (5) Wait for the BSY bit to be cleared in the FLASH_SR register
     do{
-         result = itrfApi.readMem32(0x4002200C); if(result<0) return result;
+         result = itrfApi.readMem32(0x40022010); if(result<0) return result;
     }while ( itrfApi.value32 & 0x01);
-
-    //  (5) Check the EOP flag in the FLASH_SR register
-    if( itrfApi.value32 & 0x10)
-    {
-       errorf("ERROR: Failed erasing sector %d\n", sector);
-       return -1;
-    }
-
-    // (6) Clear EOP flag by software by writing EOP at 1
-    result = itrfApi.writeMem32(0x4002200C, itrfApi.value32 | 0x10); if(result<0) return result;
-
-    // (7) Reset the PER Bit to disable the page erase
-    result = itrfApi.writeMem32(0x40022010, 0 ); if(result<0) return result;
 
     return 0;
 }
@@ -106,34 +100,61 @@ function flash_erase(sector, address)
 function flash_write(sector, address, buffer)
 {
     local targetApi = :: TargetAPI(); // Our interface to the target class
+    local count;
     local result;
 
-    // Enable the program flag PG in flash_CR
-    result = itrfApi.writeMem32(0x40022010, 0x01 ); if(result<0) return result;
 
-    // Write buffer to data ram space
-    result = itrfApi.writeBuf(dataStart, buffer); if(result<0) return result;
+    // (1) Check that no Flash main memory operation is ongoing by checking the BSY bit in the Flash status register (FLASH_SR).
 
-    buffer.byteLength /= 2; // Half words (16bits) count used by the flash loader
+    // (2) Check and clear all error programming flags due to a previous programming. If not, PGSERR is set.
 
-    // Initialize flash loader
+    // (3) Set the PG bit in the Flash control register (FLASH_CR).
+    if(itrfApi.targetVoltage() > 2.7)
+    {
+        printf("enabling 32-bit flash writes\n");
+        //write_flash_cr_psiz(sl, 2);
+    }
+    else
+    {
+        printf("Target voltage (%d V) too low for 32-bit flash, using 8-bit flash writes\n", itrfApi.targetVoltage());
+        //write_flash_cr_psiz(sl, 0);
+    }
+
+
+
+    // (4) Perform the data write operation at the desired memory address, inside main memory block or OTP area. Only double word can be programmed.
+    //      – Write a first word in an address aligned with double word
+    //      – Write the second word
+
+    //  * Write buffer to data ram space
+    result = itrfApi.writeMem(dataStart, buffer); if(result<0) return result;
+
+    count = buffer.byteLength / 8; // (64bits) count used by the flash loader
+    if (buffer.byteLength % 8)
+            count++;
+
+    // * Initialize flash loader
     result = targetApi.writeReg("R0", dataStart);   // Data address to be written
     result = targetApi.writeReg("R1", address);     // Target address in flash
-    result = targetApi.writeReg("R2", buffer.byteLength);   // Halfwords count to be written
+    result = targetApi.writeReg("R2", count);       // 64 Bits count to be written
 
-    // Run flash loader
+    // * Run flash loader
     result = targetApi.execute(0x20000000, 1); if(result<0) return result;
 
-    // Disable the program flag  PG in flash_CR
-    itrfApi.writeMem32(0x40022010, 0); if(result<0) return result;
-
-    // Check flash loader result, if $R2 is 0 then all data is written
+    // * Check flash loader result, if $R2 is 0 then all data is written
     result = targetApi.readReg("R2");
     if(targetApi.value32 != 0)
     {
        errorf("ERROR flashing sector: %d [0x%08X]", sector, address);
        return -1;
     }
+
+    // (5) Wait until the BSY bit is cleared in the FLASH_SR register.
+
+    // (6) Check that EOP flag is set in the FLASH_SR register (meaning that the programming operation has succeed), and clear it by software.
+
+    // (7) Clear the PG bit in the FLASH_SR register if there no more programming request anymore.
+    itrfApi.writeMem32(0x40022010, 0); if(result<0) return result;
 
     return 0;
 }
@@ -147,7 +168,7 @@ function flash_done()
     local result
 
     // Relock the flash by setting the FLASH_CR_LOCK in the flash CR register
-    result = itrfApi.writeMem32(0x40022010, 0x80);
+    result = itrfApi.writeMem32(0x40022014, 0x80);
     if(result<0)
         return result;
 

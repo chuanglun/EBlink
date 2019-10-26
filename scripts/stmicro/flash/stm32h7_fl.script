@@ -1,0 +1,332 @@
+/////////////////////////////////////////////////////////////////////////////////
+//
+//                   STM32F7H7_flash
+//
+//  Copyright(C) Gerard Zagema
+//
+// This script is not yet capable of flashing <2.7V. Perhaps we need an external
+// loader for that. Example of script with external loader see stm32HW_fl.script.
+//
+// Feel free to modify but don't forget to share!
+//
+
+
+// Flash loader Params :
+//  r0 = workarea start, status (out)
+//  r1 = workarea end
+//  r2 = target address
+//  r3 = count (256 bit words)
+//  r4 = flash reg base
+
+const FLASH_LOAD_SIZE = 92;
+const flashLoader = "\
+\x45\x68\x06\x68\x36\xb3\x76\x1b\x42\xbf\x76\x18\x36\x1a\x08\x3e\
+\x20\x2e\xf6\xd3\x4f\xf0\x32\x06\xe6\x60\x4f\xf0\x08\x07\xbf\xf3\
+\x4f\x8f\x55\xf8\x04\x6b\x42\xf8\x04\x6b\xbf\xf3\x4f\x8f\x26\x69\
+\x16\xf0\x04\x0f\xfb\xd1\x8d\x42\x28\xbf\x00\xf1\x08\x05\x01\x3f\
+\xED\xd1\x05\x4f\x3e\x42\x03\xd1\x45\x60\x01\x3b\xd9\xd1\x01\xe0\
+\x00\x27\x47\x60\x30\x46\x00\xbe\x00\x00\xee\x07";
+
+const flashLoader_Y = "\
+\x45\x68\x06\x68\x36\xb3\x76\x1b\x42\xbf\x76\x18\x36\x1a\x08\x3e\
+\x20\x2e\xf6\xd3\x4f\xf0\x32\x06\xe6\x60\x4f\xf0\x08\x07\xbf\xf3\
+\x4f\x8f\x55\xf8\x04\x6b\x42\xf8\x04\x6b\xbf\xf3\x4f\x8f\x8d\x42\
+\x28\xbf\x00\xf1\x08\x05\x01\x3f\xf1\xd1\x26\x69\x16\xf0\x04\x0f\
+\xfb\xd1\x05\x4f\x3e\x42\x03\xd1\x45\x60\x01\x3b\xd9\xd1\x01\xe0\
+\x00\x27\x47\x60\x30\x46\x00\xbe\x00\x00\xee\x07";
+
+const LOADER_ADDR = 0x20000000;
+const BUFFER_ADDR = 0x24000000;
+
+targetApi <- TargetAPI(); // Our interface to the target class
+
+
+/////////////////////////////////////////////////////////////////////////////////
+//
+//   Unlock the flash and preload the flash loader
+//
+function flash_start()
+{
+    local result;
+
+    // Be sure that the core is halted
+    result = targetApi.halt(); if(result<0) return result;
+
+    // Wait for halt
+    // ToDo: Timeout
+	do{
+	    targetApi.poll();
+	} while(targetApi.getState() != TARGET_HALTED )
+
+    if(itrfApi.targetVoltage() < 2.7)
+    {
+        errorf("Error: Current STM32H7x flash algorithm needs at least 2.7V\nTarget voltage is %.2f V\n", itrfApi.targetVoltage());
+        return -1;
+    }
+
+	// Load the flash loader in advance in target RAM
+	itrfApi.loadString(LOADER_ADDR, flashLoader, FLASH_LOAD_SIZE);
+
+    return 0;
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////
+//
+//   Sector erase sequence according ST user manual
+//
+function flash_erase(sector, address)
+{
+    local result;
+    local regbase = 0x52002000; // first flash bank
+
+    // Select the right bank
+	if (address >= 0x08100000) {
+		regbase = 0x52002100; // Second flash bank
+		sector = sector-8;
+	}
+
+	// 1)  Check and clear (optional) all the error flags due to previous programming/erase
+    result = itrfApi.readMem32(regbase + 0x10); if(result<0) return result;
+    if(itrfApi.value32 & 0x07EE0000 )
+    {
+        errorf("Flash erase begin error 0x%x", itrfApi.value32 & 0x07EE0000);
+        return -1;
+    }
+
+	// 2) Unlock the flash bank
+    result = flash_unlock(regbase);
+    if( result < 0)
+        return result;
+
+    // Not sure: We come out of reset with HSI 64 MHz. Adapt FLASH_ACR.
+    //result = itrfApi.writeMem32(regbase, 0); if(result<0) return result;
+
+    // (3) Set the SER bit and select the sector out of the 8 in the main memory block) you wish to erase (SNB) in the FLASH_CR register
+    result = itrfApi.writeMem32(regbase + 0x0C, (sector<<8) | 0x4 | 0x2 ); if(result<0) return result;
+
+    // (4) Set the STRT bit in the FLASH_CR register also
+    result = itrfApi.writeMem32(regbase + 0x0C, (sector<<8) | 0x84 | 0x2 ); if(result<0) return result;
+
+    // (5) Wait for the QW1/2 bit and BSY1/2 to be cleared in the corresponding FLASH_SR1/2 register
+    do{
+         result = itrfApi.readMem32(regbase + 0x10); if(result<0) return result;
+    }while ( itrfApi.value32 &  0x05 );
+
+
+    // Check for errors
+    if(itrfApi.value32 & 0x07EE0000 )
+    {
+        errorf("Flash erase end error 0x%x", itrfApi.value32 & 0x07EE0000);
+        return -1;
+    }
+
+	// Lock the flash again
+	flash_lock(regbase);
+
+    return 0;
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////
+//
+//
+function flash_write(sector, address, buffer)
+{
+    local regbase = 0x52002000; // first flash bank
+	local wPtr = BUFFER_ADDR+8;
+	local idx = 0;
+    local result;
+    local wLen = (16*1024); // How many bytes we write before we update the cir pointer of the flash loader
+
+
+    // Select the right bank
+	if (address >= 0x08100000) {
+		regbase = 0x52002100; // Second flash bank
+	}
+
+
+	// Flash loader works with multiple of 32 bytes.
+	if(buffer.byteLength & 31)
+        buffer.byteLength = buffer.byteLength + (32 - (buffer.byteLength & 31));
+
+    // Unlock flash
+	flash_unlock(regbase);
+
+    // Enable  the 32bits parallelism
+    result = itrfApi.writeMem32(regbase+0x0C, (2<<4) ); if(result<0) return result;
+
+	// Enable the program flag PG in flash_CR
+	result = itrfApi.writeMem32(regbase+0x0C, (2<<4) | (1<<1) ); if(result<0) return result;
+
+	// Setup the flash loader parameters
+	targetApi.writeReg("R0", BUFFER_ADDR);
+	targetApi.writeReg("R1", wPtr + buffer.byteLength);
+	targetApi.writeReg("R2", address);
+	targetApi.writeReg("R3", buffer.byteLength/32);
+	targetApi.writeReg("R4", regbase);
+
+	// Initialize the buffer read pointer
+	result = itrfApi.writeMem32(BUFFER_ADDR+4, wPtr);
+
+	// Initialize the buffer Write pointer
+	result = itrfApi.writeMem32(BUFFER_ADDR, wPtr);
+
+    // Start the flash loader, it will poll the write pointer for any data
+	result = targetApi.execute(LOADER_ADDR, false);
+
+    // Write the program data into the scratch area of the RAM
+    while(idx < buffer.byteLength)
+    {
+        if( wLen > (buffer.byteLength - idx ) )
+          wLen = buffer.byteLength -idx;
+
+        // Write at address 'wPtr' from buffer 'buffer' the data from offset 'idx' with
+        // a length of 'wLen' bytes.
+        itrfApi.writeMem(wPtr, buffer, idx, wLen);
+
+        idx  += wLen;
+        wPtr += wLen;
+
+        // Set the write pointer for the flash loader scratch area, the flash loader
+        // will poll this pointer to check if it can continue
+        result = itrfApi.writeMem32(BUFFER_ADDR, wPtr);
+    }
+
+    // Wait for ready
+    // ToDo: Timeout
+	do{
+	    targetApi.poll();
+	} while(targetApi.getState() != TARGET_HALTED )
+
+
+    // Check and clear (optional) all the error flags due to previous programming/erase
+    result = itrfApi.readMem32(regbase + 0x10); if(result<0) return result;
+    if(itrfApi.value32 & 0x07EE0000 )
+    {
+        errorf("Flash write error 0x%x", itrfApi.value32 & 0x07EE0000);
+        return -1;
+    }
+
+    // Disable the program flag  PG in flash_CR
+    itrfApi.writeMem32(regbase+ 0x0C, 0); if(result<0) return result;
+
+	// Lock the flash again
+	flash_lock(regbase);
+
+    return 0;
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+//
+//
+//
+function flash_done()
+{
+    return 0;
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////
+//
+//   Erase the whole chip
+//   - If this function is not defined, sector by sector erase is used.
+//   - This is an isolated function, flash_start and flash_done are not called by EB-link
+//
+function flash_erase_chip()
+{
+    local result;
+
+    // first flash bank
+    result = erase_bank(0x52002000);
+    if(result<0)
+        return result;
+
+    // second flash bank
+    // - ToDo: check if we have this
+    result = erase_bank(0x52002100);
+    if(result<0)
+        return result;
+
+    printf("Flash: chip erased.\n");
+    return 0;
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+//
+//   Erase a bank
+//
+function erase_bank(regbase)
+{
+    // 1)  Check and clear (optional) all the error flags due to previous programming/erase
+    result = itrfApi.readMem32(regbase + 0x10); if(result<0) return result;
+    if(itrfApi.value32 & 0x07EE0000 )
+    {
+        errorf("Flash error 0x%x", itrfApi.value32 & 0x07EE0000);
+        return -1;
+    }
+
+    // 2) Unlock the FLASH_CR1/2 register
+    flash_unlock(regbase);
+
+    // 3) Set the BER1/2 and START1/2 in the FLASH_CR1/2 register
+    result = itrfApi.writeMem32(regbase + 0x04, 0x88); if(result<0) return result;
+
+    // 4)  wait until the QW1/2 bit is cleared in the corresponding FLASH_SR1/2 register
+    do{
+         result = itrfApi.readMem32(regbase + 0x10); if(result<0) return result;
+    }while ( itrfApi.value32 &  0x05 );
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+//
+//   Unlock the flash
+//
+function flash_unlock(regbase)
+{
+    local result;
+
+    // Wait for flash not busy
+    do{
+         result = itrfApi.readMem32(regbase + 0x10); if(result<0) return result;
+    }while ( itrfApi.value32 &  0x01 );
+
+    // Read flash lock status in FLASH_CR
+    result = itrfApi.readMem32(regbase + 0x0C); if(result<0) return result;
+
+    // Check if it's locked by the FLASH_CR_LOCK flag
+    if( itrfApi.value32 & 0x01 )
+    {
+        // Write flash KEYR
+        result = itrfApi.writeMem32(regbase + 0x04, 0x45670123); if(result<0) return result;
+        result = itrfApi.writeMem32(regbase + 0x04, 0xcdef89ab); if(result<0) return result;
+
+
+        // Read flash CR again to check FLASH_CR_LOCK if it's unlocked
+        result = itrfApi.readMem32(regbase + 0x0C); if(result<0) return result;
+        if( itrfApi.value32 & 0x01 )
+        {
+            errorf("Error: can't unlock flash!\n");
+            return -1;
+        }
+    }
+
+    return 0;
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+//
+//   Lock the flash
+//
+function flash_lock(regbase)
+{
+    local result;
+
+    result = itrfApi.writeMem32(regbase + 0x0C, 0x01);
+    if(result<0)
+        return result;
+    return 0;
+}
+
+
+
