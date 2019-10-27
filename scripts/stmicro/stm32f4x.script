@@ -149,7 +149,6 @@ function stm32_device(deviceId)
 
         case 0x419 : // CHIPID_STM32_F4_HD
             ram_size = 0x30000;
-            page_size = 0x4000;
             devApi.memmap(mem_template_F4_HD);
             break;
 

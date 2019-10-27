@@ -12,6 +12,7 @@ itrfApi <- InterfAPI();  // Global so that all included scripts files also have 
 
 /////////////////////////////////////////////////////
 //
+//  EBlink called Entry point 
 //
 function main()
 {
@@ -39,6 +40,7 @@ function main()
 
 /////////////////////////////////////////////////////
 //
+// 
 //
 function set_target(deviceId)
 {
@@ -151,7 +153,7 @@ function set_target(deviceId)
 
 /////////////////////////////////////////////////////////////////////////////////
 //
-// Additional commands after reset (optional)
+// Additional commands after reset (optional) called by EBlink
 //
 // resetType
 //
