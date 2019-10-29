@@ -30,11 +30,11 @@ name: CMSIS-DAP - ARM debug protocol driver
         <not yet implemented>
 
 
-name: ST-link - STmicro V2 interface driver 
+name: ST-link - STmicro V2/V3 interface driver 
      Usage -I ST-link[,options]
 
         rconnect     : Connect under reset
-        speed=nnn    : Interface speed
+        speed=nnn    : Interface speed  (default jtag=8000KHz, SWD= 4000KHz)
         swd          : use SWD (default)
         jtag         : use Jtag
         device=<usb_bus>:<usb_addr> : Select probe explicit
