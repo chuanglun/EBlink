@@ -1,7 +1,15 @@
 # EBlink
 ARM Cortex-M GDB server with device squirrel scripting  support
 
+NEW (29-10-2019)
+- STlink V3 support 
+
+ISSUES
+- If flash is empty and program is flashed and reset, an exception is detected 
+  and an UNWIND is happening. Just ignore!
+
 EBlink features:
+- Integrated UNWIND in case of exception with message box popup in windows.
 - GDB server with flash caching, with EmBitz live variables/expression support!
 - Stand alone flashing tool (elf, ihex and srec) 
 - Device support by squirrel scripting, flash algorithm, device reset strategy etc
