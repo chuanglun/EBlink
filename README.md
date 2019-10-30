@@ -2,7 +2,8 @@
 ARM Cortex-M GDB server with device squirrel scripting  support
 
 NEW (29-10-2019)
-- STlink V3 support 
+- STlink V3 support
+- Linux_x64 build 
 
 ISSUES
 - If flash is empty and program is flashed and reset, an exception is detected 
