@@ -75,7 +75,7 @@ name: ST-link - STmicro V2/V3 interface driver
      Usage -G [options]
 
         S            : Shutdown after disconnect
-        nc           : Don't use EB-link flash cache
+        nc           : Don't use EBlink flash cache
         port=ppp     : Select different TCP port, default 4242
         address=x.x.x.x : Select different listen address, default 0.0.0.0
 
