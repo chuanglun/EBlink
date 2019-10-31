@@ -12,6 +12,8 @@ ISSUES
   and an UNWIND is happening. Just ignore!
 - Non STmicro devices (e.g. Silabs, NXP) are only working with STlink-V2.
   
+![Silabs with STlink-V2](https://www.sysdes.nl/github/SilabsStlinkV2.png)   
+  
 EBlink features:
 - Integrated UNWIND in case of exception with message box popup in windows.
 - GDB server with flash caching, with EmBitz live variables/expression support!
