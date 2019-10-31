@@ -1,4 +1,6 @@
-# Cortex-M GDB server and flash tool (Win32, Linux_x64)
+# Cortex-M GDB server, flash tool (Win32, Linux_x64)
+## STlink V2 & V3 support (CMSIS-DAP on his way)
+
 EBlink ARM Cortex-M debug tool with squirrel scripting device support
 
 NEW (29-10-2019)
@@ -12,14 +14,14 @@ ISSUES
 EBlink features:
 - Integrated UNWIND in case of exception with message box popup in windows.
 - GDB server with flash caching, with EmBitz live variables/expression support!
-- Stand alone flashing tool (elf, ihex and srec) 
+- Stand alone command line flashing tool (elf, ihex and srec) 
 - Device support by squirrel scripting, flash algorithm, device reset strategy etc
-- Multiple interfaces (right now STlink)
+- Ready for multiple interfaces
 
 Usage: eblink \<options\>
 
     -h,           --help            Print this help
-    -g,           --nogui           No GUI message boxes (Not for Linux)
+    -g,           --nogui           No GUI message boxes (Windows only)
     -v,           --verbose         Specify generally verbose logging
     -D <script>,  --device <script> Select the device script <>.script
     -T <options>, --target          Select target(optional)
