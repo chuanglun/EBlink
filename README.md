@@ -1,4 +1,4 @@
-#Cortex-M GDB server and flash tool (Win32, Linux_x64)
+# Cortex-M GDB server and flash tool (Win32, Linux_x64)
 EBlink ARM Cortex-M debug tool with squirrel scripting device support
 
 NEW (29-10-2019)
