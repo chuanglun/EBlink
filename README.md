@@ -10,7 +10,8 @@ NEW (29-10-2019)
 ISSUES
 - If flash is empty and program is flashed and reset, an exception is detected 
   and an UNWIND is happening. Just ignore!
-
+- Non STmicro devices (e.g. Silabs, NXP) are only working with STlink-V2.
+  
 EBlink features:
 - Integrated UNWIND in case of exception with message box popup in windows.
 - GDB server with flash caching, with EmBitz live variables/expression support!
