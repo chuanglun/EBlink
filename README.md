@@ -13,7 +13,7 @@ ISSUES
 - Non STmicro devices (e.g. Silabs, NXP) are only working with STlink-V2.
   
 
-![Silabs with STlink-V2](https://www.sysdes.nl/github/SilabsStlinkV2_2.png)  
+![Silabs with STlink-V2](https://www.sysdes.nl/github/SilabsStlinkV2_3.png)  
 
   
 EBlink features:
