@@ -126,7 +126,6 @@ function stm32_device(deviceId)
     devApi.memmap( format(mem_template_H7, flash_1bank, string_2MB));
 
     printf("Detected FLASH size: 0x%X\nConfigured RAM size: 0x%X\n", flash_size, ram_size);
-    devApi.target("cortex-m7,fpu");
 
     devApi.setFlashSectorTrim(true);
     //devApi.setFlashEraseValue(0xFF);

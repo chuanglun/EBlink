@@ -84,7 +84,7 @@ function stm32_device(deviceId)
 		result = itrfApi.readMem32(0x1FF07A22);
 	else
 		result = itrfApi.readMem32(0x1ff0f442);
-		
+
     flash_size = itrfApi.value32 >>16;
     flash_size = (flash_size & 0xffff) * 1024;
 
@@ -102,17 +102,16 @@ function stm32_device(deviceId)
     case 0x451 : // CHIPID_STM32_F7xx
             ram_size = 0x80000;
             break;
-			
-	case 0x452 : // CHIPID_STM32_F72x		
+
+	case 0x452 : // CHIPID_STM32_F72x
             ram_size = 0x80000;
-            break;	
+            break;
 
     }
 
     devApi.memmap( format(mem_template_F7, ram_size, string_2MB));
 
     printf("Detected FLASH size: 0x%X\nConfigured RAM size: 0x%X\n", flash_size, ram_size);
-    devApi.target("cortex-m7,fpu");
 
     require("stmicro/flash/stm32f7f4_fl.script");
 

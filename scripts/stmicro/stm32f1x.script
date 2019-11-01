@@ -58,7 +58,7 @@ function stm32_device(deviceId)
             ram_size = 0x5000;
             break;
 
-        case 0x412 : // CHIPID_STM32_F1_LOW		
+        case 0x412 : // CHIPID_STM32_F1_LOW
             page_size = 0x400;
             ram_size = 0x2800;
             break;
@@ -97,7 +97,6 @@ function stm32_device(deviceId)
 
     printf("Detected FLASH size: 0x%X\nConfigured RAM size: 0x%X\n", flash_size, ram_size);
 
-    devApi.target("cortex-m3");
     devApi.memmap( format( mem_template,  flash_size,
                                           ram_size,
                                           flash_size,

@@ -59,9 +59,6 @@ function stm32_device(deviceId)
     result = itrfApi.readMem32(0x1fff75e0)
     flash_size = (itrfApi.value32 &0xFFFF) *1024;
 
-    // Set the target and options
-    devApi.target("cortex-m4,fpu");
-
     // Set the memory map according the device ID
       switch(deviceId) {
         case 0x415 : // CHIPID_STM32_L4

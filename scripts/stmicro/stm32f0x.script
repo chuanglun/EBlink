@@ -77,7 +77,6 @@ function stm32_device(deviceId)
 
     printf("Detected FLASH size: 0x%X\nConfigured RAM size: 0x%X\n", flash_size, ram_size);
 
-    devApi.target("cortex-m0");
     devApi.memmap( format( mem_template,  flash_size,
                                           ram_size,
                                           flash_size,
