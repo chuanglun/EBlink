@@ -81,7 +81,7 @@ name: ST-link - STmicro V2/V3 interface driver
 
         S            : Shutdown after disconnect
         nc           : Don't use EBlink flash cache
-        port=ppp     : Select different TCP port, default 4242
+        port=ppp     : Select different TCP port, default 2331
         address=x.x.x.x : Select different listen address, default 0.0.0.0
 
         e.g.  -G S,nc
