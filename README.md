@@ -12,11 +12,9 @@ ISSUES
   and an UNWIND is happening. Just ignore!
 - Non STmicro devices (e.g. Silabs, NXP) are only working with STlink-V2.
   
-<<<<<<< HEAD
+
 ![Silabs with STlink-V2](https://www.sysdes.nl/github/SilabsStlinkV2.png)  
-=======
-![Silabs with STlink-V2](https://www.sysdes.nl/github/SilabsStlinkV2.png)   
->>>>>>> remotes/origin/master
+
   
 EBlink features:
 - Integrated UNWIND in case of exception with message box popup in windows.
