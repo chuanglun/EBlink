@@ -2,8 +2,6 @@
 //
 //                   STM32F7F4_flash (stm32F7xx and stm32F4xxx )
 //
-//  Gerard Zagema
-//
 //
 // This script doesn't use an external flash loader but is writing directly
 // to the target. Speed doesn't differ much but it is easier.

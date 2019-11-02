@@ -3,8 +3,6 @@
 //     The EFM32GGx flashing scripts according
 //     Silabs reference manual
 //
-//  Gerard Zagema
-//
 
 /*
     The offset register address is relative to the registers base address (0x400C0000).

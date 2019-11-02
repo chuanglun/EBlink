@@ -5,8 +5,6 @@
 //     the device ID and include the corresponding
 //     device script's
 //
-//  Gerard Zagema
-//
 
 itrfApi <- InterfAPI();  // Global so that all included scripts files also have access
 
@@ -135,18 +133,20 @@ function set_target(deviceId)
 	case 0x452 : // CHIPID_STM32_F72x
         require("stmicro/stm32f7x.script");
         break;
-
+		
+    // Cortex M7
 	case 0x450 : // CHIPID_STM32H7
 	    require("stmicro/stm32h7x.script");
         break;
 
+	// ---------- Not supported ChipId yet -----------	
     default:
         printf("\nError: Unknown device ID\n       Please report this ID so that we can add it.\n");
         errorf("Error unsupported STM32 ID: 0x%X\n", deviceId);
         return -1;	// We have already throw an error so use -1.
     }
 
-    // Call the script we just loaded
+    // Call our generic entry point of the script we just loaded
     return stm32_device(deviceId);
 }
 

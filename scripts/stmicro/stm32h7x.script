@@ -2,12 +2,13 @@
 //
 //                   STM32H7x
 //
-//  Gerard Zagema
 
 /////////////////////////////////////////////////////
 //
 //   Memory map template of this device(s)
 //   Avoid unnecessary spaces. (we omit the DOCTYPE, GDB isn't using it. )
+//
+//   We use @@ to denote that it is a multi-line format string and not verbatim.
 //
 const mem_template_H7 = @@"
 <?xml version=\"1.0\"?> <memory-map>
@@ -61,7 +62,7 @@ const mem_template_H7 = @@"
 </memory-map>";
 
 
-// The second 1MB bank if available, is put into the place holder above
+// The second 1MB bank if available which is put into the place holder above
 const mem_template_2MB = @@"
     <!-- Sectors 8..16 128kB each -->
     <memory type=\"flash\" start=\"0x08100000\" length=\"0x100000\">
@@ -123,15 +124,15 @@ function stm32_device(deviceId)
 
     }
 
+    // Generate XML and put it in EBlink's device object
     devApi.memmap( format(mem_template_H7, flash_1bank, string_2MB));
 
+    // Inform the user
     printf("Detected FLASH size: 0x%X\nConfigured RAM size: 0x%X\n", flash_size, ram_size);
-
-    devApi.setFlashSectorTrim(true);
-    //devApi.setFlashEraseValue(0xFF);
 
     require("stmicro/flash/stm32h7_fl.script");
 
+    // No errors
     return 0;
 }
 
