@@ -6,7 +6,7 @@
 //     device script's
 //
 
-itrfApi <- InterfAPI();  // Global so that all included scripts files also have access
+itrfApi <- InterfAPI();  // Global so that all included script files also have access
 
 /////////////////////////////////////////////////////
 //
@@ -166,9 +166,9 @@ function  reset_post(resetType)
 {
     local targetApi = :: TargetAPI(); // Our interface to the target class
 
-    // We don't use this if the reset is an user_script type. In that
-    // case, the user is responsible to initialize the chip and we don't
-    // gonna intervene with it.
+    // We don't use this if the reset is a user_script type. In that
+    // case, the user is responsible for the initialization.
+	//
     if( resetType < 3)
     {
         // Set the Stack pointer according the Vector table entry
