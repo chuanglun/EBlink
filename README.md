@@ -8,7 +8,7 @@ NEW (29-10-2019)
 - Linux_x64 build 
 
 ISSUES
-- If flash is empty and program is flashed and reset, an exception is detected 
+- If flash is empty and program is flashed and reset, a traget exception is detected 
   and an UNWIND is happening. Just ignore!
 - Non STmicro devices (e.g. Silabs, NXP) are only working with STlink-V2.
   
@@ -17,7 +17,7 @@ ISSUES
 
   
 EBlink features:
-- Integrated UNWIND in case of exception with message box popup in windows.
+- Integrated target stack frame UNWIND in case of exception with message box popup in windows.
 - GDB server with flash caching, with EmBitz live variables/expression support!
 - Stand alone command line flashing tool (elf, ihex and srec) 
 - Device support by squirrel scripting, flash algorithm, device reset strategy etc
