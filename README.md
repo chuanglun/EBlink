@@ -13,7 +13,7 @@ ISSUES
 - Non STmicro devices (e.g. Silabs, NXP) are only working with STlink-V2.
   
 
-![Silabs with STlink-V2](https://www.sysdes.nl/github/SilabsStlinkV2_3.png)  
+![Silabs with STlink-V2](https://www.sysdes.nl/github/SilabsStlinkV2_4.png)  
 
   
 EBlink features:
@@ -50,7 +50,7 @@ name: STlink - STmicro V2/V3 interface driver
      Usage -I stlink[,options]
 
         rconnect     : Connect under reset
-        speed=nnn    : Interface speed  (default jtag=8000KHz, SWD= 4000KHz)
+        speed=nnn    : Interface speed  (default is MAX possible)
         swd          : use SWD (default)
         jtag         : use Jtag
         device=<usb_bus>:<usb_addr> : Select probe explicit
