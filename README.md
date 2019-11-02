@@ -46,8 +46,8 @@ name: CMSIS-DAP - ARM debug protocol driver
         <not yet implemented>
 
 
-name: ST-link - STmicro V2/V3 interface driver 
-     Usage -I ST-link[,options]
+name: STlink - STmicro V2/V3 interface driver 
+     Usage -I stlink[,options]
 
         rconnect     : Connect under reset
         speed=nnn    : Interface speed  (default jtag=8000KHz, SWD= 4000KHz)
@@ -55,7 +55,7 @@ name: ST-link - STmicro V2/V3 interface driver
         jtag         : use Jtag
         device=<usb_bus>:<usb_addr> : Select probe explicit
 
-        e.g.  -I ST-link,rconnect,speed=3000
+        e.g.  -I stlink,rconnect,speed=3000
 
 ==== Flash loader
      Usage -F [options]
@@ -89,10 +89,10 @@ name: ST-link - STmicro V2/V3 interface driver
 Examples:
 
         Connect STmicro device with STlink on GDB server
-        => eblink -I st-link -D stm32-auto -G
+        => eblink -I stlink -D stm32-auto -G
 
         Connect silabs device with STlink on bus 2:4 and launch the GDB server on port 4243:
-        => eblink -I st-link,device=2:4 -D silabs-auto -G port=4243
+        => eblink -I stlink,device=2:4 -D silabs-auto -G port=4243
 
         Flash STmicro device with STlink and run
-        => eblink -I st-link -D stm32-auto -F verify,run,file=release.elf,        
+        => eblink -I stlink -D stm32-auto -F verify,run,file=release.elf,        
