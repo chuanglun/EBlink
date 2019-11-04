@@ -208,9 +208,9 @@ function main()
         break;
 
 
-    default:
-        printf("\nError: Unknown family ID: %d\n       Please report this ID so that we can add it.\n", famId);
-        errorf("Error unsupported Silabs fam ID: %d\n", famId);
+    default:        
+		printf("\n\nPlease report this ID so that we can add it.\n");
+        errorf("Error unsupported Silabs fam ID: %d\n", famId);		
         return -1;	// We have already throw an error so use -1.
     }
 

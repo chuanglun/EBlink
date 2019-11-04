@@ -141,7 +141,7 @@ function set_target(deviceId)
 
 	// ---------- Not supported ChipId yet -----------	
     default:
-        printf("\nError: Unknown device ID\n       Please report this ID so that we can add it.\n");
+        printf("\n\nPlease report this ID so that we can add it.\n");
         errorf("Error unsupported STM32 ID: 0x%X\n", deviceId);
         return -1;	// We have already throw an error so use -1.
     }

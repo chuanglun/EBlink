@@ -74,7 +74,7 @@ function flash_start()
 /////////////////////////////////////////////////////////////////////////////////
 //
 //   The sector erase is called by EBlink if a sector need to be changed
-//   Sector erase sequence according ST user manual 
+//   Sector erase sequence according ST user manual
 //
 function flash_erase(sector, address)
 {
@@ -91,8 +91,8 @@ function flash_erase(sector, address)
     result = itrfApi.readMem32(regbase + 0x10); if(result<0) return result;
     if(itrfApi.value32 & 0x07EE0000 )
     {
-        errorf("Flash erase begin error 0x%x", itrfApi.value32 & 0x07EE0000);
-        return -1; 
+        errorf("Flash erase begin error 0x%x\n", itrfApi.value32 & 0x07EE0000);
+        return -1;
     }
 
 	// 2) Unlock the flash bank
@@ -118,7 +118,7 @@ function flash_erase(sector, address)
     // Check for errors
     if(itrfApi.value32 & 0x07EE0000 )
     {
-        errorf("Flash erase end error 0x%x", itrfApi.value32 & 0x07EE0000);
+        errorf("Flash erase end error 0x%x\n", itrfApi.value32 & 0x07EE0000);
         return -1;
     }
 
@@ -221,7 +221,7 @@ function flash_write(sector, address, buffer)
 
 /////////////////////////////////////////////////////////////////////////////////
 //
-//  Called by EBlink if flashing is done 
+//  Called by EBlink if flashing is done
 //
 function flash_done()
 {
