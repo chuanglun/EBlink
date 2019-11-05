@@ -229,8 +229,7 @@ function main()
     printf("Detected RAM   %d Kbyte\n", ramSize);
 
     // Build the XML memory map and set it active.
-    devApi.memmap( format( mem_template,  flashSize*1024, pageSize,
-                           ramSize*1024 ));
+    devApi.memmap( format( mem_template,  flashSize*1024, pageSize, ramSize*1024 ));
     return 0;
 }
 
