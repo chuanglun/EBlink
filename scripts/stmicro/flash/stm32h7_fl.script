@@ -51,6 +51,8 @@ function flash_start()
     // Be sure that the core is halted
     result = targetApi.halt(); if(result<0) return result;
 
+	targetApi.reset(0);
+	
     // Wait for halt
     // ToDo: Timeout
 	do{
@@ -238,50 +240,63 @@ function flash_done()
 //   - If this function is not defined, sector by sector erase is used.
 //   - This is an isolated function, flash_start and flash_done are not called by EB-link
 //
+// ToDo: Check if we have a second flash bank
 function flash_erase_chip()
 {
     local result;
+	
+	printf("Flash: Start chip erase ");
+	
+	// 1. Check and clear (optional) all the error flags due to previous programming/erase 
+	result = itrfApi.readMem32(0x52002000 + 0x10); if(result<0) return result;
+    if(itrfApi.value32 & 0x07EE0000 )
+    {
+        errorf("Flash error bank1 0x%x", itrfApi.value32 & 0x07EE0000);
+        return -1;
+    }
+	
+	result = itrfApi.readMem32(0x52002100 + 0x10); if(result<0) return result;
+    if(itrfApi.value32 & 0x07EE0000 )
+    {
+        errorf("Flash error bank2 0x%x", itrfApi.value32 & 0x07EE0000);
+        return -1;
+    }	
 
-    // first flash bank
-    result = erase_bank(0x52002000);
-    if(result<0)
-        return result;
-
-    // second flash bank
-    // - ToDo: check if we have this
-    result = erase_bank(0x52002100);
-    if(result<0)
-        return result;
-
-    printf("Flash: chip erased.\n");
+	// 2. Unlock the two FLASH_CR1/2 registers and FLASH_OPTCR register
+	flash_unlock(0x52002000);
+	flash_unlock(0x52002100);
+	
+	//  3. Set the MER bit to 1 in FLASH_OPTCR register. It automatically sets BER1, BER2,
+    //     START1 and START2 to 1, thus launching a bank erase operation on both banks. 
+	result = itrfApi.writeMem32(0x52002000 + 0x18, 0x10 ); if(result<0) return result;
+	
+	 //(Not sure !!)
+	//result = itrfApi.writeMem32(0x52002100 + 0x18, 0x10 ); if(result<0) return result;
+	
+	// Then wait until both QW1 and QW2 bits are cleared in the corresponding FLASH_SR1/2
+    // register.
+	
+	// ... bank 1 
+    do{
+         result = itrfApi.readMem32(0x52002000 + 0x10); if(result<0) return result;
+		 CursorAnimate();
+    }while ( itrfApi.value32 &  0x05 );	
+	
+	// .... and bank 2
+    do{
+         result = itrfApi.readMem32(0x52002100 + 0x10); if(result<0) return result;
+		 CursorAnimate();
+    }while ( itrfApi.value32 &  0x05 )	
+	
+	
+	// Lock the flash banks again
+	flash_lock(0x52002000);
+	flash_lock(0x52002100);
+	
+    printf("done\n");
     return 0;
 }
 
-/////////////////////////////////////////////////////////////////////////////////
-//
-//   Erase a bank (internal script helper function for erase chip)
-//
-function erase_bank(regbase)
-{
-    // 1)  Check and clear (optional) all the error flags due to previous programming/erase
-    result = itrfApi.readMem32(regbase + 0x10); if(result<0) return result;
-    if(itrfApi.value32 & 0x07EE0000 )
-    {
-        errorf("Flash error 0x%x", itrfApi.value32 & 0x07EE0000);
-        return -1;
-    }
-
-    // 2) Unlock the FLASH_CR1/2 register
-    flash_unlock(regbase);
-
-    // 3) Set the BER1/2 and START1/2 in the FLASH_CR1/2 register
-    result = itrfApi.writeMem32(regbase + 0x04, 0x88); if(result<0) return result;
-
-    // 4)  wait until the QW1/2 bit is cleared in the corresponding FLASH_SR1/2 register
-    do{
-         result = itrfApi.readMem32(regbase + 0x10); if(result<0) return result;
-    }while ( itrfApi.value32 &  0x05 );
-}
 
 /////////////////////////////////////////////////////////////////////////////////
 //
