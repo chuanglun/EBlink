@@ -1,1 +1,1 @@
-eblink.exe -I stlink,speed=24000 -D stm32-auto -G
+eblink.exe -I stlink -D stm32-auto -G
