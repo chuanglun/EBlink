@@ -19,7 +19,7 @@ ISSUES
 EBlink features:
 - Integrated target stack frame UNWIND in case of exception with message box popup in windows.
 - GDB server with flash caching, with EmBitz live variables/expression support!
-- Supports Hotplug for Embitz 2.0 (monitor command "IsRunning" for target state query)
+- Supports Hotplug for Embitz 1.1 [see issue](https://github.com/EmBitz/EBlink/issues/3#issue-518281157) and 2.0 (monitor command "IsRunning" for target state query)
 - Stand alone command line flashing tool (elf, ihex and srec) 
 - All device related functions by squirrel scripting e.g. flash algorithm, device reset strategy etc etc
 - Ready for multiple interfaces
