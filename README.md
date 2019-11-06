@@ -29,7 +29,7 @@ eblink - usage:
 	EBlink <options>
 
 	-h,           --help			Print this help
-	-g,           --nogui			No GUI message boxes
+	-g,           --nogui			No GUI message boxes (win32 only)
 	-v <level>,   --verbose <0..7>		Specify generally verbose logging
 	-D <script>,  --device <script>		Select the device script <>.script
 	-T <options>, --target			Select target(optional) default cortex-m
