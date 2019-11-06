@@ -28,13 +28,13 @@ eblink - usage:
 
 	EBlink <options>
 
-	-h,           --help				Print this help
-	-g,           --nogui				No GUI message boxes
-	-v <level>,   --verbose <0..7>	Specify generally verbose logging
-	-D <script>,  --device <script>	Select the device script <>.script
+	-h,           --help			Print this help
+	-g,           --nogui			No GUI message boxes
+	-v <level>,   --verbose <0..7>		Specify generally verbose logging
+	-D <script>,  --device <script>		Select the device script <>.script
 	-T <options>, --target			Select target(optional) default cortex-m
 	-I <options>, --interf			Select interface
-	-F <options>, --flash <options>	tRun image flashing
+	-F <options>, --flash <options>		Run image flashing
 	-G [options], --gdb <options>		Launch GDB server
 	
 	--device and --interf are mandatory, normally combined with --flash or/and --gdb
