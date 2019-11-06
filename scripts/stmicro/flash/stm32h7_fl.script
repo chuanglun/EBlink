@@ -25,14 +25,6 @@ const flashLoader = "\
 \xED\xd1\x05\x4f\x3e\x42\x03\xd1\x45\x60\x01\x3b\xd9\xd1\x01\xe0\
 \x00\x27\x47\x60\x30\x46\x00\xbe\x00\x00\xee\x07";
 
-// The older Y verion flash loader
-const flashLoader_Y = "\
-\x45\x68\x06\x68\x36\xb3\x76\x1b\x42\xbf\x76\x18\x36\x1a\x08\x3e\
-\x20\x2e\xf6\xd3\x4f\xf0\x32\x06\xe6\x60\x4f\xf0\x08\x07\xbf\xf3\
-\x4f\x8f\x55\xf8\x04\x6b\x42\xf8\x04\x6b\xbf\xf3\x4f\x8f\x8d\x42\
-\x28\xbf\x00\xf1\x08\x05\x01\x3f\xf1\xd1\x26\x69\x16\xf0\x04\x0f\
-\xfb\xd1\x05\x4f\x3e\x42\x03\xd1\x45\x60\x01\x3b\xd9\xd1\x01\xe0\
-\x00\x27\x47\x60\x30\x46\x00\xbe\x00\x00\xee\x07";
 
 const LOADER_ADDR = 0x20000000;
 const BUFFER_ADDR = 0x24000000;
@@ -90,8 +82,7 @@ function flash_erase(sector, address)
 	}
 
 	// 1)  Check and clear (optional) all the error flags due to previous programming/erase
-    result = itrfApi.readMem32(regbase + 0x10); if(result<0) return result;
-    if(itrfApi.value32 & 0x07EE0000 )
+    if(flash_get_clear_status(regbase) )
     {
         errorf("Flash erase begin error 0x%x\n", itrfApi.value32 & 0x07EE0000);
         return -1;
@@ -239,39 +230,43 @@ function flash_done()
 //   Erase the whole chip
 //   - If this function is not defined, sector by sector erase is used.
 //   - This is an isolated function, flash_start and flash_done are not called by EB-link
+//   - The boolean "hasSecondBank" is set by parent script
 //
 // ToDo: Check if we have a second flash bank
 function flash_erase_chip()
 {
     local result;
 	
-	printf("Flash: Start chip erase ");
+	printf("Flash: chip erasing ");
 	
 	// 1. Check and clear (optional) all the error flags due to previous programming/erase 
-	result = itrfApi.readMem32(0x52002000 + 0x10); if(result<0) return result;
-    if(itrfApi.value32 & 0x07EE0000 )
+    if(flash_get_clear_status(0x52002000) )
     {
         errorf("Flash error bank1 0x%x", itrfApi.value32 & 0x07EE0000);
         return -1;
     }
 	
-	result = itrfApi.readMem32(0x52002100 + 0x10); if(result<0) return result;
-    if(itrfApi.value32 & 0x07EE0000 )
-    {
-        errorf("Flash error bank2 0x%x", itrfApi.value32 & 0x07EE0000);
-        return -1;
-    }	
-
 	// 2. Unlock the two FLASH_CR1/2 registers and FLASH_OPTCR register
-	flash_unlock(0x52002000);
-	flash_unlock(0x52002100);
+	flash_unlock(0x52002000);	
+	
+	// The same, two steps, for the second bank if exists
+	if(hasSecondBank)
+	{
+		if(flash_get_clear_status(0x52002100) )
+		if(itrfApi.value32 & 0x07EE0000 )
+		{
+			errorf("Flash error bank2 0x%x", itrfApi.value32 & 0x07EE0000);
+			return -1;
+		}
+		
+		flash_unlock(0x52002100);
+	}	
+
 	
 	//  3. Set the MER bit to 1 in FLASH_OPTCR register. It automatically sets BER1, BER2,
     //     START1 and START2 to 1, thus launching a bank erase operation on both banks. 
 	result = itrfApi.writeMem32(0x52002000 + 0x18, 0x10 ); if(result<0) return result;
 	
-	 //(Not sure !!)
-	//result = itrfApi.writeMem32(0x52002100 + 0x18, 0x10 ); if(result<0) return result;
 	
 	// Then wait until both QW1 and QW2 bits are cleared in the corresponding FLASH_SR1/2
     // register.
@@ -283,20 +278,35 @@ function flash_erase_chip()
     }while ( itrfApi.value32 &  0x05 );	
 	
 	// .... and bank 2
-    do{
-         result = itrfApi.readMem32(0x52002100 + 0x10); if(result<0) return result;
-		 CursorAnimate();
-    }while ( itrfApi.value32 &  0x05 )	
-	
-	
+	if(hasSecondBank)
+		do{
+			result = itrfApi.readMem32(0x52002100 + 0x10); if(result<0) return result;
+			CursorAnimate();
+		}while ( itrfApi.value32 &  0x05 )	
+		
 	// Lock the flash banks again
 	flash_lock(0x52002000);
-	flash_lock(0x52002100);
+	
+	if(hasSecondBank)
+		flash_lock(0x52002100);
 	
     printf("done\n");
     return 0;
 }
 
+/////////////////////////////////////////////////////////////////////////////////
+//
+//   Get (and clear) the flash status
+//
+function flash_get_clear_status(regbase)
+{
+	local result;
+	
+	result = itrfApi.readMem32(regbase + 0x10); if(result<0) return result;
+    if( !result && (itrfApi.value32 & 0x07EE0000 ))
+	   return -1;
+	return 0;   
+}
 
 /////////////////////////////////////////////////////////////////////////////////
 //
