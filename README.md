@@ -39,6 +39,11 @@ eblink - usage:
 	
 	--device and --interf are mandatory, normally combined with --flash or/and --gdb
 
+       e.g.
+       	EBlink -I stlink -D stm32-auto -G
+       	EBlink -I stlink,speed=3000 -D silabs-auto -F erase,verify,run,file=mytarget.elf
+       	EBlink -I cmsis-dap -T cortex-m,nu -G port=4242,nc
+
 
 ==== Interfaces
 
