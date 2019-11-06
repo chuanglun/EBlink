@@ -26,6 +26,8 @@ EBlink features:
 
 eblink - usage:
 
+	EBlink <options>
+
 	-h,           --help				Print this help
 	-g,           --nogui				No GUI message boxes
 	-v <level>,   --verbose <0..7>	Specify generally verbose logging
@@ -42,13 +44,15 @@ eblink - usage:
 
 
 name: CMSIS-DAP - ARM debug protocol driver 
-     Usage -I cmsis-dap[,options]
+	
+	Usage -I cmsis-dap[,options]
 
         <not yet implemented>
 
 
 name: STlink - STmicro V2/3 interface driver 
-     Usage -I stlink[,options]
+	
+	Usage -I stlink[,options]
 
         rconnect     : Connect under reset
         speed=nnn    : Interface speed (default max possible)
@@ -62,6 +66,7 @@ name: STlink - STmicro V2/3 interface driver
 
 
 name: cortex-m
+     
      Usage -T cortex-m[,options]
 
         nu           : Disable stack unwind at exception
@@ -69,7 +74,8 @@ name: cortex-m
         e.g.  -T cortex-m,nu
 
 ==== Flash loader
-     Usage -F [options]
+	
+	Usage -F [options]
 
         erase        : Chip erase the flash
         verify       : Verify flash after upload
@@ -89,6 +95,7 @@ name: cortex-m
 
 
 ==== GDB server
+     
      Usage -G [options]
 
         S            : Shutdown after disconnect
