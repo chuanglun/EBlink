@@ -24,6 +24,11 @@ EBlink features:
 - All device related functions by squirrel scripting e.g. flash algorithm, device reset strategy etc etc
 - Ready for multiple interfaces
 
+Remark:
+
+EBlink uses ROM caching for speed performance. If GDB reads memory from the ROM (flash) region then EBlink will not query the target but will instead return from cache. Sometimes, like 
+debugging flash writing applications (e.g. bootloader), this behavior is not preferred and doesn't show the real flash modifications in GDB. If flash modifying code is debugged, turn off the caching with the "nc" GDB server option.
+
 eblink - usage:
 
 	EBlink <options>
