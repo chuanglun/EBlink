@@ -39,16 +39,23 @@ targetApi <- TargetAPI(); // Our interface to the target class
 function flash_start()
 {
     local result;
+    local time;
 
     // Be sure that the core is halted
     result = targetApi.halt(); if(result<0) return result;
 
 	targetApi.reset(0);
-	
+
     // Wait for halt
-    // ToDo: Timeout
+    time = GetTickCount();
 	do{
 	    targetApi.poll();
+	    // Timeout of 1sec
+	    if(GetTickCount() - time > 1000)
+        {
+            errorf("Error: Can't stop the target\n");
+            return -1;
+        }
 	} while(targetApi.getState() != TARGET_HALTED )
 
     if(itrfApi.targetVoltage() < 2.7)
@@ -74,6 +81,7 @@ function flash_erase(sector, address)
 {
     local result;
     local regbase = 0x52002000; // first flash bank
+    local time;
 
     // Select the right bank
 	if (address >= 0x08100000) {
@@ -84,7 +92,7 @@ function flash_erase(sector, address)
 	// 1)  Check and clear (optional) all the error flags due to previous programming/erase
     if(flash_get_clear_status(regbase) )
     {
-        errorf("Flash erase begin error 0x%x\n", itrfApi.value32 & 0x07EE0000);
+        errorf("Error: Flash erase begin error 0x%x\n", itrfApi.value32 & 0x07EE0000);
         return -1;
     }
 
@@ -103,15 +111,23 @@ function flash_erase(sector, address)
     result = itrfApi.writeMem32(regbase + 0x0C, (sector<<8) | 0x84 | 0x2 ); if(result<0) return result;
 
     // (5) Wait for the QW1/2 bit and BSY1/2 to be cleared in the corresponding FLASH_SR1/2 register
+    time = GetTickCount();
     do{
-         result = itrfApi.readMem32(regbase + 0x10); if(result<0) return result;
+        result = itrfApi.readMem32(regbase + 0x10); if(result<0) return result;
+
+	    // Timeout of 5sec
+	    if(GetTickCount() - time > 5000)
+        {
+            errorf("Error: Sector erase timeout\n");
+            return -1;
+        }
     }while ( itrfApi.value32 &  0x05 );
 
 
     // Check for errors
     if(itrfApi.value32 & 0x07EE0000 )
     {
-        errorf("Flash erase end error 0x%x\n", itrfApi.value32 & 0x07EE0000);
+        errorf("Error: Flash erase end error 0x%x\n", itrfApi.value32 & 0x07EE0000);
         return -1;
     }
 
@@ -133,7 +149,7 @@ function flash_write(sector, address, buffer)
 	local idx = 0;
     local result;
     local wLen = (16*1024); // How many bytes we write before we update the cir pointer of the flash loader
-
+    local time;
 
     // Select the right bank
 	if (address >= 0x08100000) {
@@ -189,9 +205,15 @@ function flash_write(sector, address, buffer)
     }
 
     // Wait for ready
-    // ToDo: Timeout
+    time = GetTickCount();
 	do{
 	    targetApi.poll();
+	    // Timeout of 5sec
+	    if(GetTickCount() - time > 5000)
+        {
+            errorf("Error: Flashing timeout\n");
+            return -1;
+        }
 	} while(targetApi.getState() != TARGET_HALTED )
 
 
@@ -199,7 +221,7 @@ function flash_write(sector, address, buffer)
     result = itrfApi.readMem32(regbase + 0x10); if(result<0) return result;
     if(itrfApi.value32 & 0x07EE0000 )
     {
-        errorf("Flash write error 0x%x", itrfApi.value32 & 0x07EE0000);
+        errorf("Error: Flash write error 0x%x", itrfApi.value32 & 0x07EE0000);
         return -1;
     }
 
@@ -236,61 +258,76 @@ function flash_done()
 function flash_erase_chip()
 {
     local result;
-	
+    local time = GetTickCount();
+
 	printf("Flash: chip erasing ");
-	
-	// 1. Check and clear (optional) all the error flags due to previous programming/erase 
+
+	// 1. Check and clear (optional) all the error flags due to previous programming/erase
     if(flash_get_clear_status(0x52002000) )
     {
-        errorf("Flash error bank1 0x%x", itrfApi.value32 & 0x07EE0000);
+        errorf("Error: Flash error bank1 0x%x", itrfApi.value32 & 0x07EE0000);
         return -1;
     }
-	
+
 	// 2. Unlock the two FLASH_CR1/2 registers and FLASH_OPTCR register
-	flash_unlock(0x52002000);	
-	
+	flash_unlock(0x52002000);
+
 	// The same, two steps, for the second bank if exists
 	if(hasSecondBank)
 	{
 		if(flash_get_clear_status(0x52002100) )
 		if(itrfApi.value32 & 0x07EE0000 )
 		{
-			errorf("Flash error bank2 0x%x", itrfApi.value32 & 0x07EE0000);
+			errorf("Error: Flash error bank2 0x%x", itrfApi.value32 & 0x07EE0000);
 			return -1;
 		}
-		
-		flash_unlock(0x52002100);
-	}	
 
-	
+		flash_unlock(0x52002100);
+	}
+
+
 	//  3. Set the MER bit to 1 in FLASH_OPTCR register. It automatically sets BER1, BER2,
-    //     START1 and START2 to 1, thus launching a bank erase operation on both banks. 
+    //     START1 and START2 to 1, thus launching a bank erase operation on both banks.
 	result = itrfApi.writeMem32(0x52002000 + 0x18, 0x10 ); if(result<0) return result;
-	
-	
+
+
 	// Then wait until both QW1 and QW2 bits are cleared in the corresponding FLASH_SR1/2
     // register.
-	
-	// ... bank 1 
+
+	// ... bank 1
     do{
-         result = itrfApi.readMem32(0x52002000 + 0x10); if(result<0) return result;
-		 CursorAnimate();
-    }while ( itrfApi.value32 &  0x05 );	
-	
+        result = itrfApi.readMem32(0x52002000 + 0x10); if(result<0) return result;
+        CursorAnimate();
+
+	    // Timeout of 10sec (it can take quite long
+	    if(GetTickCount() - time > 10000)
+        {
+            errorf("Error: Mass erase timeout\n");
+            return -1;
+        }
+    }while ( itrfApi.value32 &  0x05 );
+
 	// .... and bank 2
 	if(hasSecondBank)
 		do{
 			result = itrfApi.readMem32(0x52002100 + 0x10); if(result<0) return result;
 			CursorAnimate();
-		}while ( itrfApi.value32 &  0x05 )	
-		
+
+            // Timeout of 10sec (it can take quite long
+            if(GetTickCount() - time > 10000)
+            {
+                errorf("Error: Mass erase timeout\n");
+                return -1;
+            }
+		}while ( itrfApi.value32 &  0x05 )
+
 	// Lock the flash banks again
 	flash_lock(0x52002000);
-	
+
 	if(hasSecondBank)
 		flash_lock(0x52002100);
-	
-    printf("done\n");
+
+    printf("done [%ums] \n", GetTickCount() - time);
     return 0;
 }
 
@@ -301,11 +338,11 @@ function flash_erase_chip()
 function flash_get_clear_status(regbase)
 {
 	local result;
-	
+
 	result = itrfApi.readMem32(regbase + 0x10); if(result<0) return result;
     if( !result && (itrfApi.value32 & 0x07EE0000 ))
 	   return -1;
-	return 0;   
+	return 0;
 }
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -315,10 +352,18 @@ function flash_get_clear_status(regbase)
 function flash_unlock(regbase)
 {
     local result;
+    local time = GetTickCount();
 
     // Wait for flash not busy
     do{
          result = itrfApi.readMem32(regbase + 0x10); if(result<0) return result;
+
+	    // Timeout of 1sec
+	    if(GetTickCount() - time > 1000)
+        {
+            errorf("Error: Flash unlock timeout\n");
+            return -1;
+        }
     }while ( itrfApi.value32 &  0x01 );
 
     // Read flash lock status in FLASH_CR
