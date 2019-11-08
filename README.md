@@ -46,7 +46,7 @@ eblink - usage:
 
        e.g.
        	EBlink -I stlink -D stm32-auto -G
-       	EBlink -I stlink,speed=3000 -D silabs-auto -F erase,verify,run,file=mytarget.elf
+       	EBlink -I stlink,rc,speed=3000 -D silabs-auto -F erase,verify,run,file=mytarget.elf
        	EBlink -I cmsis-dap -T cortex-m,nu -G port=4242,nc
 
 
@@ -64,13 +64,13 @@ name: STlink - STmicro V2/3 interface driver
 	
 	Usage -I stlink[,options]
 
-        rconnect     : Connect under reset
+        rc           : Connect under reset 
         speed=nnn    : Interface speed (default max possible)
         swd          : use SWD (default)
         jtag         : use Jtag
         device=<usb_bus>:<usb_addr> : Select probe explicit
 
-        e.g.  -I stlink,rconnect,speed=3000
+        e.g.  -I stlink,rc,speed=3000
 
 ==== Targets
 
@@ -96,9 +96,10 @@ name: cortex-m
                                       Default     = ELF file format
 
         e.g. -F file=test.elf
-             -F verify,run,file=test.srec
+             -F run,file=test.hex		
+             -F erase,verify,run,file=test.srec
              -F erase
-             -F erase,run,file=test.hex
+             -F run			 
 
         Default (without erase) only modified sectors are (re)flashed.
 
