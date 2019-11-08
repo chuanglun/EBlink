@@ -130,7 +130,7 @@ function stm32_device(deviceId)
     devApi.memmap( format(mem_template_H7, flash_1bank, string_2MB));
 
     // Inform the user
-    printf("Detected FLASH size: 0x%X\nConfigured RAM size: 0x%X\n", flash_size, ram_size);
+    printf("Detected FLASH : 0x%X\nConfigured RAM : 0x%X\n", flash_size, ram_size);
 
     require("stmicro/flash/stm32h7_fl.script");
 
