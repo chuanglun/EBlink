@@ -14,7 +14,13 @@ itrfApi <- InterfAPI();  // Global so that all included script files also have a
 //
 function main()
 {
+    local targetApi = :: TargetAPI(); // Needed for resetting
     local result;
+
+    // If an IDE is used without hotplug capabilities then you could
+    // uncomment the next line to force a reset.
+    // Allowable  resets: ( SYSTEM_RESET, CORE_RESET, JTAG_RESET or USER_RESET)
+    //targetApi.reset(SYSTEM_RESET);
 
     // Default device ID register
     result = itrfApi.readMem32(0xE0042000);
@@ -27,14 +33,17 @@ function main()
     if( (result >=0) && (itrfApi.value32 == 0) )
         result = itrfApi.readMem32(0x5C001000);
 
+    // If we still haven't a valid device ID, inform user and quit
     if(  (result < 0 ) || (itrfApi.value32 == 0) )
     {
-        errorf("Error: can't access target device!\n");
+        errorf("Error:\tCan't access target device!\n\tUse stlink reset (\"r\" switch)");
         return -1;	// We have already throw an error so use -1 (otherwise < -1)
     }
 
+    // We have valid device ID which will be used to load the right scripts
     return set_target( itrfApi.value32 & 0xfff );
 }
+
 
 /////////////////////////////////////////////////////
 //
@@ -133,13 +142,13 @@ function set_target(deviceId)
 	case 0x452 : // CHIPID_STM32_F72x
         require("stmicro/stm32f7x.script");
         break;
-		
+
     // Cortex M7
 	case 0x450 : // CHIPID_STM32H7
 	    require("stmicro/stm32h7x.script");
         break;
 
-	// ---------- Not supported ChipId yet -----------	
+	// ---------- Not supported ChipId yet -----------
     default:
         printf("\n\nPlease report this ID so that we can add it.\n");
         errorf("Error unsupported STM32 ID: 0x%X\n", deviceId);
@@ -155,12 +164,11 @@ function set_target(deviceId)
 //
 // Additional commands after reset (optional) called by EBlink
 //
-// resetType
-//
-// O : System reset
-// 1 : Core reset
-// 2 : Jtag reset
-// 3 : User script reset
+// resetType:
+//        SYSTEM_RESET
+//        CORE_RESET
+//        JTAG_RESET
+//        USER_RESET
 //
 function  reset_post(resetType)
 {
@@ -169,7 +177,7 @@ function  reset_post(resetType)
     // We don't use this if the reset is a user_script type. In that
     // case, the user is responsible for the initialization.
 	//
-    if( resetType < 3)
+    if( resetType < USER_RESET)
     {
         // Set the Stack pointer according the Vector table entry
         itrfApi.readMem32(0x08000000);

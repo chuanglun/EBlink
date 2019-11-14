@@ -3,6 +3,11 @@
 
 EBlink ARM Cortex-M debug tool with squirrel scripting device support
 
+NEW (14-11-2019)
+- Reset behavior changed, it is now always on and for hotplug use the Disable Reset ("dr") stlink interface option
+- New script interfaceApi function "resetCtrl(bool)" which controls the NRST line directly
+- Bug minor fixes
+
 NEW (29-10-2019)
 - STlink V3 support
 - Linux_x64 build 
@@ -24,10 +29,11 @@ EBlink features:
 - All device related functions by squirrel scripting e.g. flash algorithm, device reset strategy etc etc
 - Ready for multiple interfaces
 
-Remark:
+Remarks:
 
-EBlink uses ROM caching for speed performance. If GDB reads memory from the ROM (flash) region then EBlink will not query the target but will instead return from cache. Sometimes, like 
-debugging flash writing applications (e.g. bootloader), this behavior is not preferred and doesn't show the real flash modifications in GDB. If flash modifying code is debugged, turn off the caching with the "nc" GDB server option.
+1) EBlink uses ROM caching for speed performance. If GDB reads memory from the ROM (flash) region then EBlink will not query the target but will instead return from cache. Sometimes, like debugging flash writing applications (e.g. bootloader), this behavior is not preferred and doesn't show the real flash modifications in GDB. If flash modifying code is debugged, turn off the caching with the "nc" GDB server option.
+
+2) By default the stlink interface doesn't reset the target when it connects to make hotpluging possible. However, if the target is not responding then sometimes a reset (or even connect under reset) is needed. Use the "rc" stlink interface option e.g. "-I stlink,rc" to turn the connection under reset on.
 
 eblink - usage:
 
@@ -46,7 +52,7 @@ eblink - usage:
 
        e.g.
        	EBlink -I stlink -D stm32-auto -G
-       	EBlink -I stlink,rc,speed=3000 -D silabs-auto -F erase,verify,run,file=mytarget.elf
+       	EBlink -I stlink,nr,speed=3000 -D silabs-auto -F erase,verify,run,file=mytarget.elf
        	EBlink -I cmsis-dap -T cortex-m,nu -G port=4242,nc
 
 
@@ -64,13 +70,13 @@ name: STlink - STmicro V2/3 interface driver
 	
 	Usage -I stlink[,options]
 
-        rc           : Connect under reset 
+        dr           : Disable reset at connection (hotplug)
         speed=nnn    : Interface speed (default max possible)
         swd          : use SWD (default)
         jtag         : use Jtag
         device=<usb_bus>:<usb_addr> : Select probe explicit
 
-        e.g.  -I stlink,rc,speed=3000
+        e.g.  -I stlink,dr,speed=3000
 
 ==== Targets
 
