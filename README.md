@@ -33,7 +33,7 @@ Remarks:
 
 1) EBlink uses ROM caching for speed performance. If GDB reads memory from the ROM (flash) region then EBlink will not query the target but will instead return from cache. Sometimes, like debugging flash writing applications (e.g. bootloader), this behavior is not preferred and doesn't show the real flash modifications in GDB. If flash modifying code is debugged, turn off the caching with the "nc" GDB server option.
 
-2) By default the stlink interface doesn't reset the target when it connects to make hotpluging possible. However, if the target is not responding then sometimes a reset (or even connect under reset) is needed. Use the "rc" stlink interface option e.g. "-I stlink,rc" to turn the connection under reset on.
+2) By default, the "Connection under reset" for the stlink interface is enabled. For hotplugging use the "dr" switch (Disable Reset) for the stlink interface e.g. -I stlink,dr
 
 eblink - usage:
 
