@@ -52,7 +52,7 @@ eblink - usage:
 
        e.g.
        	EBlink -I stlink -D stm32-auto -G
-       	EBlink -I stlink,nr,speed=3000 -D silabs-auto -F erase,verify,run,file=mytarget.elf
+       	EBlink -I stlink,dr,speed=3000 -D silabs-auto -F erase,verify,run,file=mytarget.elf
        	EBlink -I cmsis-dap -T cortex-m,nu -G port=4242,nc
 
 
