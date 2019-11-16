@@ -1,0 +1,4 @@
+#install udev rules
+sudo cp 49-stlink* /etc/udev/rules.d/
+#and restart udev
+sudo udevadm control --reload
