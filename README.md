@@ -3,6 +3,9 @@
 
 EBlink ARM Cortex-M debug tool with squirrel scripting device support
 
+NEW (16-11-2019)
+- Raspberry binary
+
 CHANGES (14-11-2019)
 - Reset behavior changed: "Connect under reset" is now always enabled and for hotplug use the Disable Reset ("dr") stlink interface option
 - New script interfaceApi function "resetCtrl(bool)" which controls the NRST line directly
