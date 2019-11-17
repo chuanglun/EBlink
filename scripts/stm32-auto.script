@@ -36,7 +36,7 @@ function main()
     // If we still haven't a valid device ID, inform user and quit
     if(  (result < 0 ) || (itrfApi.value32 == 0) )
     {
-        errorf("Error:\tCan't access target device!\n\tUse stlink reset (\"r\" switch)");
+        errorf("Error:\tCan't access target device!\n\tIf reset is disabled (\"dr\" option), try with reset.");
         return -1;	// We have already throw an error so use -1 (otherwise < -1)
     }
 
