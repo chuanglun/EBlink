@@ -4,17 +4,15 @@
 
 EBlink ARM Cortex-M debug tool with squirrel scripting device support
 
-NEW (16-11-2019)
-- Raspberry binary
+Changes (18-11-2019) rc19.11-7
+- BUG Fix: STlink/V2 init sequence was wrong (was working and tested for V3 interfaces)
+- Added: Support optional environment variable EB_SCRIPT_PATH
 
 CHANGES (14-11-2019)
 - Reset behavior changed: "Connect under reset" is now always enabled and for hotplug use the Disable Reset ("dr") stlink interface option
 - New script interfaceApi function "resetCtrl(bool)" which controls the NRST line directly
 - Bug minor fixes
 
-NEW (29-10-2019)
-- STlink V3 support
-- Linux_x64 build 
 
 ISSUES
 - If flash is empty and program is flashed and reset, a target exception is detected 
