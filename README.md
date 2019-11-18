@@ -5,7 +5,7 @@
 EBlink ARM Cortex-M debug tool with squirrel scripting device support
 
 Changes (18-11-2019) rc19.11-7
-- BUG Fix: STlink/V2 init sequence was wrong (was working and tested for V3 interfaces)
+- BUG Fix: STlink/V2 init sequence was broken (was working and tested for V3 interfaces)
 - Added: Support optional environment variable EB_SCRIPT_PATH
 
 CHANGES (14-11-2019)
