@@ -7,7 +7,7 @@ EBlink ARM Cortex-M debug tool with squirrel scripting device support
 Changes (18-11-2019) rc19.11-7
 - BUG Fix: STlink/V2 init sequence was broken (was working and tested for V3 interfaces)
 - Added: Support optional environment variable EB_SCRIPT_PATH
-- Added: Auto connect sequence for foreign vendors (e.g. silabs)
+- Added: STlink auto connect reset sequence for foreign vendors (e.g. silabs)
 
 CHANGES (14-11-2019)
 - Reset behavior changed: "Connect under reset" is now always enabled and for hotplug use the Disable Reset ("dr") stlink interface option
