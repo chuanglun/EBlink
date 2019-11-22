@@ -98,7 +98,7 @@ name: cortex-m
 
         erase        : Chip erase the flash
         verify       : Verify flash after upload
-        run          : Start image after upload
+        run          : Start image
         file=<file>  : Load the file, <file>.hex  = Intel HEX format
                                       <file>.srec = Motorola srec file format
 
