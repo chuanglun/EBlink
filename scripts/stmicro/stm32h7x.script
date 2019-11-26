@@ -57,8 +57,14 @@ const mem_template_H7 = @@"
     <!-- bootrom -->
     <memory type=\"rom\" start=\"0x00100000\" length=\"0xEDC0\"/>
 
-    <!-- option byte area -->
-    <memory type=\"rom\" start=\"0x1fff0000\" length=\"0x20\"/>
+	<memory type=\"rom\" start=\"0x1fff0000\" length=\"0x20\"/>
+	
+    <!-- option byte area (virtual sector) -->
+    <memory type=\"flash\" start=\"0x1ff20000\" length=\"32\">
+	    <property name=\"blocksize\">32</property>
+		<property name=\"secstart\">999</property>
+	</memory>
+	
 </memory-map>";
 
 
