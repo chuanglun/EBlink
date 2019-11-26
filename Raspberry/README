@@ -1,6 +1,8 @@
 To make this work:
 
 - copy the script folder inside the folder containing the eblink binary
+  ( Or set environment variable EB_SCRIPT_PATH to the script directory )
+  
 - Copy the udev stlink rules and follow the readme inside that folder.
 
 

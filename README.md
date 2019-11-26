@@ -7,7 +7,7 @@ EBlink ARM Cortex-M debug tool with squirrel scripting device support
 Changes (18-11-2019) rc19.11-7
 - BUG Fix: STlink/V2 init sequence was broken (was working and tested for V3 interfaces)
 - Added: Support optional environment variable EB_SCRIPT_PATH
-- Added: Auto connect sequence for foreign vendors (e.g. silabs)
+- Added: STlink auto connect reset sequence for foreign vendors (e.g. silabs)
 
 CHANGES (14-11-2019)
 - Reset behavior changed: "Connect under reset" is now always enabled and for hotplug use the Disable Reset ("dr") stlink interface option
@@ -34,7 +34,7 @@ EBlink features:
 
 Remarks:
 
-1) EBlink uses ROM caching for speed performance. If GDB reads memory from the ROM (flash) region then EBlink will not query the target but will instead return from cache. Sometimes, like debugging flash writing applications (e.g. bootloader), this behavior is not preferred and doesn't show the real flash modifications in GDB. If flash modifying code is debugged, turn off the caching with the "nc" GDB server option.
+1) EBlink uses ROM caching for speed performance. It is parsing the same XML memory map, which is provided by scripting, which is offered to GDB to get the memory information. If GDB reads memory from the ROM (flash) region then EBlink will not query the target but will instead return from cache. Sometimes, like debugging flash writing applications (e.g. bootloader), this behavior is not preferred and doesn't show the real flash modifications in GDB. If flash modifying code is debugged, turn off the caching with the "nc" GDB server option.
 
 2) By default, the "Connection under reset" for the stlink interface is enabled. For hotplugging use the "dr" switch (Disable Reset) for the stlink interface e.g. -I stlink,dr
 
@@ -98,7 +98,7 @@ name: cortex-m
 
         erase        : Chip erase the flash
         verify       : Verify flash after upload
-        run          : Start image after upload
+        run          : Start image
         file=<file>  : Load the file, <file>.hex  = Intel HEX format
                                       <file>.srec = Motorola srec file format
 
