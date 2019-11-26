@@ -245,7 +245,22 @@ function flash_write(sector, address, buffer)
 
 /////////////////////////////////////////////////////////////////////////////////
 //
-//  
+//  Write STM32H7 option bytes 
+//
+//  Virtual sector 999 of 32 bytes with format as below. 
+//  Be aware of reserved reset values!! (otherwise program errors)
+//
+//  typedef struct {       //   Reset    Flash control offset
+//     un32 FLASH_OPTSR;   //0x1416AAF0  0x20 (alias 0x120)
+//     un32 FLASH_BOOT;    //0x1FF00800  0x44 (alias 0x144)
+//     un32 FLASH_PRAR_x1; //0x000000FF  0x2C
+//     un32 FLASH_PRAR_x2; //0x000000FF  0x12C
+//     un32 FLASH_SCAR_x1; //0x800000FF  0x34
+//     un32 FLASH_SCAR_x2; //0x800000FF  0x134
+//     un32 FLASH_WPSN_x1; //0x000000FF  0x3C
+//     un32 FLASH_WPSN_x2; //0x000000FF  0x13C
+//  } STM32H7_options;
+//
 //
 function option_write(buffer)
 {
