@@ -5,7 +5,7 @@
 EBlink ARM Cortex-M debug tool with squirrel scripting device support
 
 Changes (28-11-2019) rc19.11-8
-- Added: option bytes programming stm32h7. By using a virtual sector, the option bytes can be defined inside GCC and are also inside ihex, srec or elf files.
+- Added: option bytes programming stm32h7. By using a virtual sector #999 of 32bytes, the option bytes can be defined inside GCC and are also stored inside ihex, srec or elf files. So production cli flashing will also program the option bytes.
 - Bug fix: Sector numbering passing to flash write function. 
 
 Changes (18-11-2019) rc19.11-7
