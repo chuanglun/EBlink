@@ -44,5 +44,5 @@ Be aware that there are reserved bits in some registers which are set at reset a
   
 
 The script file for stm32h7 flashing is filtering this virtual options sector before going into normal sector programming or erasing. 
-It will instead call a special function to program this virtual sector inside the option bytes. 
+It will instead call a special function to program this virtual sector inside the option bytes. (check stm32h7 scripts for details)
 
