@@ -42,6 +42,6 @@ static const STM32H7_optionsTp STM32H7_options __attribute__((section(".optionBy
 	
 Be aware that there are reserved bits in some registers which are set at reset and which should be preserved when programming new values.
   
-How does this work?
+
 The script file for stm32h7 flashing is filtering this virtual options sector before going into normal sector programming or erasing. It will instead call a special function to program this virtual sector inside the option bytes.
 
