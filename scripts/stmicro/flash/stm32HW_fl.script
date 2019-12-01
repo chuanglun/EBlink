@@ -121,7 +121,7 @@ function flash_write(sector, address, buffer)
     result = targetApi.writeReg("R2", buffer.byteLength);   // Halfwords count to be written
 
     // Run flash loader
-    result = targetApi.execute(0x20000000, 1); if(result<0) return result;
+    result = targetApi.execute(0x20000000, true); if(result<0) return result;
 
     // Disable the program flag  PG in flash_CR
     itrfApi.writeMem32(0x40022010, 0); if(result<0) return result;
