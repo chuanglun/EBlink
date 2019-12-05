@@ -40,7 +40,7 @@ function stm32_device(deviceId)
     local result;
     local flash_size;
     local page_size;
-	local cram_size;
+    local cram_size;
     local sram_size;
 
     // Enable debug clocks: DBG_STANDBY & DBG_STOP & DBG_SLEEP - RM0090 Page 1676/1705
@@ -54,15 +54,15 @@ function stm32_device(deviceId)
     switch(deviceId)
     {		
 			
-		case 0x468 : // STM32G431xx/441xx  (cat 2)
+	case 0x468 : // STM32G431xx/441xx  (cat 2)
             page_size = 0x800;
-			cram_size = 0x2800; // 10K
+	    cram_size = 0x2800; // 10K
             sram_size = 0x8000; // 32K
             break;		
 		
-		case 0x469 : // STM32G47xxx/48xxx   (cat 3)			
+	case 0x469 : // STM32G47xxx/48xxx   (cat 3)			
             page_size =  0x800;  
-			cram_size = 0x8000;  // 32K
+	    cram_size = 0x8000;  // 32K
             sram_size = 0x20000; // 128K
             break;		
     }
