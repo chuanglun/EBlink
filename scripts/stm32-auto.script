@@ -72,6 +72,12 @@ function set_target(deviceId)
     case 0x457 : // CHIPID_STM32_L0_CAT1
         require("stmicro/stm32l0x.script");
         break;
+		
+    // Cortex M0+		
+    case 0x460 : // STM32G07xxx/08xxx
+    case 0x466 : // STM32G03xxx/04xxx	
+	    require("stmicro/stm32g0x.script");
+        break;
 
     // Cortex M3
     case 0x410 : // CHIPID_STM32_F1_MEDIUM
@@ -134,6 +140,12 @@ function set_target(deviceId)
     case 0x415 : // CHIPID_STM32_L4
     case 0x435 : // CHIPID_STM32_L43X
         require("stmicro/stm32l4x.script");
+        break;
+		
+    // Cortex M4		
+	case 0x468 : // STM32G431xx/441xx  
+	case 0x469 : // STM32G47xxx/48xxx 
+	    require("stmicro/stm32g4x.script");
         break;
 
     // Cortex M7
