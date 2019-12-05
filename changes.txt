@@ -1,0 +1,18 @@
+Changes (5-12-2019) rc19.12-1
+- Added: STM32G0x & STM32G4x fast programming (options not ready)
+- Added: Interface speed query script function
+- Mod:   STM32H7x flashing directly
+
+Changes (28-11-2019) rc19.11-8
+- Added: option bytes programming stm32h7. By using a virtual sector #999 of 32bytes, the option bytes can be defined inside GCC and are also stored inside ihex, srec or elf files. So production cli flashing will also program the option bytes. (See doc folder)
+- Bug fix: Sector numbering passing to flash write function. 
+
+Changes (18-11-2019) rc19.11-7
+- BUG Fix: STlink/V2 init sequence was broken (was working and tested for V3 interfaces)
+- Added: Support optional environment variable EB_SCRIPT_PATH
+- Added: STlink auto connect reset sequence for foreign vendors (e.g. silabs)
+
+CHANGES (14-11-2019)
+- Reset behavior changed: "Connect under reset" is now always enabled and for hotplug use the Disable Reset ("dr") stlink interface option
+- New script interfaceApi function "resetCtrl(bool)" which controls the NRST line directly
+- Bug minor fixes

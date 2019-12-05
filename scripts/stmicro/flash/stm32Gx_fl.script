@@ -2,9 +2,7 @@
 //
 //                   STM32G0_fl flash loader
 //
-
-//  ToDo:  - fast programming with bootloader
-//         - option programming
+//  ToDo:  - option programming
 //         - dual bank for G4x
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -92,21 +90,33 @@ function flash_write(sector, address, buffer)
 	
 	// 3. Set the PG bit of the FLASH control register (FLASH_CR)
 	result = itrfApi.writeMem32(0x40022014,  1 ); if(result<0) return result;	
-
 	
-    for(local count = 0; count < buffer.byteLength; count += 4)
-    {
-        itrfApi.writeMem32(address, buffer.un32(count) );
-        address += 4;
-		count   += 4
-        itrfApi.writeMem32(address, buffer.un32(count) );
-		address += 4;	
+	// STlink/V2 and V2.1 are rather slow, we can write direct
+	if( itrfApi.getName() != "STlink/V3" )
+	{
+	  itrfApi.writeBuf(address, buffer);
+	}
+	else
+	{   // STlink/V3 is too fast for direct so we will program per 64 bits
+		for(local count = 0; count < buffer.byteLength; )
+		{		
+			// 64 bits per time
+			itrfApi.writeMem(address, buffer, count, 8 );
+			address += 8;
+			count   += 8;
 		
-		// 5. Wait until the BSY1 bit of the flash_SR
-		result = flash_check_busy();
-		if(result<0) return result;
-    }
-
+			// 5. Wait until the BSY1 bit of the flash_SR
+			// This is only needed for high speed (ICP) but in case the V3 will be faster 
+			// in the future, we already catch it here.
+			if( itrfApi.getSpeed() > 25000  )
+			{
+				result = flash_check_busy(); if(result<0) return result;
+			}
+		}
+    }	
+	
+    result = flash_check_busy();
+	if(result<0) return result;
 	
 	// 7. Clear the PG bit of the FLASH control register (FLASH_CR) if there no more
     // programming request anymore

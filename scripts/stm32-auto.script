@@ -16,7 +16,7 @@ function main()
 {
     local targetApi = :: TargetAPI(); // Needed for resetting
     local result;
-
+	
     // If an IDE is used without hotplug capabilities then you could
     // uncomment the next line to force a reset.
     // Allowable  resets: ( SYSTEM_RESET, CORE_RESET, JTAG_RESET or USER_RESET)
