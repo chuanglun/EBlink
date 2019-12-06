@@ -1,3 +1,8 @@
+Changes (6-12-2019) Version 1.0
+- Added: script varaible VERSION to check API compatibility 
+- Fixed: At debug or trace no cursor animation
+- Mod:   To release state
+
 Changes (5-12-2019) rc19.12-1
 - Added: STM32G0x & STM32G4x fast programming (options not ready)
 - Added: Interface speed query script function

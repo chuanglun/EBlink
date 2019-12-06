@@ -17,6 +17,13 @@ function main()
     local targetApi = :: TargetAPI(); // Needed for resetting
     local result;
 	
+	// Check if the right script API is supported
+	if( VERSION < 1)
+	{
+	   errorf("Error:\nIncompatiable EBlink version %.1f\n\tPlease update\n", VERSION);
+	   return -1;
+	}	
+	
     // If an IDE is used without hotplug capabilities then you could
     // uncomment the next line to force a reset.
     // Allowable  resets: ( SYSTEM_RESET, CORE_RESET, JTAG_RESET or USER_RESET)
