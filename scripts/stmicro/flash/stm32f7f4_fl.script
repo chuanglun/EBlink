@@ -95,8 +95,11 @@ function flash_erase(sector, address)
     if(result<0) return result;
 
     // (4) Wait for the BSY bit to be cleared
-    result = flash_check_busy();
-    if(result<0) return result;
+    if(flash_check_busy(15000) <0)
+    {
+        errorf("Error: Sector program timeout\n");
+        return -1;
+    }
 
     return 0;
 }
@@ -130,14 +133,20 @@ function flash_write(sector, address, buffer)
         // This is only needed for high speed writes
         if( itrfApi.getSpeed() > 10000  )
         {
-            result = flash_check_busy();
-            if(result<0) return result;
+            if(flash_check_busy(5000) <0)
+            {
+                errorf("Error: Sector program timeout\n");
+                return -1;
+            }
         }
     }
 
-    // Wait for ready
-    result = flash_check_busy();
-    if(result<0) return result;
+    // Wait for ready (timeout 5 sec)
+    if(flash_check_busy(5000) <0)
+    {
+        errorf("Error: Sector program timeout\n");
+        return -1;
+    }
 
     // Disable the program flag  PG in flash_CR
     itrfApi.writeMem32(0x40023c10, 0);
@@ -190,9 +199,12 @@ function flash_erase_chip()
     result = itrfApi.writeMem32(0x40023c10,  pgSize | 0x10004);
     if(result<0) return result;
 
-    // (4) Wait for the BSY bit to be cleared
-    result = flash_check_busy();
-    if(result<0) return result;
+    // (4) Wait for the BSY bit to be cleared (worst case at low voltage > 30sec)
+    if(flash_check_busy(40000) <0)
+    {
+        errorf("Error: Sector erase timeout\n");
+        return -1;
+    }
 
     // Check for error
     result = itrfApi.readMem32(0x40023c0C);
@@ -201,9 +213,9 @@ function flash_erase_chip()
     flash_done();
 
     // Evaluate the result
-    if ((itrfApi.value32 & 0xF2) || !(itrfApi.value32 & 0x01))
+    if ( itrfApi.value32 & 0xF2 )
     {
-        printf("Flash: chip erase failed!\n");
+        printf("Flash: chip erase failed! 0x%x\n", itrfApi.value32);
         return -1;
     }
 
@@ -215,7 +227,7 @@ function flash_erase_chip()
 //
 //
 //
-function flash_check_busy()
+function flash_check_busy(timeout)
 {
     local result;
     local time;
@@ -225,12 +237,12 @@ function flash_check_busy()
     {
         result = itrfApi.readMem32(0x40023c0C);
         if(result<0) return result;
+        CursorAnimate();
 
-        // Timeout of 5sec
-        if(GetTickCount() - time > 5000)
+        // Check timeout
+        if( (GetTickCount() - time) > timeout)
         {
-            errorf("Error: Sector erase timeout\n");
-            return -1;
+            return -2;
         }
     }
     while ( itrfApi.value32 &  0x10000 );
