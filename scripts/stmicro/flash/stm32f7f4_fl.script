@@ -51,7 +51,7 @@ function flash_start()
 
     if(itrfApi.targetVoltage() < 2.7)
     {
-        errorf("Error: Current STM32F4x flash algorithm needs at least 2.7V\nTarget voltage is %.2f V\n", itrfApi.targetVoltage());
+        errorf("Error: Current STM32F4x/STM32F7x flash algorithm needs at least 2.7V\nTarget voltage is %.2f V\n", itrfApi.targetVoltage());
         return -1;
     }
 
@@ -105,9 +105,27 @@ function flash_write(sector, address, buffer)
     // Enable the program flag PG in flash_CR together with the 32bits parallelism
     result = itrfApi.writeMem32(0x40023c10, (2<<8) | 0x01 ); if(result<0) return result;
 
-    // Write buffer to flash space directly
-    result = itrfApi.writeBuf(address, buffer); if(result<0) return result;
+		
+	// Make length multiple of 256 bits.
+	if(buffer.byteLength & 31)
+		buffer.byteLength = buffer.byteLength + (32 - (buffer.byteLength & 31));
 
+	for(local count = 0; count < buffer.byteLength; )
+	{		
+		// 256 bits per time
+		result = itrfApi.writeMem(address, buffer, count, 32 );
+		if(result<0) return result;
+		address += 32;
+		count   += 32;
+			
+		// This is only needed for high speed (ICP) but in case the V3 will be faster 
+		// in the future, we already catch it here.
+		if( itrfApi.getSpeed() > 25000  )
+		{
+			//result = flash_check_busy(); if(result<0) return result;
+		}
+	}	
+	
     // Wait for ready
     do{
          result = itrfApi.readMem32(0x40023c0C); if(result<0) return result;

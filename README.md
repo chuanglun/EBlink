@@ -4,9 +4,10 @@
 
 EBlink ARM Cortex-M debug tool with squirrel scripting device support
 
-Changes (6-12-2019) Release 1.0
-- Added: Script variable VERSION to check EBlink version (Script API compatibility)
-- Fix:   No animation cursor at TRACE and DEBUG level
+Changes (5-12-2019) rc19.12-1
+- Added: STM32G0x & STM32G4x fast programming (options not ready)
+- Added: Interface speed query script function
+- Mod:   STM32H7x flashing directly
 
 
 ISSUES
