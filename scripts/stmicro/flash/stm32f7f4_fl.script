@@ -3,49 +3,41 @@
 //                   STM32F7F4_flash (stm32F7xx and stm32F4xxx )
 //
 //
-// This script doesn't use an external flash loader but is writing directly
-// to the target. Speed doesn't differ much but it is easier.
-//
-// This script is not yet capable of flashing <2.7V. Perhaps we need an external
-// loader for that. Example of script with external loader see stm32HW_fl.script.
-//
-// Feel free to modify but don't forget to share!
-//
 
 pgWidth <- 0;
 pgSize  <- 0;
 
 /////////////////////////////////////////////////////////////////////////////////
 //
-//   Unlock the flash and preload the flash loader
+//   Unlock the flash
 //
 function flash_start()
 {
     local targetApi = :: TargetAPI(); // Our interface to the target class
     local result;
-	local voltage;
+    local voltage;
 
     // Be sure that the core is halted
-    result = targetApi.halt(); if(result<0) return result;
-
-    // Wait for flash not busy
-    do{
-         result = itrfApi.readMem32(0x40023c0C); if(result<0) return result;
-    }while ( itrfApi.value32 &  0x01 );
+    result = targetApi.halt();
+    if(result<0) return result;
 
     // Read flash lock status in FLASH_CR
-    result = itrfApi.readMem32(0x40023c10); if(result<0) return result;
+    result = itrfApi.readMem32(0x40023c10);
+    if(result<0) return result;
 
     // Check if it's locked by the FLASH_CR_LOCK flag
     if( itrfApi.value32 & 0x80000000 )
     {
         // Write flash KEYR
-        result = itrfApi.writeMem32(0x40023c04,0x45670123); if(result<0) return result;
-        result = itrfApi.writeMem32(0x40023c04,0xcdef89ab); if(result<0) return result;
+        result = itrfApi.writeMem32(0x40023c04,0x45670123);
+        if(result<0) return result;
+        result = itrfApi.writeMem32(0x40023c04,0xcdef89ab);
+        if(result<0) return result;
 
 
         // Read flash CR again to check FLASH_CR_LOCK if it's unlocked
-        result = itrfApi.readMem32(0x40023c10); if(result<0) return result;
+        result = itrfApi.readMem32(0x40023c10);
+        if(result<0) return result;
         if( itrfApi.value32 & 0x80000000 )
         {
             errorf("Error: can't unlock flash!\n");
@@ -53,28 +45,31 @@ function flash_start()
         }
     }
 
-	// Check the voltage and set the right flash strategy
-	voltage = itrfApi.targetVoltage();
+    // Check the voltage and set the right flash strategy
+    voltage = itrfApi.targetVoltage();
     if(voltage  < 1.8)
     {
         errorf("Error: Current STM32F4x/STM32F7x flash algorithm needs at least 1.8V\nTarget voltage is %.2f V\n", voltage );
         return -1;
     }
-	else if(voltage  < 2.1)
-	{  // Low voltage is 8 bits
-		pgWidth = 8;
-		pgSize  = 0;
-	}
-	else if(voltage  < 2.7)
-	{  // Mid voltage is 16 bits
-		pgWidth = 16;
-		pgSize  = (1<<8);
-	}
-	else 
-	{  // Higher voltage is 32 bits
-		pgWidth = 32;
-		pgSize  = (2<<8);
-	}	
+    else if(voltage  < 2.1)
+    {
+        // Low voltage is 8 bits
+        pgWidth = 8;
+        pgSize  = 0;
+    }
+    else if(voltage  < 2.7)
+    {
+        // Mid voltage is 16 bits
+        pgWidth = 16;
+        pgSize  = (1<<8);
+    }
+    else
+    {
+        // Higher voltage is 32 bits
+        pgWidth = 32;
+        pgSize  = (2<<8);
+    }
 
     return 0;
 }
@@ -89,18 +84,24 @@ function flash_erase(sector, address)
     local result;
 
     // (1) Check that no Flash memory operation is ongoing by checking the BSY bit in the FLASH_SR register
-    do{
-       result = itrfApi.readMem32(0x40023c0C); if(result<0) return result;
-    }while ( itrfApi.value32 &  0x10000 );
+    do
+    {
+        result = itrfApi.readMem32(0x40023c0C);
+        if(result<0) return result;
+    }
+    while ( itrfApi.value32 &  0x10000 );
 
     // (2) Set the SER bit and select the sector out of the 8 in the main memory block) you wish to erase (SNB) in the FLASH_CR register
-    result = itrfApi.writeMem32(0x40023c10, (sector<<3) | pgSize | 2 ); if(result<0) return result;
+    result = itrfApi.writeMem32(0x40023c10, (sector<<3) | pgSize | 2 );
+    if(result<0) return result;
 
     // (3) Set the STRT bit in the FLASH_CR register also
-    result = itrfApi.writeMem32(0x40023c10, (sector<<3) | pgSize | 0x10002); if(result<0) return result;
+    result = itrfApi.writeMem32(0x40023c10, (sector<<3) | pgSize | 0x10002);
+    if(result<0) return result;
 
     // (4) Wait for the BSY bit to be cleared
-	result = flash_check_busy(); if(result<0) return result;
+    result = flash_check_busy();
+    if(result<0) return result;
 
     return 0;
 }
@@ -119,33 +120,37 @@ function flash_write(sector, address, buffer)
 
 
     // Enable the program flag PG in flash_CR together with the 32bits parallelism
-    result = itrfApi.writeMem32(0x40023c10, pgSize | 0x01 ); if(result<0) return result;
+    result = itrfApi.writeMem32(0x40023c10, pgSize | 0x01 );
+    if(result<0) return result;
 
-		
-	// Make length multiple of 256 bits.
-	if(buffer.byteLength & (pgWidth-1))
-		buffer.byteLength = buffer.byteLength + (pgWidth - (buffer.byteLength & (pgWidth-1)));
 
-	for(local count = 0; count < buffer.byteLength; )
-	{		
-		// pgWidth bits per time (depends on voltage)
-		result = itrfApi.writeMem(address, buffer, count, pgWidth );
-		if(result<0) return result;
-		address += pgWidth;
-		count   += pgWidth;
-			
-		// This is only needed for high speed writes
-		if( itrfApi.getSpeed() > 10000  )
-		{
-			result = flash_check_busy(); if(result<0) return result;
-		}
-	}	
-	
+    // Make length multiple of 256 bits.
+    if(buffer.byteLength & (pgWidth-1))
+        buffer.byteLength = buffer.byteLength + (pgWidth - (buffer.byteLength & (pgWidth-1)));
+
+    for(local count = 0; count < buffer.byteLength; )
+    {
+        // pgWidth bits per time (depends on voltage)
+        result = itrfApi.writeMem(address, buffer, count, pgWidth );
+        if(result<0) return result;
+        address += pgWidth;
+        count   += pgWidth;
+
+        // This is only needed for high speed writes
+        if( itrfApi.getSpeed() > 10000  )
+        {
+            result = flash_check_busy();
+            if(result<0) return result;
+        }
+    }
+
     // Wait for ready
-    result = flash_check_busy(); if(result<0) return result;
+    result = flash_check_busy();
+    if(result<0) return result;
 
     // Disable the program flag  PG in flash_CR
-    itrfApi.writeMem32(0x40023c10, 0); if(result<0) return result;
+    itrfApi.writeMem32(0x40023c10, 0);
+    if(result<0) return result;
 
 
     return 0;
@@ -184,30 +189,32 @@ function flash_erase_chip()
     // Chip erase sequence according ST user manual
     //
     // (1) Check that no Flash memory operation is ongoing by checking the BSY bit in the FLASH_SR register
-    do{
-       result = itrfApi.readMem32(0x40023c0C); if(result<0) return result;
-    }while ( itrfApi.value32 &  0x10000 );
+    // ....We skip this because every action is ending with this check
 
     // (2)Set the MER bit in the FLASH_CR register
-    result = itrfApi.writeMem32(0x40023c10,  4 ); if(result<0) return result;
+    result = itrfApi.writeMem32(0x40023c10,  4 );
+    if(result<0) return result;
 
     // (3) Set the STRT bit in the FLASH_CR register also
-    result = itrfApi.writeMem32(0x40023c10,  0x10004); if(result<0) return result;
+    result = itrfApi.writeMem32(0x40023c10,  0x10004);
+    if(result<0) return result;
 
     // (4) Wait for the BSY bit to be cleared
-    result = flash_check_busy(); if(result<0) return result;
+    result = flash_check_busy();
+    if(result<0) return result;
 
-	// Check for error
-	result = itrfApi.readMem32(0x40023c0C); 
+    // Check for error
+    result = itrfApi.readMem32(0x40023c0C);
 
     // Disable the flash engine
     flash_done();
 
-	// Evaluate the result
-	if ((itrfApi.value32 & 0xF2) || !(itrfApi.value32 & 0x01)){
-	    printf("Flash: chip erase failed!\n");
-		return -1;
-	}
+    // Evaluate the result
+    if ((itrfApi.value32 & 0xF2) || !(itrfApi.value32 & 0x01))
+    {
+        printf("Flash: chip erase failed!\n");
+        return -1;
+    }
 
     printf("Flash: chip erased.\n");
     return 0;
@@ -219,24 +226,25 @@ function flash_erase_chip()
 //
 function flash_check_busy()
 {
-	local result;
-	local time;
-	
-	
-	time = GetTickCount();
-    do{
-        result = itrfApi.readMem32(0x40023c0C); if(result<0) return result;
+    local result;
+    local time;
 
-	    // Timeout of 5sec
-	    if(GetTickCount() - time > 5000)
+    time = GetTickCount();
+    do
+    {
+        result = itrfApi.readMem32(0x40023c0C);
+        if(result<0) return result;
+
+        // Timeout of 5sec
+        if(GetTickCount() - time > 5000)
         {
             errorf("Error: Sector erase timeout\n");
             return -1;
         }
-		
-    }while ( itrfApi.value32 &  0x10000 );	
-	
-	return 0;
+    }
+    while ( itrfApi.value32 &  0x10000 );
+
+    return 0;
 }
 
 
