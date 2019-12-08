@@ -7,7 +7,7 @@ EBlink ARM Cortex-M debug tool with squirrel scripting device support
 Changes (8-12-2019) Release 1.1
 - Added: Multiple scripts possible (e.g. platform specific reset) with -D stm32-auto,myreset
 - Added: Script files can have their own extension, w/o extension .script is default
-- Fix:   Max 1800 usb packet length (wrong copy from texane) cause wrong RAM debugging
+- Fix:   Max 1800 usb packet length (wrong copy from texane) causes wrong RAM debugging
 
 ISSUES
 - If flash is empty and program is flashed and reset, a target exception is detected 
