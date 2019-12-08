@@ -1,3 +1,8 @@
+Changes (8-12-2019) Version 1.1
+- Added: Possibility to define multiple script file -D stm32auto,my_reset
+- Added: Script uses default .script unless an extension is given
+- Fixed: Mem download was truncated at 1800 bytes blocks 
+
 Changes (6-12-2019) Version 1.0
 - Added: script varaible VERSION to check API compatibility 
 - Fixed: At debug or trace no cursor animation
