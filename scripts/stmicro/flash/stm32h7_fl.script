@@ -163,14 +163,12 @@ function flash_write(sector, address, buffer)
 			itrfApi.writeMem(address, buffer, count, 32 );
 			address += 32;
 			count   += 32;
-		
-			// 5. Wait until the BSY1 bit of the flash_SR
 			
 			// This is only needed for high speed (ICP) but in case the V3 will be faster 
 			// in the future, we already catch it here.
 			if( itrfApi.getSpeed() > 25000  )
 			{
-				result = flash_check_busy(); if(result<0) return result;
+				//result = flash_check_busy(); if(result<0) return result;
 			}
 		}
     }
