@@ -174,7 +174,7 @@ function set_target(deviceId)
         return -1;	// We have already throw an error so use -1.
     }
 
-    // Call our generic entry point of the script we just loaded
+    // Call our generic entry point of the device script we just loaded
     return stm32_device(deviceId);
 }
 
