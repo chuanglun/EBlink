@@ -5,10 +5,10 @@
 EBlink ARM Cortex-M debug tool with squirrel scripting device support
 
 Changes (21-12-2019) Release 1.2
-- Added: animation type needed for tool integration
-         -a 0 (or just -a) -> turn off any progress animation
-		 -a 1              -> Animated cursor (default animation type)
-		 -a 2 (or higher)  -> Dotted progress with (n-1)*10ms resolution, so -p 11 = 100ms between dots.
+- Added: set animation type with -a [n], needed for tool integration
+	n = 0 (or just -a) -> turn off any progress animation
+	n = 1              -> Animated cursor (default animation type)
+	n = >1             -> Dotted progress with (n-1)*10ms resolution, so -a 11 = 100ms between dots.
 
 ISSUES
 - If flash is empty and program is flashed and reset, a target exception is detected 
@@ -40,7 +40,7 @@ eblink - usage:
 	-h,           --help			Print this help
 	-g,           --nogui			No GUI message boxes (win32 only)
 	-v <level>,   --verbose <0..7>		Specify generally verbose logging
-    -a [type],    --animation [0..]       Set the animation type (0=off, 1 = cursor, >1 = dot)	
+	-a [type],    --animation [0..]         Set the animation type (0=off, 1 = cursor, >1 = dot)	
 	-D <scripts>, --device <scripts>	Device script load list <.,.,.>
 	-T <options>, --target			Select target(optional) default cortex-m
 	-I <options>, --interf			Select interface
