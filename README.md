@@ -5,7 +5,7 @@
 EBlink ARM Cortex-M debug tool with squirrel scripting device support
 
 Changes (21-12-2019) Release 1.2
-- Added: set animation type with -a [n], needed for tool integration  
+- Added: set progress animation type with -a [n], needed for tool integration  
 	n = 0 (or just -a) -> turn off any progress animation  
 	n = 1              -> Animated cursor (default animation type)  
 	n = >1             -> Dotted progress with (n-1)*10ms resolution, so -a 11 = 100ms between dots.  
