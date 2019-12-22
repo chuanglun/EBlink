@@ -8,7 +8,7 @@ Changes (21-12-2019) Release 1.2
 - Added: set progress animation type with -a [n], needed for tool integration  
 	n = 0 (or just -a) -> turn off any progress animation  
 	n = 1              -> Animated cursor (default animation type)  
-	n > 1              -> Dotted progress with (n-1)*10ms resolution, so -a 11 = 100ms between dots.  
+	n > 1              -> Dotted progress with (n *10ms) resolution, so "-a 10" = 100ms between dots.  
 
 ISSUES
 - If flash is empty and program is flashed and reset, a target exception is detected 
