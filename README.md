@@ -4,9 +4,10 @@
 
 EBlink ARM Cortex-M debug tool with squirrel scripting device support
 
+#### V2.0 MAJOR CHANGE IN CLI
 Changes (21-1-2020) Release 2.0
-- The -D switch is replaced by -S and multiple -S switches can be used on command line
-- The -D switch is now to define symbols which can be used in scripts (like GCC -D)
+- The -D switch is replaced by -S and multiple -S switches can be used on command line [see issue](https://github.com/EmBitz/EBlink/issues/17)
+- The -D switch is now to define symbols which can be used in scripts (like GCC -D) [see issue](https://github.com/EmBitz/EBlink/issues/17)
 - The GDB switch 'S' (shutdown after disconnect) is now lowercase 's'  
  
 
@@ -39,22 +40,22 @@ eblink - usage:
 
 	-h,           --help			Print this help
 	-g,           --nogui			No GUI message boxes
-	-v <level>,   --verbose <0..7>	Specify level of verbose logging (default 4)
-	-a [type],    --animation [0..]	Set the animation type (0=off, 1 = cursor, >1 = dot)
-	-I <options>, --interf		Select interface
-	-T <options>, --target		Select target(optional)
+	-v <level>,   --verbose <0..7>		Specify level of verbose logging (default 4)
+	-a [type],    --animation [0..]		Set the animation type (0=off, 1 = cursor, >1 = dot)
+	-I <options>, --interf			Select interface
+	-T <options>, --target			Select target(optional)
 	-S <file>,    --script <file>		Load a device script file
-	-D <def>,     --define <def>		Define script global variable "name=vale"
-	-F <options>, --flash <options>	Run image flashing
+	-D <def>,     --define <def>		Define script global variable "name=value"
+	-F <options>, --flash <options>		Run image flashing
 	-G [options], --gdb <options>		Launch GDB server
 	
 	--script and --interf are mandatory, normally combined with --flash or/and --gdb
 
        e.g.
-       	EBlink -I stlink -S stm32-auto -G
-		EBlink -I stlink -S stm32-auto -G -D flashSize=1024 -D ramSize=16
-       	EBlink -I stlink,dr,speed=3000 -S silabs-auto -F erase,verify,run,file=mytarget.elf
-       	EBlink -I cmsis-dap -T cortex-m,nu -G port=4242,nc,s
+        EBlink -I stlink -S stm32-auto -G
+        EBlink -I stlink -S stm32-auto -G -D flashSize=1024 -D ramSize=16
+        EBlink -I stlink,dr,speed=3000 -S silabs-auto -F erase,verify,run,file=mytarget.elf
+        EBlink -I cmsis-dap -T cortex-m,nu -S stm32-auto -G port=4242,nc,s -S myReset.scr
 
 
 ==== Interfaces
