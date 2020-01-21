@@ -51,10 +51,10 @@ eblink - usage:
 	--script and --interf are mandatory, normally combined with --flash or/and --gdb
 
        e.g.
-       	EBlink -I stlink -S stm32-auto -G
-	EBlink -I stlink -S stm32-auto -G -D flashSize=1024 -D ramSize=16
-       	EBlink -I stlink,dr,speed=3000 -S silabs-auto -F erase,verify,run,file=mytarget.elf
-       	EBlink -I cmsis-dap -T cortex-m,nu -G port=4242,nc,s
+        EBlink -I stlink -S stm32-auto -G
+        EBlink -I stlink -S stm32-auto -G -D flashSize=1024 -D ramSize=16
+        EBlink -I stlink,dr,speed=3000 -S silabs-auto -F erase,verify,run,file=mytarget.elf
+        EBlink -I cmsis-dap -T cortex-m,nu -G port=4242,nc,s
 
 
 ==== Interfaces
