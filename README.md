@@ -45,7 +45,7 @@ eblink - usage:
 	-I <options>, --interf			Select interface
 	-T <options>, --target			Select target(optional)
 	-S <file>,    --script <file>		Load a device script file
-	-D <def>,     --define <def>		Define script global variable "name=vale"
+	-D <def>,     --define <def>		Define script global variable "name=value"
 	-F <options>, --flash <options>		Run image flashing
 	-G [options], --gdb <options>		Launch GDB server
 	
