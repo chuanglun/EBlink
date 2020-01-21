@@ -39,20 +39,20 @@ eblink - usage:
 
 	-h,           --help			Print this help
 	-g,           --nogui			No GUI message boxes
-	-v <level>,   --verbose <0..7>	Specify level of verbose logging (default 4)
-	-a [type],    --animation [0..]	Set the animation type (0=off, 1 = cursor, >1 = dot)
-	-I <options>, --interf		Select interface
-	-T <options>, --target		Select target(optional)
+	-v <level>,   --verbose <0..7>		Specify level of verbose logging (default 4)
+	-a [type],    --animation [0..]		Set the animation type (0=off, 1 = cursor, >1 = dot)
+	-I <options>, --interf			Select interface
+	-T <options>, --target			Select target(optional)
 	-S <file>,    --script <file>		Load a device script file
 	-D <def>,     --define <def>		Define script global variable "name=vale"
-	-F <options>, --flash <options>	Run image flashing
+	-F <options>, --flash <options>		Run image flashing
 	-G [options], --gdb <options>		Launch GDB server
 	
 	--script and --interf are mandatory, normally combined with --flash or/and --gdb
 
        e.g.
        	EBlink -I stlink -S stm32-auto -G
-		EBlink -I stlink -S stm32-auto -G -D flashSize=1024 -D ramSize=16
+	EBlink -I stlink -S stm32-auto -G -D flashSize=1024 -D ramSize=16
        	EBlink -I stlink,dr,speed=3000 -S silabs-auto -F erase,verify,run,file=mytarget.elf
        	EBlink -I cmsis-dap -T cortex-m,nu -G port=4242,nc,s
 
