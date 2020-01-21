@@ -1,1 +1,1 @@
-eblink.exe -I stlink,dr -D stm32-auto -G
+eblink.exe -I stlink,dr -S stm32-auto -G

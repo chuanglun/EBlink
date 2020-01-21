@@ -1,2 +1,2 @@
 #!/bin/bash
-./eblink -I stlink -D stm32-auto -G
+./eblink -I stlink -S stm32-auto -G

@@ -4,11 +4,11 @@
 
 EBlink ARM Cortex-M debug tool with squirrel scripting device support
 
-Changes (21-12-2019) Release 1.2
-- Added: set progress animation type with -a [n], needed for tool integration  
-	n = 0 (or just -a) -> turn off any progress animation  
-	n = 1              -> Animated cursor (default animation type)  
-	n > 1              -> Dotted progress with (n *10ms) resolution, so "-a 10" = 100ms between dots.  
+Changes (21-1-2020) Release 2.0
+- The -D switch is replaced by -S and multiple -S switches can be used on command line
+- The -D switch is now to define symbols which can be used in scripts (like GCC -D)
+- The GDB switch 'S' (shutdown after disconnect) is now lowercase 's'  
+ 
 
 ISSUES
 - If flash is empty and program is flashed and reset, a target exception is detected 
@@ -38,21 +38,23 @@ eblink - usage:
 	EBlink <options>
 
 	-h,           --help			Print this help
-	-g,           --nogui			No GUI message boxes (win32 only)
-	-v <level>,   --verbose <0..7>		Specify generally verbose logging
-	-a [type],    --animation [0..]         Set the animation type (0=off, 1 = cursor, >1 = dot)	
-	-D <scripts>, --device <scripts>	Device script load list <.,.,.>
-	-T <options>, --target			Select target(optional) default cortex-m
-	-I <options>, --interf			Select interface
-	-F <options>, --flash <options>		Run image flashing
+	-g,           --nogui			No GUI message boxes
+	-v <level>,   --verbose <0..7>	Specify level of verbose logging (default 4)
+	-a [type],    --animation [0..]	Set the animation type (0=off, 1 = cursor, >1 = dot)
+	-I <options>, --interf		Select interface
+	-T <options>, --target		Select target(optional)
+	-S <file>,    --script <file>		Load a device script file
+	-D <def>,     --define <def>		Define script global variable "name=vale"
+	-F <options>, --flash <options>	Run image flashing
 	-G [options], --gdb <options>		Launch GDB server
 	
-	--device and --interf are mandatory, normally combined with --flash or/and --gdb
+	--script and --interf are mandatory, normally combined with --flash or/and --gdb
 
        e.g.
-       	EBlink -I stlink -D stm32-auto -G
-       	EBlink -I stlink,dr,speed=3000 -D silabs-auto -F erase,verify,run,file=mytarget.elf
-       	EBlink -I cmsis-dap -T cortex-m,nu -G port=4242,nc
+       	EBlink -I stlink -S stm32-auto -G
+		EBlink -I stlink -S stm32-auto -G -D flashSize=1024 -D ramSize=16
+       	EBlink -I stlink,dr,speed=3000 -S silabs-auto -F erase,verify,run,file=mytarget.elf
+       	EBlink -I cmsis-dap -T cortex-m,nu -G port=4242,nc,s
 
 
 ==== Interfaces
@@ -114,9 +116,9 @@ name: cortex-m
      
      Usage -G [options]
 
-        S            : Shutdown after disconnect
+        s            : Shutdown after disconnect
         nc           : Don't use EBlink flash cache
         port=ppp     : Select different TCP port, default 2331
         address=x.x.x.x : Select different listen address, default 0.0.0.0
 
-        e.g.  -G S,nc
+        e.g.  -G s,nc
