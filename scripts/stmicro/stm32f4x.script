@@ -182,6 +182,7 @@ function stm32_device(deviceId)
         default:
         break;
     }
+	
 
     // Inform the user
     printf("Detected FLASH : 0x%X\nConfigured RAM : 0x%X\n", flash_size, ram_size);

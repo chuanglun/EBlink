@@ -5,6 +5,12 @@
 //     the device ID and include the corresponding
 //     device script's
 //
+//     The script tries to detect the right memory sizes
+//     however, if this is not correct you can set the sizes
+//     in kilobytes on the command line as:
+//
+//         -D FLASH_SIZE=xxx  and -D RAM_SIZE=xxxx check also device scripts)
+//
 
 itrfApi <- InterfAPI();  // Global so that all included script files also have access
 
@@ -16,14 +22,14 @@ function main()
 {
     local targetApi = :: TargetAPI(); // Needed for resetting
     local result;
-	
+
 	// Check if the right script API is supported
 	if( VERSION < 1)
 	{
 	   errorf("Error:\nIncompatiable EBlink version %.1f\n\tPlease update\n", VERSION);
 	   return -1;
-	}	
-	
+	}
+
     // If an IDE is used without hotplug capabilities then you could
     // uncomment the next line to force a reset.
     // Allowable  resets: ( SYSTEM_RESET, CORE_RESET, JTAG_RESET or USER_RESET)
@@ -79,10 +85,10 @@ function set_target(deviceId)
     case 0x457 : // CHIPID_STM32_L0_CAT1
         require("stmicro/stm32l0x.script");
         break;
-		
-    // Cortex M0+		
+
+    // Cortex M0+
     case 0x460 : // STM32G07xxx/08xxx
-    case 0x466 : // STM32G03xxx/04xxx	
+    case 0x466 : // STM32G03xxx/04xxx
 	    require("stmicro/stm32g0x.script");
         break;
 
@@ -148,10 +154,10 @@ function set_target(deviceId)
     case 0x435 : // CHIPID_STM32_L43X
         require("stmicro/stm32l4x.script");
         break;
-		
-    // Cortex M4		
-	case 0x468 : // STM32G431xx/441xx  
-	case 0x469 : // STM32G47xxx/48xxx 
+
+    // Cortex M4
+	case 0x468 : // STM32G431xx/441xx
+	case 0x469 : // STM32G47xxx/48xxx
 	    require("stmicro/stm32g4x.script");
         break;
 

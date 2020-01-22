@@ -87,11 +87,6 @@ function stm32_device(deviceId)
     flash_size = itrfApi.value32 >>16;
     flash_size = (flash_size & 0xffff) * 1024;
 
-    if(flash_size>0x100000)
-      string_2MB = mem_template_2MB;
-     else
-      string_2MB = "";
-
     switch(deviceId) {
 
     case 0x449 : // CHIPID_STM32_F7
@@ -107,11 +102,31 @@ function stm32_device(deviceId)
             break;
 
     }
+	
+    // Inform the user
+    printf("Detected FLASH : 0x%X\nConfigured RAM : 0x%X\n", flash_size, ram_size);	
+	
+	// The user specified the size of flash memory
+	if (isScriptObject("FLASH_SIZE") && FLASH_SIZE>0)
+    {
+	  flash_size = (FLASH_SIZE & 0xffff) * 1024;
+	  printf("CLI set  FLASH : 0x%X\n", flash_size);	  
+	}
+	
+	// The user specified the size of ram memory
+	if (isScriptObject("RAM_SIZE") && RAM_SIZE>0)
+    {
+	  ram_size = (RAM_SIZE & 0xffff) * 1024;
+	  printf("CLI set    RAM : 0x%X\n", ram_size);		  
+	}
+
+    if(flash_size>0x100000)
+      string_2MB = mem_template_2MB;
+     else
+      string_2MB = "";
 
     devApi.memmap( format(mem_template_F7, ram_size, string_2MB));
 
-    // Inform the user
-    printf("Detected FLASH : 0x%X\nConfigured RAM : 0x%X\n", flash_size, ram_size);
 
     require("stmicro/flash/stm32f7f4_fl.script");
 

@@ -45,12 +45,12 @@ function main()
     local devApi = ::DeviceAPI(); // We only use the device class wrapper in this function
     local result;
 
-    // Check if the right script API is supported
-    if( VERSION < 1)
-    {
-        errorf("Error:\nIncompatiable EBlink version %.1f\nPlease update EBlink\n", VERSION);
-        return -1;
-    }	
+	// Check if the right script API is supported
+	if( VERSION < 1)
+	{
+	   errorf("Error:\nIncompatiable EBlink version %.1f\nPlease update EBlink\n", VERSION);
+	   return -1;
+	}	
 	
     // Get the family ID and part number
     result = itrfApi.readMem32(0x0FE081FC);
@@ -228,11 +228,24 @@ function main()
 
     // Get the MEM_INFO_FLASH and MEM_INFO_RAM
     result = itrfApi.readMem32(0x0FE081F8 );
+
     flashSize = itrfApi.value32 & 0xFFFF;
     local ramSize = (itrfApi.value32 >> 16) & 0xFFFF;
-    
-    // Inform the user about our memory
-    printf("Detected FLASH : 0x%X (0x%X)\nDetected   RAM : 0x%X\n", flashSize, pageSize, ramSize);    
+	
+	// The user specified the size of flash memory
+	if (isScriptObject("FLASH_SIZE") && FLASH_SIZE>0)
+    {
+	  flashSize = FLASH_SIZE & 0xffff;
+	}
+	
+	// The user specified the size of ram memory
+	if (isScriptObject("RAM_SIZE") && RAM_SIZE>0)
+    {
+	  ramSize = RAM_SIZE & 0xffff;
+	}
+
+    printf("Detected FLASH %d Kbyte - Page %d bytes\n", flashSize, pageSize);
+    printf("Detected RAM   %d Kbyte\n", ramSize);
 
     // Build the XML memory map and set it active.
     devApi.memmap( format( mem_template,  flashSize*1024, pageSize, ramSize*1024 ));
@@ -244,18 +257,16 @@ function main()
 //
 // Additional commands after reset (optional)
 //
-// resetType:
-//        SYSTEM_RESET
-//        CORE_RESET
-//        JTAG_RESET
-//        USER_RESET
+//  resetType :  0 = Core
+//               1 = pin
+//               2 = user script
 //
 function  reset_post(resetType)
 {
     // We don't use this if the reset is an user_script type. In that
     // case, the user is responsible to initialize the chip and we don't
     // gonna intervene with it.
-    if( resetType < USER_RESET)
+    if( resetType < 2)
     {
         // Set the Stack pointer according the Vector table entry
         itrfApi.readMem32(0x00000000);

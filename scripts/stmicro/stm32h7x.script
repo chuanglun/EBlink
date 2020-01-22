@@ -111,6 +111,32 @@ function stm32_device(deviceId)
     result = itrfApi.readMem32(0x1ff1e880);
     flash_size = (itrfApi.value32 & 0xffff) * 1024;
 
+
+    switch(deviceId) {
+
+    case 0x450 : // CHIPID_STM32_H7XXXX
+            ram_size = 0x80000;
+            break;
+
+    }
+	
+    // Inform the user
+    printf("Detected FLASH : 0x%X\nConfigured RAM : 0x%X\n", flash_size, ram_size);	
+	
+	// The user specified the size of flash memory
+	if (isScriptObject("FLASH_SIZE") && FLASH_SIZE>0)
+    {
+	  flash_size = (FLASH_SIZE & 0xffff) * 1024;
+	  printf("CLI set  FLASH : 0x%X\n", flash_size);	  
+	}
+	
+	// The user specified the size of ram memory
+	if (isScriptObject("RAM_SIZE") && RAM_SIZE>0)
+    {
+	  ram_size = (RAM_SIZE & 0xffff) * 1024;
+	  printf("CLI set    RAM : 0x%X\n", ram_size);		  
+	}
+
     if(flash_size>0x100000)
     {
       flash_1bank = 0x100000;
@@ -123,20 +149,8 @@ function stm32_device(deviceId)
       string_2MB = "";
     }
 
-    switch(deviceId) {
-
-
-    case 0x450 : // CHIPID_STM32_H7XXXX
-            ram_size = 0x80000;
-            break;
-
-    }
-
     // Generate XML and put it in EBlink's device object
     devApi.memmap( format(mem_template_H7, flash_1bank, string_2MB));
-
-    // Inform the user
-    printf("Detected FLASH : 0x%X\nConfigured RAM : 0x%X\n", flash_size, ram_size);
 
     require("stmicro/flash/stm32h7_fl.script");
 
