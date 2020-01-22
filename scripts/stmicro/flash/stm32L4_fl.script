@@ -39,14 +39,14 @@ function flash_start()
 
     // Pre load the Halfword flash loader at the start of RAM and save the loader size.
     // The return value is length of bytes loaded ( >0) or error (<0)
-    dataStart = itrfApi.loadBin("scripts/stmicro/flash/stm32L4_fl.bin", 0x20000000);
+    dataStart = itrfApi.loadBin("stmicro/flash/stm32L4_fl.bin", 0x20000000);
 
     // If dataStart is <0 = Error
     if(dataStart < 0 )
     {
        // Check if we already notified the user (< -1) otherwise, do so.
        if(dataStart < -1)
-           errorf("Script error loading flash loader: " + "scripts/stmicro/flash/stm32L4_fl.bin" );
+           errorf("Script error loading flash loader: " + "stmicro/flash/stm32L4_fl.bin" );
        return -1;
     }
 

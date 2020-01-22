@@ -124,7 +124,7 @@ function set_target(deviceId)
             break;
         }
 
-        require("stm32f2x.script");
+        require("stmicro/stm32f2x.script");
         break;
 
     // Cortex M4
