@@ -9,7 +9,7 @@
 //     however, if this is not correct you can set the sizes
 //     in kilobytes on the command line as:
 //
-//         -D FLASH_SIZE=xxx  and -D RAM_SIZE=xxxx check also device scripts)
+//         -D FLASH_SIZE=xxx  and -D RAM_SIZE=xxxx  (check also device scripts)
 //
 
 itrfApi <- InterfAPI();  // Global so that all included script files also have access
