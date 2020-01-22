@@ -46,7 +46,7 @@ function flash_start()
     {
        // Check if we already notified the user (< -1) otherwise, do so.
        if(dataStart < -1)
-           errorf("Script error loading flash loader: " + "scripts/stmicro/flash/stm32HW_fl.bin" );
+           errorf("Script error loading flash loader: " + "stmicro/flash/stm32HW_fl.bin" );
        return -1;
     }
 
