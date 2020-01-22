@@ -1,6 +1,7 @@
 Changes (21-1-2020) Release 2.0
 - Changed: The -D switch is replaced by -S and multiple -S switches can be used on command line
 - Added:   The -D switch is now to define symbols which can be used in scripts (like GCC -D)
+- Added:   The -P switchs will add search paths for the script files
 - Changed: The GDB switch 'S' (shutdown after disconnect) is now lowercase 's' 
 
 Changes (21-12-2019) Release 1.2
