@@ -4,6 +4,8 @@
 
 EBlink ARM Cortex-M debug tool with squirrel scripting device support
 
+Also available at: https://git.embitz.org/explore/repos
+
  #### R2.0 MAJOR CHANGE IN CLI
 Changes (21-1-2020) Release 2.0
 - The -D switch is replaced by -S and multiple -S switches can be used on command line [see issue](https://github.com/EmBitz/EBlink/issues/17)
