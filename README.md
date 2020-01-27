@@ -17,9 +17,10 @@ Changes (21-1-2020) Release 2.0
 - if you need live variables for e.g. Embitz (OpenOCD doesn't support live variables)
 - as a non-intrusive memory inspector (eblink supports non-stop mode )
 - for easy complex custom board reset strategies or memory maps with special options
+- for faster debug sessions because of the EBlink flash cache (e.g. only modified sectors are rewritten)
 - for using easy auto configuration scripts
-- for faster debug sessions because of the EBlink caching (only modified sectors are rewritten)
 - as a remote GDB server e.g. Raspberrypi (lightweight)
+- simple standalone flash tool
 
 ![Silabs with STlink-V2](https://www.sysdes.nl/github/SilabsStlinkV2_4.png)  
 
