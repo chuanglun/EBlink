@@ -12,13 +12,14 @@ Changes (21-1-2020) Release 2.0
 - The -D switch is now to define symbols which can be used in scripts (like GCC -D) [see issue](https://github.com/EmBitz/EBlink/issues/17)
 - New -P switch to add a script search path, multiple -P are allowed
 - The GDB switch 'S' (shutdown after disconnect) is now lowercase 's'  
- 
-
-ISSUES
-- If flash is empty and program is flashed and reset, a target exception is detected 
-  and an UNWIND is happening. Just ignore!
-- Non STmicro devices (e.g. Silabs, NXP) are only working with STlink-V2.
-  
+   
+ ##### When Eblink instead of OpenOCD:
+- if you need live variables for e.g. Embitz (OpenOCD doesn't support live variables)
+- as a non-intrusive memory inspector (eblink supports non-stop mode )
+- for easy complex custom board reset strategies or memory maps with special options
+- for using easy auto configuration scripts
+- for faster debug sessions because of the EBlink caching (only modified sectors are rewritten)
+- as a remote GDB server e.g. Raspberrypi (lightweight)
 
 ![Silabs with STlink-V2](https://www.sysdes.nl/github/SilabsStlinkV2_4.png)  
 
@@ -36,6 +37,12 @@ Remarks:
 1) EBlink uses ROM caching for speed performance. It is parsing the same XML memory map, which is provided by scripting, which is offered to GDB to get the memory information. If GDB reads memory from the ROM (flash) region then EBlink will not query the target but will instead return from cache. Sometimes, like debugging flash writing applications (e.g. bootloader), this behavior is not preferred and doesn't show the real flash modifications in GDB. If flash modifying code is debugged, turn off the caching with the "nc" GDB server option.
 
 2) By default, the "Connection under reset" for the stlink interface is enabled. For hotplugging use the "dr" switch (Disable Reset) for the stlink interface e.g. -I stlink,dr
+
+
+ISSUES
+- If flash is empty and program is flashed and reset, a target exception is detected 
+  and an UNWIND is happening. Just ignore!
+- Non STmicro devices (e.g. Silabs, NXP) are only working with STlink-V2.
 
 eblink - usage:
 
