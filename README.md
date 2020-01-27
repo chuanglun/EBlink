@@ -19,7 +19,7 @@ Changes (21-1-2020) Release 2.0
 - for easy complex custom board reset strategies or memory maps with special options
 - for faster debug sessions because of the EBlink flash cache (e.g. only modified sectors are rewritten)
 - for using easy auto configuration scripts
-- as a remote GDB server e.g. Raspberrypi (lightweight)
+- as a remote GDB server e.g. Raspberry (lightweight)
 - simple standalone flash tool
 
 ![Silabs with STlink-V2](https://www.sysdes.nl/github/SilabsStlinkV2_4.png)  
