@@ -25,7 +25,7 @@ Changes (21-1-2020) Release 2.0
 ![Silabs with STlink-V2](https://www.sysdes.nl/github/SilabsStlinkV2_4.png)  
 
   
-EBlink features:
+### EBlink features:
 - Integrated target stack frame UNWIND in case of exception with message box popup in windows.
 - GDB server with flash caching, with EmBitz live variables/expression support!
 - Supports Hotplug for Embitz 1.1 [see issue](https://github.com/EmBitz/EBlink/issues/3#issue-518281157) and 2.0 (monitor command "IsRunning" for target state query)
@@ -33,19 +33,19 @@ EBlink features:
 - All device related functions by squirrel scripting e.g. flash algorithm, device reset strategy etc etc
 - Ready for multiple interfaces
 
-Remarks:
+#### Remarks:
 
 1) EBlink uses ROM caching for speed performance. It is parsing the same XML memory map, which is provided by scripting, which is offered to GDB to get the memory information. If GDB reads memory from the ROM (flash) region then EBlink will not query the target but will instead return from cache. Sometimes, like debugging flash writing applications (e.g. bootloader), this behavior is not preferred and doesn't show the real flash modifications in GDB. If flash modifying code is debugged, turn off the caching with the "nc" GDB server option.
 
 2) By default, the "Connection under reset" for the stlink interface is enabled. For hotplugging use the "dr" switch (Disable Reset) for the stlink interface e.g. -I stlink,dr
 
 
-ISSUES
+#### ISSUES
 - If flash is empty and program is flashed and reset, a target exception is detected 
   and an UNWIND is happening. Just ignore!
 - Non STmicro devices (e.g. Silabs, NXP) are only working with STlink-V2.
 
-eblink - usage:
+## eblink - usage:
 
 	EBlink <options>
 
