@@ -15,7 +15,7 @@ Changes (21-1-2020) Release 2.0
    
  ##### When to consider EBlink instead of OpenOCD:
 - if you need live variables for e.g. Embitz (OpenOCD doesn't support live variables)
-- as a non-intrusive memory inspector (eblink supports non-stop mode )
+- as a non-intrusive memory inspector (eblink supports hot-plugging and non-stop mode )
 - for easy complex custom board reset strategies or memory maps with special options
 - for faster debug sessions because of the EBlink flash cache (e.g. only modified sectors are rewritten)
 - for using easy auto configuration scripts
