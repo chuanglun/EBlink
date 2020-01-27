@@ -13,7 +13,7 @@ Changes (21-1-2020) Release 2.0
 - New -P switch to add a script search path, multiple -P are allowed
 - The GDB switch 'S' (shutdown after disconnect) is now lowercase 's'  
    
- ##### When to considering EBlink instead of OpenOCD:
+ ##### When to consider EBlink instead of OpenOCD:
 - if you need live variables for e.g. Embitz (OpenOCD doesn't support live variables)
 - as a non-intrusive memory inspector (eblink supports non-stop mode )
 - for easy complex custom board reset strategies or memory maps with special options
