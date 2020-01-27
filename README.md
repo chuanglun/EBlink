@@ -45,7 +45,7 @@ Changes (21-1-2020) Release 2.0
   and an UNWIND is happening. Just ignore!
 - Non STmicro devices (e.g. Silabs, NXP) are only working with STlink-V2.
 
-## eblink - usage:
+## EBlink - usage:
 
 	EBlink <options>
 
