@@ -65,7 +65,7 @@ Changes (21-1-2020) Release 2.0
 
        e.g.
         EBlink -I stlink -S stm32-auto -G
-        EBlink -I stlink -S stm32-auto -G -D flashSize=1024 -D ramSize=16
+        EBlink -I stlink -S stm32-auto -G -D FLASH_SIZE=1024 -D RAM_SIZE=16
         EBlink -I stlink,dr,speed=3000 -S silabs-auto -F erase,verify,run,file=mytarget.elf
         EBlink -I cmsis-dap -T cortex-m,nu -S stm32-auto -G port=4242,nc,s -S myReset.scr
 
