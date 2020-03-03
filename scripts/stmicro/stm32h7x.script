@@ -97,8 +97,17 @@ function stm32_device(deviceId)
     // Enable debug clocks: DBG_STANDBY & DBG_STOP & DBG_SLEEP - RM0090 Page 1676/1705
     result = itrfApi.writeMem32(0x5c001004, 7);
 
-    // Stop watchdog counters during halt: DBGMCU_APB1_FZ = DBG_IWDG_STOP | DBG_WWDG_STOP
-    result = itrfApi.writeMem32(0xE0042008, 0x00001800);
+    // Stop watchdog counters during halt: DBGMCU_APB3FZ2 |= WWDG1
+	itrfApi.readMem32(0xE00E1038)
+    result = itrfApi.writeMem32(0xE00E1038, itrfApi.value32 | 0x40);
+	
+    // Stop watchdog counters during halt: DBGMCU_APB1LFZ2 |= WWDG2
+	itrfApi.readMem32(0xE00E1040)
+    result = itrfApi.writeMem32(0xE00E1040, itrfApi.value32 | 0x800);	
+	
+    // Stop watchdog counters during halt: DBGMCU_APB4FZ2 |= WDGLSD1 | WDGLSD2
+	itrfApi.readMem32(0xE00E1058)
+    result = itrfApi.writeMem32(0xE00E1058, itrfApi.value32 | 0xC0000)	
 
 	// If IWDG runs as HARDWARE watchdog (44.3.4) erase
 	// will be aborted by the Watchdog and erase fails!
