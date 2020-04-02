@@ -9,7 +9,7 @@ Also available at: https://git.embitz.org/explore/repos
  #### R2.0 MAJOR CHANGE IN CLI
 Changes (2-4-2020) Release 2.1
 - Added: Breakpoint instruction (brkpt) handling single step
-- Added: Semihosting 
+- Added: Semihosting ( "monitor semihosting enable/disable" or "monitor EnableSemihost")
    
  ##### When to consider EBlink instead of OpenOCD:
 - if you need live variables for e.g. Embitz (OpenOCD doesn't support live variables)
