@@ -7,11 +7,9 @@ EBlink ARM Cortex-M debug tool with squirrel scripting device support
 Also available at: https://git.embitz.org/explore/repos
 
  #### R2.0 MAJOR CHANGE IN CLI
-Changes (21-1-2020) Release 2.0
-- The -D switch is replaced by -S and multiple -S switches can be used on command line [see issue](https://github.com/EmBitz/EBlink/issues/17)
-- The -D switch is now to define symbols which can be used in scripts (like GCC -D) [see issue](https://github.com/EmBitz/EBlink/issues/17)
-- New -P switch to add a script search path, multiple -P are allowed
-- The GDB switch 'S' (shutdown after disconnect) is now lowercase 's'  
+Changes (2-4-2020) Release 2.1
+- Added: Breakpoint instruction (brkpt) handling single step
+- Added: Semihosting 
    
  ##### When to consider EBlink instead of OpenOCD:
 - if you need live variables for e.g. Embitz (OpenOCD doesn't support live variables)

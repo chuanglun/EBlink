@@ -1,3 +1,7 @@
+Changes (2-4-2020) Release 2.1
+- Added: Breakpoint instruction (brkpt) handling single step
+- Added: Semihosting
+
 Changes (21-1-2020) Release 2.0
 - Changed: The -D switch is replaced by -S and multiple -S switches can be used on command line
 - Added:   The -D switch is now to define symbols which can be used in scripts (like GCC -D)
