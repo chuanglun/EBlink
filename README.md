@@ -85,7 +85,7 @@ name: STlink - STmicro V2/3 interface driver
 	
 	Usage -I stlink[,options]
 
-        dr           : Disable reset at connection (hotplug)
+        dr           : Disable reset at connection (same as cli --hotplug)
         speed=nnn    : Interface speed (default max possible)
         swd          : use SWD (default)
         jtag         : use Jtag
