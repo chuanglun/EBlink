@@ -53,7 +53,7 @@ Changes (2-4-2020) Release 2.1
 	-g,           --nogui			No GUI message boxes
 	-v <level>,   --verbose <0..7>		Specify level of verbose logging (default 4)
 	-a [type],    --animation [0..]		Set the animation type (0=off, 1 = cursor, >1 = dot)
-	-H,           --hotplug         Don't reset at target connection
+	-H,           --hotplug                 Don't reset at target connection
 	-I <options>, --interf			Select interface
 	-T <options>, --target			Select target(optional)
 	-S <file>,    --script <file>		Load a device script file
