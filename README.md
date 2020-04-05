@@ -6,7 +6,9 @@ EBlink ARM Cortex-M debug tool with squirrel scripting device support
 
 Also available at: https://git.embitz.org/explore/repos
 
- #### R2.0 MAJOR CHANGE IN CLI
+Changes (5-4-2020) Release 2.2
+- Added: --hotplug (-H) used in Embitz 2.0 for easy connection at running target without stopping
+
 Changes (2-4-2020) Release 2.1
 - Added: Breakpoint instruction (brkpt) handling single step
 - Added: Semihosting 
@@ -51,6 +53,7 @@ Changes (2-4-2020) Release 2.1
 	-g,           --nogui			No GUI message boxes
 	-v <level>,   --verbose <0..7>		Specify level of verbose logging (default 4)
 	-a [type],    --animation [0..]		Set the animation type (0=off, 1 = cursor, >1 = dot)
+	-H,           --hotplug         Don't reset at target connection
 	-I <options>, --interf			Select interface
 	-T <options>, --target			Select target(optional)
 	-S <file>,    --script <file>		Load a device script file
