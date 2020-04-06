@@ -255,18 +255,20 @@ function main()
 
 /////////////////////////////////////////////////////////////////////////////////
 //
-// Additional commands after reset (optional)
+// Additional commands after reset (optional) called by EBlink
 //
-//  resetType :  0 = Core
-//               1 = pin
-//               2 = user script
+// resetType:
+//        SYSTEM_RESET
+//        CORE_RESET
+//        JTAG_RESET
+//        USER_RESET
 //
 function  reset_post(resetType)
 {
     // We don't use this if the reset is an user_script type. In that
     // case, the user is responsible to initialize the chip and we don't
     // gonna intervene with it.
-    if( resetType < 2)
+    if( resetType != USER_RESET)
     {
         // Set the Stack pointer according the Vector table entry
         itrfApi.readMem32(0x00000000);
