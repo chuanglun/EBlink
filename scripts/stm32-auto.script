@@ -45,6 +45,10 @@ function main()
     //Otherwise.. Perhaps H7
     if( (result >=0) && (itrfApi.value32 == 0) )
         result = itrfApi.readMem32(0x5C001000);
+		
+    //Otherwise.. Perhaps L5
+    if( (result >=0) && (itrfApi.value32 == 0) )
+        result = itrfApi.readMem32(0xE0044000);		
 
     // If we still haven't a valid device ID, inform user and quit
     if(  (result < 0 ) || (itrfApi.value32 == 0) )
@@ -171,6 +175,11 @@ function set_target(deviceId)
     // Cortex M7
 	case 0x450 : // CHIPID_STM32H7
 	    require("stmicro/stm32h7x.script");
+        break;
+		
+	// Cortex M33
+    case 0x472: // CHIPID_STM32_L552xx/L562xx
+		require("stmicro/stm32l5x.script");
         break;
 
 	// ---------- Not supported ChipId yet -----------
