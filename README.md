@@ -8,9 +8,9 @@ Also available at: https://git.embitz.org/explore/repos
 
 Changes (7-4-2020) Release 2.3
 - Added: The flash option "mod" to do flash modifications. This option can be used with or
-         without file flashing. If a file is given then the modifications are done at file image.
+         without file flashing. If a file is given then the modifications are done at file image. Muliple mods are allowed.
 	 
-		 e.g. EBlink -I stlink -S stm32-auto -F mod=080000004;DEAD12345678
+		 e.g. EBlink -I stlink -S stm32-auto -F mod=080000004;DEAD12345678,mod=080001000;12345678DEAD
 		 
 		      EBlink -I stlink -S stm32-auto -F file=test,mod=080000004;DEAD12345678		 
 		 
@@ -25,6 +25,7 @@ Changes (5-4-2020) Release 2.2
 - for faster debug sessions because of the EBlink flash cache (e.g. only modified sectors are rewritten)
 - for using easy auto configuration scripts
 - as a remote (wifi) GDB server e.g. Raspberry (lightweight)
+- If you need a CLI programmer to modify particular flash locations (checksum, serials etc)
 - simple standalone flash tool
 
 ![Silabs with STlink-V2](https://www.sysdes.nl/github/SilabsStlinkV2_4.png)  
