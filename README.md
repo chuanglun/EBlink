@@ -8,7 +8,7 @@ Also available at: https://git.embitz.org/explore/repos
 
 Changes (7-4-2020) Release 2.3
 - Added: The flash option "mod" to do flash modifications. This option can be used with or
-         without file flashing. If a file is given then the modifications are done at file image.
+         without file flashing. If a file is given then the modifications are done at file image.		 
 		 e.g. EBlink -I stlink -S stm32-auto -F mod=080000004;DEAD12345678
 		      EBlink -I stlink -S stm32-auto -F file=test,mod=080000004;DEAD12345678		 
 		 
