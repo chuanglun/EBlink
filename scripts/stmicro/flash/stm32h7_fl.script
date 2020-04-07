@@ -35,11 +35,15 @@ function flash_start()
         }
 	} while(targetApi.getState() != TARGET_HALTED )
 
+	if (isScriptObject("SKIP_VLC") && SKIP_VLC==0)
+	{
+	
     if(itrfApi.targetVoltage() < 2.7)
     {
         errorf("Error: Current STM32H7x flash algorithm needs at least 2.7V\nTarget voltage is %.2f V\n", itrfApi.targetVoltage());
         return -1;
     }
+	}
 
 	// No errors
     return 0;

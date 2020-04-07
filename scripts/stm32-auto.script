@@ -211,7 +211,7 @@ function  reset_post(resetType)
     // We don't use this if the reset is a user_script type. In that
     // case, the user is responsible for the initialization.
 	//
-    if( resetType < USER_RESET)
+    if( resetType != USER_RESET )
     {
         // Set the Stack pointer according the Vector table entry
         itrfApi.readMem32(0x08000000);

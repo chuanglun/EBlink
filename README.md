@@ -6,12 +6,15 @@ EBlink ARM Cortex-M debug tool with squirrel scripting device support
 
 Also available at: https://git.embitz.org/explore/repos
 
+Changes (7-4-2020) Release 2.3
+- Added: The flash option "mod" to do flash modifications. This option can be used with or
+         without file flashing. If a file is given then the modifications are done at file image.
+		 e.g. EBlink -I stlink -S stm32-auto -F mod=080000004;DEAD12345678
+		      EBlink -I stlink -S stm32-auto -F file=test,mod=080000004;DEAD12345678		 
+		 
 Changes (5-4-2020) Release 2.2
 - Added: --hotplug (-H) used in Embitz 2.0 for launching EBlink at a running target without stopping the target
 
-Changes (2-4-2020) Release 2.1
-- Added: Breakpoint instruction (brkpt) handling single step
-- Added: Semihosting ( "monitor semihosting enable/disable" or "monitor EnableSemihost")
    
  ##### When to consider EBlink instead of OpenOCD:
 - if you need live variables for e.g. Embitz (OpenOCD doesn't support live variables)
@@ -111,6 +114,8 @@ name: cortex-m
         erase        : Chip erase the flash
         verify       : Verify flash after upload
         run          : Start image
+        mod=<hex address>;<hex byte(s)>
+                     : Modify flash location at address with a given byte array
         file=<file>  : Load the file, <file>.hex  = Intel HEX format
                                       <file>.srec = Motorola srec file format
 
@@ -118,12 +123,14 @@ name: cortex-m
 
         e.g. -F file=test.elf
              -F run,file=test.hex		
+             -F run,verify,mod=80000004;DEAD
+             -F run,file=test.hex,mod=80000004;45FECA1245,mod=80000100;DEAD
              -F erase,verify,run,file=test.srec
              -F erase
              -F run			 
 
         Default (without erase) only modified sectors are (re)flashed.
-
+		Multiple modifications are allowed and is done after any file upload.
 
 
 ==== GDB server
