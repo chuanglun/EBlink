@@ -10,7 +10,7 @@ Changes (7-4-2020) Release 2.3
 - Added: The flash option "mod" to do flash modifications. This option can be used with or
          without file flashing. If a file is given then the modifications are done at file image. Muliple mods are allowed.
 	 
-		 e.g. EBlink -I stlink -S stm32-auto -F mod=080000004;DEAD12345678,mod=080001000;12345678DEAD
+		 e.g. EBlink -I stlink -S stm32-auto -F mod=080000004;DEAD12345678,mod=080001000;4567
 		 
 		      EBlink -I stlink -S stm32-auto -F file=test,mod=080000004;DEAD12345678		 
 		 
