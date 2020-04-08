@@ -7,8 +7,8 @@ EBlink ARM Cortex-M debug tool with squirrel scripting device support
 Also available at: https://git.embitz.org/explore/repos
 
 Changes (7-4-2020) Release 2.3
-- Added: The flash option "mod" to do flash modifications. This option can be used with or
-         without file flashing. If a file is given then the modifications are done at file image. Muliple mods are allowed.
+- Added: The flash option "mod" to do flash modifications on byte(s) level. This option can be used with or
+         without file flashing. If a file is given then the modifications are done at file image in cache before flashing. Muliple mods are allowed.
 	 
 		 e.g. EBlink -I stlink -S stm32-auto -F mod=080000004;DEAD12345678,mod=080001000;4567FE,mod=08000A201;EB
 		 
