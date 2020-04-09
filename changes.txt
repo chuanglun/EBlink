@@ -1,3 +1,13 @@
+Changes (9-4-2020) Release 2.4
+- Added: The flash option "read"  which will read a memory location from target and will return it 
+         as a hex string. Use verbose level 8 to minimize info.
+         Syntax read=<dec byte length>@<hex address>
+                e.g.  EBlink -I stlink -S stm32-auto -F read=4@080000000,read=4@080000004
+
+- Changed: The flash option "mod" is changed to write. Syntax write=hhhhhhhh@aaaaaa 
+		 e.g. EBlink -I stlink -S stm32-auto -F write=12345678@080000004
+
+
 Changes (7-4-2020) Release 2.3
 - Added: The flash option "mod" to do flash modifications. This option can be used with or
          without file flashing. If a file is given then the modifications are done at file image.

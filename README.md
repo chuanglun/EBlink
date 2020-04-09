@@ -6,26 +6,25 @@ EBlink ARM Cortex-M debug tool with squirrel scripting device support
 
 Also available at: https://git.embitz.org/explore/repos
 
-Changes (7-4-2020) Release 2.3
-- Added: The flash option "mod" to do flash modifications on byte(s) level. This option can be used with or
-         without file flashing. If a file is given then the modifications are done at file image in cache before flashing. Muliple mods are allowed.
-	 
-		 e.g. EBlink -I stlink -S stm32-auto -F mod=080000004;DEAD12345678,mod=080001000;4567FE,mod=08000A201;EB
-		 
-		      EBlink -I stlink -S stm32-auto -F file=test,mod=080000004;DEAD12345678		 
-		 
-Changes (5-4-2020) Release 2.2
-- Added: --hotplug (-H) used in Embitz 2.0 for launching EBlink at a running target without stopping the target
+Changes (9-4-2020) Release 2.4
+- Added: The flash option "read"  which will read a memory (also ram) location from target and will return it 
+         as a hex string. Use verbose level 8 to minimize info. Use -H to read from running target without stopping.
+         Syntax read=<dec byte length>@<hex address>
+                e.g.  EBlink -I stlink -S stm32-auto -F read=4@080000000,read=4@080000004
+
+- Changed: The flash option "mod" is changed to write. Syntax write=hhhhhhhh@aaaaaa 
+		 e.g. EBlink -I stlink -S stm32-auto -F write=12345678@080000004
 
    
  ##### When to consider EBlink instead of OpenOCD:
 - if you need live variables for e.g. Embitz (OpenOCD doesn't support live variables)
 - as a non-intrusive memory inspector (eblink supports hot-plugging and non-stop mode )
+- if you need a CLI memory reader to read particular memory locations (also on running targets) and print them at stdout
+- if you need a CLI programmer to modify particular flash locations (checksum, serials etc)
 - for easy complex custom board reset strategies or memory maps with special options
 - for faster debug sessions because of the EBlink flash cache (e.g. only modified sectors are rewritten)
 - for using easy auto configuration scripts
 - as a remote (wifi) GDB server e.g. Raspberry (lightweight)
-- If you need a CLI programmer to modify particular flash locations (checksum, serials etc)
 - simple standalone flash tool
 
 ![Silabs with STlink-V2](https://www.sysdes.nl/github/SilabsStlinkV2_4.png)  
@@ -57,7 +56,7 @@ Changes (5-4-2020) Release 2.2
 
 	-h,           --help			Print this help
 	-g,           --nogui			No GUI message boxes
-	-v <level>,   --verbose <0..7>		Specify level of verbose logging (default 4)
+	-v <level>,   --verbose <0..8>		Specify level of verbose logging (default 4)
 	-a [type],    --animation [0..]		Set the animation type (0=off, 1 = cursor, >1 = dot)
 	-H,           --hotplug                 Don't reset at target connection
 	-I <options>, --interf			Select interface
@@ -117,8 +116,14 @@ name: cortex-m
         erase        : Chip erase the flash
         verify       : Verify flash after upload
         run          : Start image
-        mod=<hex address>;<hex byte(s)>
+		
+        read=<dec byte length>@<hex address>
+                     : Read memory location at address with a given length and print as hex string.
+					   Use verbose level 8 for minimal print info."
+		
+        write=<hex byte(s)>@<hex address>
                      : Modify flash location at address with a given byte array
+					 
         file=<file>  : Load the file, <file>.hex  = Intel HEX format
                                       <file>.srec = Motorola srec file format
 
@@ -126,14 +131,15 @@ name: cortex-m
 
         e.g. -F file=test.elf
              -F run,file=test.hex		
-             -F run,verify,mod=80000004;DEAD
+             -F read=4@8000000A,read=12@8000000C			 
+             -F run,verify,write=DEAD@80000004
              -F run,file=test.hex,mod=80000004;45FECA1245,mod=80000100;DEAD
              -F erase,verify,run,file=test.srec
              -F erase
              -F run			 
 
         Default (without erase) only modified sectors are (re)flashed.
-		Multiple modifications are allowed and is done after any file upload.
+		Multiple writes and reads are allowed and is done after any file upload.
 
 
 ==== GDB server
