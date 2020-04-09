@@ -22,7 +22,7 @@ Changes (9-4-2020) Release 2.4
 - if you need live variables for e.g. Embitz (OpenOCD doesn't support live variables)
 - as a non-intrusive memory inspector (eblink supports hot-plugging and non-stop mode )
 - if you need a CLI memory reader to read particular memory locations (also on running targets) and print them at stdout
-- if you need a CLI programmer to modify particular flash locations (checksum, serials etc)
+- if you need a CLI programmer to modify particular in-place flash locations (checksum, serials etc)
 - for easy complex custom board reset strategies or memory maps with special options
 - for faster debug sessions because of the EBlink flash cache (e.g. only modified sectors are rewritten)
 - for using easy auto configuration scripts
