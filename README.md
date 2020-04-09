@@ -28,9 +28,6 @@ Changes (9-4-2020) Release 2.4
 - for using easy auto configuration scripts
 - as a remote (wifi) GDB server e.g. Raspberry (lightweight)
 - simple standalone flash tool
-
-![Silabs with STlink-V2](https://www.sysdes.nl/github/SilabsStlinkV2_4.png)  
-
   
 ### EBlink features:
 - Integrated target stack frame UNWIND in case of exception with message box popup in windows.
