@@ -15,7 +15,7 @@ Changes (9-4-2020) Release 2.4
 
 - Changed: The flash option "mod" is changed to write. Syntax write=hhhhhhhh@aaaaaa 
 		
-		e.g. EBlink -I stlink -S stm32-auto -F write=12345678@080000004
+		e.g. EBlink -I stlink -S stm32-auto -F write=1234ABCD@080000004
 
    
  ##### When to consider EBlink instead of OpenOCD:
