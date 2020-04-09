@@ -9,7 +9,7 @@ Also available at: https://git.embitz.org/explore/repos
 Changes (9-4-2020) Release 2.4
 - Added: The flash option "read"  which will read a memory (also ram) location from target and will return it 
          as a hex string. Use verbose level 8 to minimize info. Use -H to read from running target without stopping.
-         Syntax read=<dec byte length>@<hex address>
+         Syntax read=byte length@hex address
                 
 		e.g.  EBlink -I stlink -S stm32-auto -F read=4@080000000,read=4@080000004
 
