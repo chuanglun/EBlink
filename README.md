@@ -4,7 +4,6 @@
 
 EBlink ARM Cortex-M debug tool with squirrel scripting device support
 
-Also available at: https://git.embitz.org/explore/repos
 
 Changes (9-4-2020) Release 2.4
 - Added: The flash option "read"  which will read a memory (also ram) location from target and will return it 
