@@ -131,7 +131,7 @@ name: cortex-m
              -F run,file=test.hex		
              -F read=4@8000000A,read=12@8000000C			 
              -F run,verify,write=DEAD@80000004
-             -F run,file=test.hex,mod=80000004;45FECA1245,mod=80000100;DEAD
+             -F run,file=test.hex,write=45FECA1245@80000004,write=EBAB@80000100
              -F erase,verify,run,file=test.srec
              -F erase
              -F run			 
