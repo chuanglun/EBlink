@@ -137,7 +137,7 @@ name: cortex-m
              -F run			 
 
         Default (without erase) only modified sectors are (re)flashed.
-		Multiple writes and reads are allowed and is done after any file upload.
+	Multiple writes and reads are allowed and is done after any file upload.
 
 
 ==== GDB server
