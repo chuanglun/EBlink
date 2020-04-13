@@ -12,7 +12,7 @@ Changes (9-4-2020) Release 2.4
                 
 		e.g.  EBlink -I stlink -S stm32-auto -F read=4@080000000,read=4@080000004
 
-- Changed: The flash option "mod" is changed to write. Syntax write=hhhhhhhh@aaaaaa 
+- Changed: The flash option "mod" is changed to write. Syntax write=hh......@aaaaaa 
 		
 		e.g. EBlink -I stlink -S stm32-auto -F write=1234ABCD@080000004
 
@@ -60,9 +60,9 @@ Changes (9-4-2020) Release 2.4
 	-H,           --hotplug                 Don't reset/stop at target connection
 	-I <options>, --interf			Select interface
 	-T <options>, --target			Select target(optional)
-	-S <file>,    --script <file>		Load a device script file
+	-S <file>,    --script <file>		Add a device script file
 	-P <path>,    --path <path>		Add a search path for scripts
-	-D <def>,     --define <def>		Define script global variable "name=value"
+	-D <def>,     --define <def>		Add a script global define "name=value"
 	-F <options>, --flash <options>		Run image flashing
 	-G [options], --gdb <options>		Launch GDB server
 	
