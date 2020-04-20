@@ -4,7 +4,6 @@
 
 EBlink ARM Cortex-M debug tool with squirrel scripting device support
 
-Also available at: https://git.embitz.org/explore/repos
 
 Changes (9-4-2020) Release 2.4
 - Added: The flash option "read"  which will read a memory (also ram) location from target and will return it 
@@ -13,7 +12,7 @@ Changes (9-4-2020) Release 2.4
                 
 		e.g.  EBlink -I stlink -S stm32-auto -F read=4@080000000,read=4@080000004
 
-- Changed: The flash option "mod" is changed to write. Syntax write=hhhhhhhh@aaaaaa 
+- Changed: The flash option "mod" is changed to write. Syntax write=hh......@aaaaaa 
 		
 		e.g. EBlink -I stlink -S stm32-auto -F write=1234ABCD@080000004
 
@@ -32,6 +31,7 @@ Changes (9-4-2020) Release 2.4
 ### EBlink features:
 - Integrated target stack frame UNWIND in case of exception with message box popup in windows.
 - GDB server with flash caching, with EmBitz live variables/expression support!
+- Full Semi-hosting support
 - Supports Hotplug for Embitz 1.1 [see issue](https://github.com/EmBitz/EBlink/issues/3#issue-518281157) and 2.0 (monitor command "IsRunning" for target state query)
 - Stand alone command line flashing tool (elf, ihex and srec) 
 - All device related functions by squirrel scripting e.g. flash algorithm, device reset strategy etc etc
@@ -57,12 +57,12 @@ Changes (9-4-2020) Release 2.4
 	-g,           --nogui			No GUI message boxes
 	-v <level>,   --verbose <0..8>		Specify level of verbose logging (default 4)
 	-a [type],    --animation [0..]		Set the animation type (0=off, 1 = cursor, >1 = dot)
-	-H,           --hotplug                 Don't reset at target connection
+	-H,           --hotplug                 Don't reset/stop at target connection
 	-I <options>, --interf			Select interface
 	-T <options>, --target			Select target(optional)
-	-S <file>,    --script <file>		Load a device script file
+	-S <file>,    --script <file>		Add a device script file
 	-P <path>,    --path <path>		Add a search path for scripts
-	-D <def>,     --define <def>		Define script global variable "name=value"
+	-D <def>,     --define <def>		Add a script global define "name=value"
 	-F <options>, --flash <options>		Run image flashing
 	-G [options], --gdb <options>		Launch GDB server
 	
@@ -132,13 +132,13 @@ name: cortex-m
              -F run,file=test.hex		
              -F read=4@8000000A,read=12@8000000C			 
              -F run,verify,write=DEAD@80000004
-             -F run,file=test.hex,mod=80000004;45FECA1245,mod=80000100;DEAD
+             -F run,file=test.hex,write=45FECA1245@80000004,write=EBAB@80000100
              -F erase,verify,run,file=test.srec
              -F erase
              -F run			 
 
         Default (without erase) only modified sectors are (re)flashed.
-		Multiple writes and reads are allowed and is done after any file upload.
+	Multiple writes and reads are allowed and is done after any file upload.
 
 
 ==== GDB server
