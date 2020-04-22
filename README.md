@@ -16,7 +16,7 @@ Changes (9-4-2020) Release 2.4
                 
 		e.g.  EBlink -I stlink -S stm32-auto -F read=4@080000000,read=4@080000004
 
-- Changed: The flash option "mod" is changed to write. Syntax write=hh......@aaaaaa 
+- Changed: The flash option "mod" is changed to write. Syntax write=<hex byte array>@<hex start address>
 		
 		e.g. EBlink -I stlink -S stm32-auto -F write=1234ABCD@080000004
 
