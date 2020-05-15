@@ -1,3 +1,6 @@
+Changes (15-5-2020) Release 2.7
+- Fix: the interfcae script function loadBin(<filename>) is now using the same serach path engine as the script loader
+
 Changes (20-4-2020) Release 2.5
 - Fix: stm32h7 script chip erase
 - Fix: Flash file relative to eblink path (instead of script path)

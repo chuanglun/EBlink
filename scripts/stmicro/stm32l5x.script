@@ -1,0 +1,91 @@
+/////////////////////////////////////////////////////
+//
+//                   STM32L5x
+//
+
+/////////////////////////////////////////////////////
+//
+//   Memory map template of this device(s)
+//   Avoid unnecessary spaces.
+//
+
+//*************************************************************
+//*****             Memory map of the L5                   ****
+//*************************************************************
+const mem_template_L5 = @@"
+<?xml version=\"1.0\"?>
+<memory-map>
+  <memory type=\"rom\" start=\"0x00000000\" length=\"0x100000\"/>
+  <memory type=\"ram\" start=\"0x10000000\" length=\"0x10000\"/>
+  <memory type=\"ram\" start=\"0x20000000\" length=\"0x20000\"/>
+ <!-- Sectors 0..3 page size 16kB -->
+  <memory type=\"flash\" start=\"0x08000000\" length=\"0x10000\">
+   <property name=\"blocksize\">0x4000</property>
+   <property name=\"secstart\">0</property>
+  </memory>
+  <!-- Sectors 4 page size 64kB -->
+  <memory type=\"flash\" start=\"0x08010000\" length=\"0x10000\">
+   <property name=\"blocksize\">0x10000</property>
+  </memory>
+    <!-- Sectors 5..11 page size 128kB -->
+  <memory type=\"flash\" start=\"0x08020000\" length=\"0xE0000\">
+   <property name=\"blocksize\">0x20000</property>
+  </memory>
+  <memory type=\"ram\" start=\"0x40000000\" length=\"0x1fffffff\"/>
+  <memory type=\"ram\" start=\"0x60000000\" length=\"0x7fffffff\"/>
+  <memory type=\"ram\" start=\"0xe0000000\" length=\"0x1fffffff\"/>
+  <memory type=\"rom\" start=\"0x1fff0000\" length=\"0x7800\"/>
+  <memory type=\"rom\" start=\"0x1fffc000\" length=\"0x10\"/>
+ </memory-map>";
+
+
+
+/////////////////////////////////////////////////////
+//
+//  Entry point of this script called by parent script
+//
+//      Remark: The itrfApi is a global object from parent
+//
+function stm32_device(deviceId)
+{
+    local devApi = ::DeviceAPI();
+
+    local result;
+    local flash_size;
+    local ram_size;
+
+    // Enable debug clocks: DBG_STANDBY & DBG_STOP & DBG_SLEEP 
+    result = itrfApi.writeMem32(0xE0042004, 7);
+
+    // Stop watchdog counters during halt: DBGMCU_APB1_FZ = DBG_IWDG_STOP | DBG_WWDG_STOP
+    result = itrfApi.writeMem32(0xE0042008, 0x00001800);
+
+    // Get the flash size
+    result = itrfApi.readMem32(0x0BFA05E0)
+    flash_size = itrfApi.value32 *1024;
+
+    // Set the memory map according the device ID
+      switch(deviceId) {
+        case 0x472 : // CHIPID_STM32L552xx/L562xx
+            ram_size = 0x30000;
+            devApi.memmap( mem_template_F4 );
+            break;
+
+
+        default:
+        break;
+    }
+
+    // Inform the user
+    printf("Detected FLASH : 0x%X\nConfigured RAM : 0x%X\n", flash_size, ram_size);
+
+    // Include flash loader script
+    require("stmicro/flash/stm32l5_fl.script");
+
+    // Return "NO_ERROR"
+    return 0;
+}
+
+
+
+
