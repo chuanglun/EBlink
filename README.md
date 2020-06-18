@@ -5,7 +5,7 @@
 EBlink ARM Cortex-M debug tool with squirrel scripting device support
 
 Changes (15-5-2020) Release 2.7
-- Fix: the sript function loadBin to load a external binary e.g. flash loader was looking in the wrong path. The same serach engine for scripts are now also used for loadBin.
+- Fix: the sript function loadBin to load an external binary e.g. flash loader was looking in the wrong path. The same search engine for scripts are now also used for loadBin.
 
 
 Changes (9-4-2020) Release 2.4
