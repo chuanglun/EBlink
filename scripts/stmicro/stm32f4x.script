@@ -174,6 +174,11 @@ function stm32_device(deviceId)
             devApi.memmap( mem_template_F4 );
             break;
 
+		case 0x441 : // CHIPID_STM32_F412
+            ram_size = 0x40000;
+            devApi.memmap( mem_template_F4 );
+            break;		
+
         case 0x458 : // CHIPID_STM32_F410
             ram_size = 0x8000;
             devApi.memmap( mem_template_F4 );

@@ -149,6 +149,7 @@ function set_target(deviceId)
     case 0x431 : // CHIPID_STM32_F411RE
     case 0x433 : // CHIPID_STM32_F4_DE
     case 0x434 : // CHIPID_STM32_F4_DSI
+	case 0x441 : // CHIPID_STM32_F412
     case 0x458 : // CHIPID_STM32_F410
         require("stmicro/stm32f4x.script");
         break;
