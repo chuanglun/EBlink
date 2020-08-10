@@ -37,7 +37,7 @@ Changes (9-4-2020) Release 2.4
 - Full Semi-hosting support
 - Supports Hotplug for Embitz 1.1 [see issue](https://github.com/EmBitz/EBlink/issues/3#issue-518281157) and 2.0 (monitor command "IsRunning" for target state query)
 - Stand alone command line flashing tool (elf, ihex and srec) 
-- All device related functions by squirrel scripting e.g. flash algorithm, device reset strategy etc etc
+- All device related functions by c-like squirrel scripting e.g. flash algorithm, device reset strategy etc etc
 - Ready for multiple interfaces
 
 #### Remarks:
