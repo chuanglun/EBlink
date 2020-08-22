@@ -2,11 +2,15 @@ To make this work:
 
 - copy the script folder inside the folder containing the eblink binary
   ( Or set environment variable EB_SCRIPT_PATH to the script directory )
+  
+- Copy the udev stlink rules and follow the readme inside that folder.  
 
 If used for stm32 debugging, the stm32gdb.sh file uses a path search option and can be used right away.
 
+Possible environment variables:
+
+EB_SCRIPT_PATH      Will define the path where EBlink can find the scripts 
+EB_DEFAULT_PROBE    Will define the default interface [-I] option if not given on cli
+EB_DEFAULT_SCRIPT   Will define the default script [-S] file if not given on cli
   
-- Copy the udev stlink rules and follow the readme inside that folder.
-
-
 Have fun.
