@@ -15,7 +15,7 @@ Changes (22-8-2020) Release 2.8
 	 
 	 	e.g.  EBlink -F erase | EBlink -F run | EBlink -G 
 	 
-	 If eblink is also in your search path then you can just flash any file instantly from within that directory 
+	 If eblink is also in your search path and EB_SCRIPT_PATH is also set then you can just flash any file instantly from within that directory 
 	 
 	 	e.g.  EBlink -F file=myimage.elf,run
 		
