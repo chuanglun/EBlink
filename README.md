@@ -20,7 +20,7 @@ Changes (22-8-2020) Release 2.8
 	 	e.g.  EBlink -F file=myimage.elf,run
 		
 	 If you use mainly STMicro then you could set EB_DEFAULT_SCRIPT=stm32-auto and EB_DEFAULT_PROBE=stlink. 
-	 Tip, use EB_DEFAULT_PROBE=stlink,dr to use hotplugging by default.
+	 Tip: use EB_DEFAULT_PROBE=stlink,dr to use hotplugging by default.
 
 Changes (9-4-2020) Release 2.4
 - Added: The flash option "read"  which will read a memory (also ram) location from target and will return it 
