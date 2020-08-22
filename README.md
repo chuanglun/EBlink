@@ -9,6 +9,7 @@ Upcomming 2.9 release:
  - Add: On verbose level > 4 give info if and which environment variables are used for user feedback.
  - Add: Cortex-m target options (-T cortex-m,<...>)  for reset=[0..2],halt and resume e.g. automated testing.
  - Mod: Verbose level 0 is now minimal printing (previous level 8) for -F read memory output. Default verbose level will be 5 (previous level 4)
+ - New: Windows installer with optional windows context menu for file flashing [.hex,.elf and .srec] and core control (reset,halt and resume)
 
 
 Changes (22-8-2020) Release 2.8
