@@ -7,7 +7,7 @@ EBlink ARM Cortex-M debug tool with squirrel scripting device support
 Upcomming 2.9 release: 
  - Add: "-F cmp=myimage.elf" command to compare the content of file [elf,hex or srec] against MCU for e.g. automated testing.
  - Add: On verbose level > 4 give info if and which environment variables are used for user feedback.
- - Add: Target (-T) options reset[0..3],halt and run for e.g. automated testing.
+ - Add: Cortex-m target options (-T cortex-m,<...>)  for reset=[0..2],halt and resume e.g. automated testing.
 
 
 Changes (22-8-2020) Release 2.8
