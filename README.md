@@ -12,7 +12,7 @@ Changes (22-8-2020) Release 2.8
 	 
 	 If eblink is also in your search path then you can just flash any file instantly from within that directory 
 	 
-	 	e.g.  EBlink -F erase
+	 	e.g.  EBlink -F file=myimage.elf,run
 		
 	 Tip, use EB_DEFAULT_PROBE=stlink,dr to use hotplugging by default.
 
