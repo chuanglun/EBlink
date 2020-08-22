@@ -16,10 +16,6 @@ Changes (22-8-2020) Release 2.8
 		
 	 Tip, use EB_DEFAULT_PROBE=stlink,dr to use hotplugging by default.
 
-Changes (15-5-2020) Release 2.7
-- Fix: the sript function loadBin to load an external binary e.g. flash loader was looking in the wrong path. The same search engine for scripts is now also used for loadBin.
-
-
 Changes (9-4-2020) Release 2.4
 - Added: The flash option "read"  which will read a memory (also ram) location from target and will return it 
          as a hex string. Use verbose level 8 to minimize info. Use -H to read from running target without stopping.
