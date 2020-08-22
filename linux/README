@@ -6,5 +6,11 @@ To make this work:
 
   Or set environment variable EB_SCRIPT_PATH to the script directory, together with a search path to the binary you can
   invoke EBlink from everywhere.
+  
+ Possible environment variables:
+
+EB_SCRIPT_PATH      Will define the path where EBlink can find the scripts 
+EB_DEFAULT_PROBE    Will define the default interface [-I] option if not given on cli
+EB_DEFAULT_SCRIPT   Will define the default script [-S] file if not given on cli
     
 Have fun.
