@@ -4,6 +4,11 @@
 
 EBlink ARM Cortex-M debug tool with squirrel scripting device support
 
+Upcomming 2.9 release: 
+ - Add: "-F cmp=myimage.elf" command to compare the content of file against MCU for e.g. automated testing.
+ - Fix: On verbose level > 4 give warning that which environment variables are used.
+
+
 Changes (22-8-2020) Release 2.8
 - Added: Introduced the environment variables EB_DEFAULT_PROBE and EB_DEFAULT_SCRIPT which will be used if the options are missing
 	 from the command line. This will give you the possibility to use short commands to start EBlink. Such as:
