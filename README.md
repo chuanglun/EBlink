@@ -4,6 +4,9 @@
 
 EBlink ARM Cortex-M debug tool with squirrel scripting device support
 
+Changes (22-8-2020) Release 2.8
+- Added: Introduced the environment variables EB_DEFAULT_PROBE and EB_DEFAULT_SCRIPT. If you set these two variables then you can use short commands to start EBlink. E.g. eblink -F erase or eblink -G etc. If eblink is also in your search path then you can just flash any file instantly from within that directory e.g. eblink -F file=myimage.elf,run.
+
 Changes (15-5-2020) Release 2.7
 - Fix: the sript function loadBin to load an external binary e.g. flash loader was looking in the wrong path. The same search engine for scripts is now also used for loadBin.
 
