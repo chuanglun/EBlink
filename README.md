@@ -15,9 +15,11 @@ Changes (22-8-2020) Release 2.8
 	 
 	 	e.g.  EBlink -F erase | EBlink -F run | EBlink -G 
 	 
-	 If eblink is also in your search path and EB_SCRIPT_PATH is also set then you can just flash any file instantly from within that directory 
+	 If eblink is also in your search path and EB_SCRIPT_PATH is also set then you can just flash any file instantly from within that directory. 
 	 
 	 	e.g.  EBlink -F file=myimage.elf,run
+	
+	Tip: for windows you could define a context menu item so in explorer bij right mouse clicking the file you can select "EBlink Flash"
 		
 	 If you use mainly STMicro then you could set EB_DEFAULT_SCRIPT=stm32-auto and EB_DEFAULT_PROBE=stlink. 
 	 Tip, use EB_DEFAULT_PROBE=stlink,dr to use hotplugging by default.
