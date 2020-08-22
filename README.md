@@ -5,8 +5,8 @@
 EBlink ARM Cortex-M debug tool with squirrel scripting device support
 
 Changes (22-8-2020) Release 2.8
-- Added: Introduced the environment variables EB_DEFAULT_PROBE and EB_DEFAULT_SCRIPT. If you set these two variables then 
-	 you can use short commands to start EBlink. Such as
+- Added: Introduced the environment variables EB_DEFAULT_PROBE and EB_DEFAULT_SCRIPT which will be used if the options are missing
+	 from the command line. This will give you the possibility to use short commands to start EBlink. Such as:
 	 
 	 	e.g.  EBlink -F erase 
 	 
