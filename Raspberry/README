@@ -1,9 +1,9 @@
 To make this work:
 
+- Copy the udev stlink rules and follow the readme inside that folder.
+
 - copy the script folder inside the folder containing the eblink binary
   ( Or set environment variable EB_SCRIPT_PATH to the script directory )
-  
-- Copy the udev stlink rules and follow the readme inside that folder.  
 
 If used for stm32 debugging, the stm32gdb.sh file uses a path search option and can be used right away.
 
