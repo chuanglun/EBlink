@@ -59,7 +59,7 @@ Changes (9-4-2020) Release 2.4
 - Any length byte array memory reading also on running target from the command line (automated testing)
 - Core control (halt, reset and resume) from the command line (automated testing)
 - Stand alone command line flashing tool (elf, ihex and srec) 
-- All device related functions by c-like squirrel scripting e.g. flash algorithm, device reset strategy etc etc
+- All device related functions by c-like squirrel scripting e.g. flash or ext. EEprom algorithms, device reset strategy etc etc 
 - Ready for multiple interfaces
 
 #### Remarks:
