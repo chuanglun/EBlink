@@ -46,7 +46,7 @@ Changes (9-4-2020) Release 2.4
 - if you need a CLI programmer to modify particular in-place flash locations (checksum, serials etc)
 - for easy complex custom board reset strategies or memory maps with special options
 - for faster debug sessions because of the EBlink flash cache (e.g. only modified sectors are rewritten)
-- for using easy auto configuration scripts
+- for using easy auto configuration scripts e.g. custom flashing of ext. EEprom's etc
 - as a remote (wifi) GDB server e.g. Raspberry (lightweight)
 - simple standalone flash tool
   
