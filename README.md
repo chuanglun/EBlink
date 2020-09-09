@@ -1,6 +1,5 @@
-# Cortex-M GDB server, flash tool 
+# Cortex-M GDB server, flash tool e.g. STlink V2 & V3 support
 ## for Win32, Linux_x86_64 and Raspberry
-### STlink V2 & V3 support
 
 EBlink ARM Cortex-M debug tool with squirrel scripting device support
 
