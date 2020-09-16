@@ -123,11 +123,11 @@ name: cortex-m
         verify       : Verify flash after upload
         run          : Start image
 		
-        read=<dec byte length>@<hex address>
+        read=<byte length>@<address>
                      : Read memory location at address with a given length and print as hex string.
 					   Use verbose level 0 for minimal print info."
 		
-        write=<hex byte(s)>@<hex address>
+        write=<hex byte(s)>@<address>
                      : Modify flash location at address with a given byte array
 					 
         file=<file>  : Load the file, <file>.hex  = Intel HEX format
