@@ -7,7 +7,7 @@ Upcomming 3.0 release:
  - New: Windows installer with optional windows context menu for file flashing [.hex,.elf and .srec] and core control (reset,halt and resume)
 
 Changes (16-9-2020) Release 2.9
- - Added: "-F cmp=myimage.elf" command to compare the content of file [elf,hex or srec] against MCU for e.g. automated testing.
+ - Added: "-F cmp=myimage.elf" command to compare the content of file [elf,hex or srec] against MCU flash for e.g. automated testing.
  - Added: "-F dump=lenght@address:file" command to dump the memory content to file [hex or bin]. Works also at running target if used i.c.w. hotplug option (e.g. '-H' or '-I stlink,dr').
  - Added: On verbose level > 5 give info if and which environment variables are used for user feedback.
  - Added: Cortex-m target options (-T cortex-m,<...>)  for reset=[0..2],halt and resume e.g. automated testing.
