@@ -142,9 +142,9 @@ name: cortex-m
 
         e.g. -F file=test.elf
              -F run,file=test.hex		
-             -F read=0x4@0x8000000A,read=12@0x8000000C			 
-             -F run,verify,write=DEAD@80000004
-             -F run,file=test.hex,write=45FECA1245@0x80000004,write=EBAB@0x80000100
+             -F read=0x4@0x0800000A,read=12@0x0800000C			 
+             -F run,verify,write=DEAD@0x08000004
+             -F run,file=test.hex,write=45FECA1245@0x80000004,write=EBAB@0x08000100
              -F erase,verify,run,file=test.srec
              -F erase
              -F run			 
