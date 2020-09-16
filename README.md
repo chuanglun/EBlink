@@ -24,7 +24,7 @@ Changes (16-9-2020) Release 2.9
 - for faster debug sessions because of the EBlink flash cache (e.g. only modified sectors are rewritten)
 - for using easy auto configuration scripts e.g. custom flashing of ext. EEprom's etc
 - as a remote (wifi) GDB server e.g. Raspberry (lightweight)
-- simple standalone flash tool
+- simple standalone flash tool (program, verify, compare or dump)
   
 ### EBlink features:
 - Integrated target stack frame UNWIND in case of exception with message box popup in windows.
