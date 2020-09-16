@@ -113,7 +113,7 @@ name: cortex-m
         resume       : Resume target
 	
         e.g.  -T cortex-m,nu
-              -T cortex-m,reset,resume"
+              -T cortex-m,reset,resume
 
 ==== Flash loader
 	
