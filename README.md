@@ -9,7 +9,7 @@ Upcomming 3.0 release:
 Changes (16-9-2020) Release 2.9
  - Added: "-F cmp=myimage.elf" command to compare the content of file [elf,hex or srec] against MCU for e.g. automated testing.
  - Added: "-F dump=lenght@address:file" command to dump the memory content to file [hex or bin].
- - Added: On verbose level > 4 give info if and which environment variables are used for user feedback.
+ - Added: On verbose level > 5 give info if and which environment variables are used for user feedback.
  - Added: Cortex-m target options (-T cortex-m,<...>)  for reset=[0..2],halt and resume e.g. automated testing.
  - Mod: Verbose level 0 is now minimal printing (previous level 8) for -F read memory output. Default verbose level will be 5 (previous level 4)
  - Mod: All the CLI length and address fields (e.g. flash write, read or dump) are now decimal or hex if starting with 0x
