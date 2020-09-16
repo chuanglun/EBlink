@@ -137,8 +137,8 @@ name: cortex-m
                                       Default     = ELF file format		
 
         dump=<length>@<address>:<file> 
-     		     : Dump memory to file, <file>.hex  = Intel HEX format
-                                            Default     = Binary file format									  
+                     : Dump memory to file, <file>.hex  = Intel HEX format
+		                            Default     = Binary file format									  
 
         e.g. -F file=test.elf
              -F run,file=test.hex		
