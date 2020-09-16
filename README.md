@@ -121,7 +121,7 @@ name: cortex-m
 		
         read=<dec byte length>@<hex address>
                      : Read memory location at address with a given length and print as hex string.
-					   Use verbose level 8 for minimal print info."
+					   Use verbose level 0 for minimal print info."
 		
         write=<hex byte(s)>@<hex address>
                      : Modify flash location at address with a given byte array
