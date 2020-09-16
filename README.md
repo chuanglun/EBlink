@@ -3,39 +3,16 @@
 
 EBlink ARM Cortex-M debug tool with squirrel scripting device support
 
-Upcomming 2.9 release: 
- - Add: "-F cmp=myimage.elf" command to compare the content of file [elf,hex or srec] against MCU for e.g. automated testing.
- - Add: On verbose level > 4 give info if and which environment variables are used for user feedback.
- - Add: Cortex-m target options (-T cortex-m,<...>)  for reset=[0..2],halt and resume e.g. automated testing.
- - Mod: Verbose level 0 is now minimal printing (previous level 8) for -F read memory output. Default verbose level will be 5 (previous level 4)
+Upcomming 3.0 release: 
  - New: Windows installer with optional windows context menu for file flashing [.hex,.elf and .srec] and core control (reset,halt and resume)
 
-
-Changes (22-8-2020) Release 2.8
-- Added: Introduced the environment variables EB_DEFAULT_PROBE and EB_DEFAULT_SCRIPT which will be used if the options are missing
-	 from the command line. This will give you the possibility to use short commands to start EBlink. Such as:
-	 
-	 	e.g.  EBlink -F erase | EBlink -F run | EBlink -G 
-	 
-	 If eblink is also in your search path and EB_SCRIPT_PATH is also set then you can just flash any file instantly from within that directory. 
-	 
-	 	e.g.  EBlink -F file=myimage.elf,run
-	
-	Tip: for windows you could define a context menu item so in explorer bij right mouse clicking the file you can select "EBlink Flash"
-		
-	 If you use mainly STMicro then you could set EB_DEFAULT_SCRIPT=stm32-auto and EB_DEFAULT_PROBE=stlink. 
-	 Tip: use EB_DEFAULT_PROBE=stlink,dr to use hotplugging by default.
-
-Changes (9-4-2020) Release 2.4
-- Added: The flash option "read"  which will read a memory (also ram) location from target and will return it 
-         as a hex string. Use verbose level 8 to minimize info. Use -H to read from running target without stopping.
-         Syntax read=byte length@hex address
-                
-		e.g.  EBlink -I stlink -S stm32-auto -F read=4@080000000,read=4@080000004
-
-- Changed: The flash option "mod" is changed to write. Syntax write=<hex byte array>@<hex start address>
-		
-		e.g. EBlink -I stlink -S stm32-auto -F write=1234ABCD@080000004
+Changes (16-9-2020) Release 2.9
+ - Added: "-F cmp=myimage.elf" command to compare the content of file [elf,hex or srec] against MCU for e.g. automated testing.
+ - Added: "-F dump=<lenght>@<address>:<file>" command to dump the memory content of file [hex or bin].
+ - Added: On verbose level > 4 give info if and which environment variables are used for user feedback.
+ - Added: Cortex-m target options (-T cortex-m,<...>)  for reset=[0..2],halt and resume e.g. automated testing.
+ - Mod: Verbose level 0 is now minimal printing (previous level 8) for -F read memory output. Default verbose level will be 5 (previous level 4)
+ - Mod: All the CLI length and address fields (e.g. flash write, read or dump) are now decimal or hex if starting with 0x
 
    
  ##### When to consider EBlink instead of OpenOCD:
@@ -58,6 +35,8 @@ Changes (9-4-2020) Release 2.4
 - Any length byte array memory reading also on running target from the command line (automated testing)
 - Core control (halt, reset and resume) from the command line (automated testing)
 - Stand alone command line flashing tool (elf, ihex and srec)  for production
+- Dump memory (also on running target) to file in Intel hex or binary format
+- Compare flash against a srec, ihex or elf file.
 - All device related functions by c-like squirrel scripting e.g. flash or ext. EEprom algorithms, device reset strategy etc etc 
 - Ready for multiple interfaces
 
@@ -151,12 +130,21 @@ name: cortex-m
                                       <file>.srec = Motorola srec file format
 
                                       Default     = ELF file format
+									  
+        cmp=<file>   : Compare Flash with file, <file>.hex  = Intel HEX format
+                                      <file>.srec = Motorola srec file format
+
+                                      Default     = ELF file format		
+
+        dump=<length>@<address>:<file> 
+     		          : Dump Flash (memory) to file, <file>.hex  = Intel HEX format
+                                           Default     = Binary file format									  
 
         e.g. -F file=test.elf
              -F run,file=test.hex		
-             -F read=4@8000000A,read=12@8000000C			 
+             -F read=0x4@0x8000000A,read=12@0x8000000C			 
              -F run,verify,write=DEAD@80000004
-             -F run,file=test.hex,write=45FECA1245@80000004,write=EBAB@80000100
+             -F run,file=test.hex,write=45FECA1245@0x80000004,write=EBAB@0x80000100
              -F erase,verify,run,file=test.srec
              -F erase
              -F run			 
