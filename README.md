@@ -108,8 +108,12 @@ name: cortex-m
      Usage -T cortex-m[,options]
 
         nu           : Disable stack unwind at exception
-
-        e.g.  -T cortex-m,nu
+	reset[=0..2] : Reset the target, 0(default)=system,1=core,2=jtag
+	halt         : Halt target
+	resume       : Resume target
+	
+	e.g.  -T cortex-m,nu
+	      -T cortex-m,reset,resume"
 
 ==== Flash loader
 	
