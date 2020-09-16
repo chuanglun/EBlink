@@ -58,7 +58,7 @@ Changes (16-9-2020) Release 2.9
 
 	-h,           --help			Print this help
 	-g,           --nogui			No GUI message boxes
-	-v <level>,   --verbose <0..8>		Specify level of verbose logging (default 4)
+	-v <level>,   --verbose <0..8>		Specify level of verbose logging (default 5)
 	-a [type],    --animation [0..]		Set the animation type (0=off, 1 = cursor, >1 = dot)
 	-H,           --hotplug                 Don't reset/stop at target connection
 	-I <options>, --interf			Select interface
