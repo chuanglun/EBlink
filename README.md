@@ -4,10 +4,10 @@
 EBlink ARM Cortex-M debug tool with squirrel scripting device support
 
 Upcomming: 
- - New: Windows installer with optional windows context menu for file flashing [.hex,.elf and .srec] and core control (reset,halt and resume) or GDB server launch. If any EBlink is running, just exit EBlink from context menu.
+ - New: Windows installer with optional windows context menu for file flashing [.hex,.elf and .srec] and core control (reset,halt and resume) or GDB server launch. If EBlink is already running, just exit EBlink from context menu.
  - Fix: folder names with spaces
  
-![alt text](https://www.embitz.org/menu.gif) 
+![alt text](https://www.embitz.org/menu.gif)  
 
 Changes (16-9-2020) Release 2.9
  - Added: "-F cmp=myimage.elf" command to compare the content of file [elf,hex or srec] against MCU flash for e.g. automated testing.
