@@ -9,6 +9,8 @@ Upcomming:
  
 ![alt text](https://www.embitz.org/menu.gif)  
 
+Sneak preview (https://www.embitz.org/EBlinkInstaller3.0.zip) MD5: 86cdb16dd05d73656500c4fbde1acee5
+
 Changes (16-9-2020) Release 2.9
  - Added: "-F cmp=myimage.elf" command to compare the content of file [elf,hex or srec] against MCU flash for e.g. automated testing.
  - Added: "-F dump=lenght@address:file" command to dump the memory content to file [hex or bin]. Works also at running target if used i.c.w. hotplug option (e.g. '-H' or '-I stlink,dr').
