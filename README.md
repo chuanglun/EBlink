@@ -8,7 +8,7 @@ EBlink ARM Cortex-M debug tool with squirrel scripting device support
  https://www.embitz.org/EBlinkInstaller3.0.zip  (MD5: 5eb30718fe4c3df7c5106ed4e2bc4cdf)
  [issue #24 bug Sneak preview](https://github.com/EmBitz/EBlink/issues/24)
  
-![alt text](https://www.embitz.org/menu.gif)  
+![alt text](https://www.embitz.org/context.png)  
 
 
 
