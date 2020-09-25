@@ -1,3 +1,8 @@
+Changes (25-9-2020) Release 3.0
+ - Added: STM32WB55xx support
+ - Fixed: spaces in names of folders and files
+ - Fixed: Silent error handling of script functions returning error code < -1 (which means "user not informed yet")
+
 Changes (16-9-2020) Release 2.9
  - Added: "-F cmp=myimage.elf" command to compare the content of file [elf,hex or srec] against MCU flash for e.g. automated testing.
  - Added: "-F dump=lenght@address:file" command to dump the memory content to file [hex or bin]. Works also at running target if used i.c.w. hotplug option (e.g. '-H' or '-I stlink,dr').
