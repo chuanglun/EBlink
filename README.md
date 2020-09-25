@@ -5,21 +5,15 @@ EBlink ARM Cortex-M debug tool with squirrel scripting device support
 
 Upcomming: 
  - New: Windows installer with optional windows context menu handler (32 and 64 bits) for file flashing [.hex,.elf and .srec] and core control (reset,halt and resume) or GDB server launch. If EBlink is already running, just exit EBlink from context menu.
- - Fix: folder names with spaces
- - Fix: Error handling script files
- - Add: STM32WB55xx support
  
 ![alt text](https://www.embitz.org/menu.gif)  
 
 
 
-Changes (16-9-2020) Release 2.9
- - Added: "-F cmp=myimage.elf" command to compare the content of file [elf,hex or srec] against MCU flash for e.g. automated testing.
- - Added: "-F dump=lenght@address:file" command to dump the memory content to file [hex or bin]. Works also at running target if used i.c.w. hotplug option (e.g. '-H' or '-I stlink,dr').
- - Added: On verbose level > 5 give info if and which environment variables are used for user feedback.
- - Added: Cortex-m target options (-T cortex-m,<...>)  for reset=[0..2],halt and resume e.g. automated testing.
- - Mod: Verbose level 0 is now minimal printing (previous level 8) for -F read memory output. Default verbose level will be 5 (previous level 4)
- - Mod: All the CLI length and address fields (e.g. flash write, read or dump) are now decimal or hex if starting with 0x
+Changes (25-9-2020) Release 3.0
+ - Added: STM32WB55xx support
+ - Fixed: spaces in names of folders and files
+ - Fixed: Silent error handling of script functions returning error code < -1 (which means "user not informed yet")
 
    
  ##### When to consider EBlink instead of OpenOCD:
