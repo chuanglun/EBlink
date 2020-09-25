@@ -256,6 +256,9 @@ function flash_unlock()
 //
 function flash_lock()
 {
+    local result;
+	
 	// Write the CR register to lock (LOCK)
-    return itrfApi.writeMem32(FLASH_BASE + FLASH_CR, FLASH_CR_LOCK);
+	result =  itrfApi.readMem32(FLASH_BASE + FLASH_CR); if(result<0) return result;
+    return itrfApi.writeMem32(FLASH_BASE + FLASH_CR, itrfApi.value32 | FLASH_CR_LOCK);
 }
