@@ -11,7 +11,7 @@ Upcomming:
  
 ![alt text](https://www.embitz.org/menu.gif)  
 
-Sneak preview with EBlink V3.0 (https://www.embitz.org/EBlinkInstaller3.0.zip) MD5: 86cdb16dd05d73656500c4fbde1acee5
+
 
 Changes (16-9-2020) Release 2.9
  - Added: "-F cmp=myimage.elf" command to compare the content of file [elf,hex or srec] against MCU flash for e.g. automated testing.
