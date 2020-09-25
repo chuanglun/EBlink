@@ -1,0 +1,261 @@
+/////////////////////////////////////////////////////////////////////////////////
+//
+//                   STM32WBxxfl flash loader
+//
+//  ToDo:  - option programming
+//
+//  Remark: The STM32WB can't mass erase because the flash is shared between 2 cpu's. 
+//          EBlink however will automtically use sector-by-sector erasing if the mass erase
+//          function is not defined.
+// 
+
+const FLASH_BASE = 0x58004000;
+
+const FLASH_KEY  = 0x08;
+const FLASH_SR   = 0x10;
+const FLASH_CR   = 0x14;
+
+// Register values 
+const FLASH_SR_BSY           = 0x10000;
+const FLASH_SR_SIZERR        = 64;
+const FLASH_SR_PGAERR        = 32;
+const FLASH_SR_WRPERR        = 16;
+const FLASH_SR_PROGERR       = 8;
+const FLASH_SR_EOP           = 1;
+
+const FLASH_CR_LOCK          = 0x80000000;
+const FLASH_CR_STRT          = 0x10000;
+
+const FLASH_CR_PER           = 2;
+const FLASH_CR_PG            = 1;
+
+const FLASH_CR_PNB_SHIFT     = 3;
+const FLASH_CR_PNB_MASK      = 0x3f;
+
+const FLASH_KEY1             = 0x45670123;
+const FLASH_KEY2             = 0xCDEF89AB;
+
+/////////////////////////////////////////////////////////////////////////////////
+//
+// EBlink callback
+//
+//   Unlock the flash
+//
+function flash_start()
+{
+    local targetApi = ::TargetAPI();
+    local result;
+	local time;
+
+    // Be sure that the core is halted
+    result = targetApi.halt(); if(result<0) return result;
+	
+	targetApi.reset(0);
+
+    // Wait for halt
+    time = GetTickCount();
+	do{
+	    targetApi.poll();
+	    // Timeout of 1sec
+	    if(GetTickCount() - time > 1000)
+        {
+            errorf("Error: Can't stop the target\n");
+            return -1;
+        }
+	} while(targetApi.getState() != TARGET_HALTED )	
+		
+	return flash_unlock();
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////
+//
+// EBlink callback
+//
+//   Erase sequence according ST user manual
+//
+function flash_erase(sector, address)
+{
+    local result;
+
+    // 1. Check that no Flash memory operation is ongoing by checking the BSY1 in the SR
+	// (we already check that on the end of every flash action)
+	
+	// 2. Check and clear all error programming flags due to a previous programming. If not, PGSERR is set
+	clear_flash_errors();
+	
+    // 3. Set the PER bit and select the page to erase (PNB) in the flash_cr	
+		// --- Get current FLASH_CR register value
+	result = itrfApi.readMem32 (FLASH_BASE + FLASH_CR); if(result<0) return result;
+	
+		// --- Set the right sector number and PER and write it to FLASH_CR 
+	itrfApi.value32 = itrfApi.value32 & ~(FLASH_CR_PNB_MASK << FLASH_CR_PNB_SHIFT) | (sector << FLASH_CR_PNB_SHIFT) | FLASH_CR_PER;
+	result = itrfApi.writeMem32(FLASH_BASE + FLASH_CR, itrfApi.value32 ); if(result<0) return result;
+	
+	// 4. Set the STRT bit of the flash_cr
+		// --- Set the start bit, the itrfApi.value32 has still the current FLASH_CR value
+	result = itrfApi.writeMem32(FLASH_BASE + FLASH_CR, itrfApi.value32 | FLASH_CR_STRT ); if(result<0) return result;
+
+	// 5. Wait until the BSY bit of the flash_SR
+	// 10.000 msec timeout sometimes erasing can take long
+	return flash_check_busy(10000);
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////
+//
+// EBlink callback
+//
+//  The length is always equals to the page to be programmed in bytes.
+//  We don't use a flash loader here. We just write the pages word by word.
+//  Because every word needs to be transported by USB, we don't check the busy
+//  flag in between because we are not that fast.
+//
+function flash_write(sector, address, buffer)
+{
+    local result;
+
+	
+	// Check if the buffer.byteLength is multiple of 64bits
+	// Flash loader works with multiple of 8 bytes.
+	if(buffer.byteLength & 7)
+        buffer.byteLength = buffer.byteLength + (8 - (buffer.byteLength & 7));	
+
+		
+	// 2. Check and clear all error programming flags due to a previous programming. If not, PGSERR is set.
+	clear_flash_errors();
+
+	
+	// 3. Set the PG bit of the FLASH control register (FLASH_CR)
+	result = itrfApi.writeMem32(FLASH_BASE + FLASH_CR,  FLASH_CR_PG ); if(result<0) return result;	
+	
+	// STlink/V2 and V2.1 are rather slow, we can write direct
+	if( itrfApi.getName() != "STlink/V3" )
+	{
+	  itrfApi.writeBuf(address, buffer);
+	}
+	else
+	{   // STlink/V3 is too fast for direct so we will program per 64 bits
+		for(local count = 0; count < buffer.byteLength; )
+		{		
+			// 64 bits per time
+			itrfApi.writeMem(address, buffer, count, 8 );
+			address += 8;
+			count   += 8;
+		
+			// 5. Wait until the BSY bit of the flash_SR
+			// This is only needed for high speed (ICP) but in case the V3 will be faster 
+			// in the future, we already catch it here.
+			if( itrfApi.getSpeed() > 25000  )
+			{
+				// 1000 msec timeout
+				result = flash_check_busy(1000); if(result<0) return result;
+			}
+		}
+    }		
+	
+	// 6. Check that EOP flag is set in the FLASH_xxSR register (meaning that the
+    // programming operation has succeed), and clear it by software.
+	result = itrfApi.readMem32(FLASH_BASE + FLASH_SR); if(result<0) return result;
+	if(itrfApi.value32 & FLASH_SR_EOP)
+	{
+		result = itrfApi.writeMem32(FLASH_BASE + FLASH_SR, itrfApi.value32 | FLASH_SR_EOP ); 
+		if(result<0) return result;
+	}
+	
+	// 7. Clear the PG bit of the FLASH control register (FLASH_CR) if there no more
+    // programming request anymore
+	result = itrfApi.readMem32 (FLASH_BASE + FLASH_CR); if(result<0) return result;
+	return itrfApi.writeMem32(FLASH_BASE + FLASH_CR, itrfApi.value32 & ~FLASH_CR_PG );
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+//
+// EBlink callback
+//
+function flash_done()
+{
+	return flash_lock();
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+//
+//   Lock the flash
+//
+function flash_check_busy(timeout)
+{
+	local result;
+	local time;
+	
+	time = GetTickCount();
+	do
+	{
+		result = itrfApi.readMem32(FLASH_BASE + FLASH_SR); if(result<0) return result;
+
+	    if(GetTickCount() - time > timeout)
+        {
+            errorf("Error: flash keeps busy\n");
+            return -1;
+        }
+		
+	} while ( itrfApi.value32 & FLASH_SR_BSY);	
+
+	if( itrfApi.value32 & FLASH_SR_PGAERR)
+	{
+	   errorf("Error: flash programming failed!\n");
+	   return -1;
+	}
+		
+	if( itrfApi.value32 & FLASH_SR_WRPERR)
+	{
+	   errorf("Error: flash write protect!\n");
+	   return -1;
+	}
+	
+	// Clear error's		
+	return clear_flash_errors();
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+//
+//   Clear errors according ST user manual
+//
+function clear_flash_errors()
+{
+    local result;
+	
+	result = itrfApi.readMem32(FLASH_BASE + FLASH_SR); if(result<0) return result;
+	return itrfApi.writeMem32(FLASH_BASE + FLASH_SR, itrfApi.value32 | ( FLASH_SR_SIZERR | FLASH_SR_PGAERR | FLASH_SR_WRPERR |  FLASH_SR_PROGERR) ); 
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+//
+//   Unlock the flash
+//
+function flash_unlock()
+{
+    local result;
+
+    // Unlock Flash
+    result = itrfApi.writeMem32(FLASH_BASE + FLASH_KEY, FLASH_KEY1 ); if(result<0) return result;
+    result = itrfApi.writeMem32(FLASH_BASE + FLASH_KEY, FLASH_KEY2 ); if(result<0) return result;
+		
+	result = itrfApi.readMem32(FLASH_BASE + FLASH_CR); if(result<0) return result;
+	if(itrfApi.value32 & FLASH_CR_LOCK )
+	{
+	    errorf("Error: unlock flash failed!\n");
+		return -1;
+	}
+	
+	return 0;
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+//
+//   Lock the flash
+//
+function flash_lock()
+{
+	// Write the CR register to lock (LOCK)
+    return itrfApi.writeMem32(FLASH_BASE + FLASH_CR, FLASH_CR_LOCK);
+}

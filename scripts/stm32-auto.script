@@ -166,6 +166,11 @@ function set_target(deviceId)
 	    require("stmicro/stm32g4x.script");
         break;
 
+    // Cortex M4
+	case 0x495 : // STM32WB55
+	    require("stmicro/stm32wb55xx.script");
+        break;
+
     // Cortex M7
     case 0x449 : // CHIPID_STM32_F7
     case 0x451 : // CHIPID_STM32_F7xx
