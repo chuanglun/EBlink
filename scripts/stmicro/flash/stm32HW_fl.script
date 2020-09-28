@@ -60,7 +60,7 @@ function flash_start()
     // Pre load the Halfword flash loader at the start of RAM and save the loader size.
     // The return value is length of bytes loaded ( >0) or error (<0)
 
-	// Load the flash loader in advance in target RAM
+    // Load the flash loader in advance in target RAM
     return itrfApi.loadString(LOADER_ADDR, flashLoader, FLASH_LOAD_SIZE);
 }
 
@@ -204,45 +204,45 @@ function flash_erase_chip()
     local result;
     local time;
 
-	// Be sure that the target is halted
-	result = targetApi.halt(); if(result<0) return result;
+    // Be sure that the target is halted
+    result = targetApi.halt(); if(result<0) return result;
 
-	// Unlock flash
-	result = flash_unlock(); if(result<0) return result;
+    // Unlock flash
+    result = flash_unlock(); if(result<0) return result;
 
     // (1) Set the MER bit in the FLASH_CR register to enable mass erasing
     result = itrfApi.writeMem32(FLASH_BASE + FLASH_CR, FLASH_CR_MER ); if(result<0) return result;
 
-	// (2) Set the STRT bit in the FLASH_CR register to start the erasing
-	    result = itrfApi.writeMem32(FLASH_BASE + FLASH_CR, FLASH_CR_MER | FLASH_CR_STRT ); if(result<0) return result;
+    // (2) Set the STRT bit in the FLASH_CR register to start the erasing
+    result = itrfApi.writeMem32(FLASH_BASE + FLASH_CR, FLASH_CR_MER | FLASH_CR_STRT ); if(result<0) return result;
 
-	// (3) Wait until the BSY bit is reset in the FLASH_SR register
-	time = GetTickCount();
-    do{
-		CursorAnimate();
+    // (3) Wait until the BSY bit is reset in the FLASH_SR register
+   time = GetTickCount();
+   do{
+	CursorAnimate();
 
-	    // Check for time out of 30 seconds
-	    if(GetTickCount() - time > 3000)
+        // Check for time out of 30 seconds
+        if(GetTickCount() - time > 3000)
         {
             errorf("Error: flash keeps busy\n");
             return -1;
         }
-         result = itrfApi.readMem32(FLASH_BASE + FLASH_SR); if(result<0) return result;
-    }while ( itrfApi.value32 & FLASH_SR_BSY);
+        result = itrfApi.readMem32(FLASH_BASE + FLASH_SR); if(result<0) return result;
+   }while ( itrfApi.value32 & FLASH_SR_BSY);
 
-    // (4) Check the EOP flag in the FLASH_SR register
-    if( (itrfApi.value32 & FLASH_SR_EOP) == 0)
-    {
-       errorf("ERROR: Failed erasing sector %d\n", sector);
-       return -1;
-    }
+   // (4) Check the EOP flag in the FLASH_SR register
+   if( (itrfApi.value32 & FLASH_SR_EOP) == 0)
+   {
+      errorf("ERROR: Failed erasing sector %d\n", sector);
+      return -1;
+   }
 
-    // (5) Clear EOP flag by software by writing EOP at 1
-    result = itrfApi.writeMem32(FLASH_BASE + FLASH_SR, itrfApi.value32 | FLASH_SR_EOP); if(result<0) return result;
+   // (5) Clear EOP flag by software by writing EOP at 1
+   result = itrfApi.writeMem32(FLASH_BASE + FLASH_SR, itrfApi.value32 | FLASH_SR_EOP); if(result<0) return result;
 
-    // (6) Reset the PER Bit to disable the mass erase
-    result = itrfApi.writeMem32(FLASH_BASE + FLASH_CR, 0 ); if(result<0) return result;
+   // (6) Reset the PER Bit to disable the mass erase
+   result = itrfApi.writeMem32(FLASH_BASE + FLASH_CR, 0 ); if(result<0) return result;
 
-	// Lock the flash again
-    return flash_done();
+   // Lock the flash again
+   return flash_done();
 }
