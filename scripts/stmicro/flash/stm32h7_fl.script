@@ -56,7 +56,7 @@ function flash_erase(sector, address)
     local result;
     local regbase = 0x52002000; // first flash bank
     local time;
-	
+
 	// Skip the virtual option sector
 	if(sector == 999)
 	  return 0;
@@ -126,11 +126,11 @@ function flash_write(sector, address, buffer)
     local result;
     local time;
 
-	
+
 	// If this is the virtual option sector, go to write options
 	if(sector == 999)
 	  return option_write(buffer);
-	
+
     // Select the right bank
 	if (address >= 0x08100000) {
 		regbase = 0x52002100; // Second flash bank
@@ -153,18 +153,18 @@ function flash_write(sector, address, buffer)
 	// STlink/V2 and V2.1 are rather slow, we can write direct
 	if( itrfApi.getName() != "STlink/V3" )
 	{
-	  itrfApi.writeBuf(address, buffer);
+	  itrfApi.writeBuf(address, buffer, 32);
 	}
 	else
 	{   // STlink/V3 is too fast for direct so we will program per 256 bits
 		for(local count = 0; count < buffer.byteLength; )
-		{		
+		{
 			// 256 bits per time
 			itrfApi.writeMem(address, buffer, count, 32 );
 			address += 32;
 			count   += 32;
-			
-			// This is only needed for high speed (ICP) but in case the V3 will be faster 
+
+			// This is only needed for high speed (ICP) but in case the V3 will be faster
 			// in the future, we already catch it here.
 			if( itrfApi.getSpeed() > 25000  )
 			{
@@ -192,9 +192,9 @@ function flash_write(sector, address, buffer)
 
 /////////////////////////////////////////////////////////////////////////////////
 //
-//  Write STM32H7 option bytes 
+//  Write STM32H7 option bytes
 //
-//  Virtual sector 999 of 32 bytes with format as below. 
+//  Virtual sector 999 of 32 bytes with format as below.
 //  Be aware of reserved reset values!! (otherwise program errors)
 //
 //  typedef struct {       //   Reset    Flash control offset
@@ -212,26 +212,26 @@ function flash_write(sector, address, buffer)
 function option_write(buffer)
 {
     local regbase = 0x52002000; // first flash bank
-    local result;	
+    local result;
     local time;
-   
+
     // Check if the buffer is valid
 	if(buffer.byteLength != 32)
 	{
 	   errorf("Error: Option program length is %d, should be 32 bytes\n", buffer.byteLength);
 	   return -1;
 	}
-      
+
     printf("\n\nStart writing option bytes virtual sector 999\n");
-	
-	
+
+
     //------------- Unlock options	--------------
     // Read flash FLASH_OPTCR
     result = itrfApi.readMem32(regbase + 0x18); if(result<0) return result;
 
     // Check if options are locked by the FLASH_OPTCR_OPTLOCK flag
     if( itrfApi.value32 & 0x01 )
-    {        
+    {
 		// Write FLASH_OPTKEYR to unlock
         result = itrfApi.writeMem32(regbase + 0x08, 0x08192a3b); if(result<0) return result;
         result = itrfApi.writeMem32(regbase + 0x08, 0x4c5d6e7f); if(result<0) return result;
@@ -244,13 +244,13 @@ function option_write(buffer)
             errorf("Error: can't unlock stm32h7 options!\n");
             return -1;
         }
-    }	
-	
+    }
+
 	//-------------- Program the options ---------
 
 	printf("FLASH_OPTSR  : 0x%x\n", buffer.un32(0));
 	result = itrfApi.writeMem32(regbase + 0x20, buffer.un32(0) ); if(result<0) return result;
-	
+
 	printf("FLASH_BOOT   : 0x%x\n", buffer.un32(4));
 	result = itrfApi.writeMem32(regbase + 0x44, buffer.un32(4) ); if(result<0) return result;
 
@@ -271,43 +271,43 @@ function option_write(buffer)
 	result = itrfApi.writeMem32(regbase + 0x3C, buffer.un32(24) ); if(result<0) return result;
 
 	printf("FLASH_WPSN_x2: 0x%x\n", buffer.un32(28));
-	result = itrfApi.writeMem32(regbase + 0x13C, buffer.un32(28) ); if(result<0) return result;		
-	
-    //------------- Commit options	--------------	
-			
-		
-	// Remove OPT error flag in FLASH_OPTCCR before programming 
-    result = itrfApi.writeMem32(regbase + 0x24, 0x40000000); if(result<0) return result;	
-	
+	result = itrfApi.writeMem32(regbase + 0x13C, buffer.un32(28) ); if(result<0) return result;
+
+    //------------- Commit options	--------------
+
+
+	// Remove OPT error flag in FLASH_OPTCCR before programming
+    result = itrfApi.writeMem32(regbase + 0x24, 0x40000000); if(result<0) return result;
+
 	// Set the FLASH_OPTCR_OPTSTART in the FLASH_OPTCR
 	result = itrfApi.writeMem32(regbase + 0x18, 2); if(result<0) return result;
-						
+
     time = GetTickCount();
     do{
 	    // Read the FLASH_OPTSR_CUR to get the busy flag
         result = itrfApi.readMem32(regbase + 0x1C); if(result<0) return result;
-		
+
 		CursorAnimate();
-		
+
 	    // Timeout of 1sec
 	    if(GetTickCount() - time > 1000)
         {
             errorf("Error: Option program timeout\n");
             return -1;
         }
-    // Check for the busy flag 		
-    }while ( itrfApi.value32 &  0x01 );		
-				
-    result = itrfApi.readMem32(regbase + 0x1c); if(result<0) return result;	
-	
+    // Check for the busy flag
+    }while ( itrfApi.value32 &  0x01 );
+
+    result = itrfApi.readMem32(regbase + 0x1c); if(result<0) return result;
+
 	if(itrfApi.value32 & 0x40000000)
 	  errorf("Error: Option bytes writing failed!\n");
-	else	
-	  printf("Options bytes ready\n\n");	
-		
-	// Relock the options bytes	
-	result = itrfApi.writeMem32(regbase + 0x18, 1); if(result<0) return result;	
-		
+	else
+	  printf("Options bytes ready\n\n");
+
+	// Relock the options bytes
+	result = itrfApi.writeMem32(regbase + 0x18, 1); if(result<0) return result;
+
     return 0;
 }
 
@@ -335,17 +335,17 @@ function flash_done()
 function flash_erase_chip()
 {
     local time = GetTickCount();
-	
+
 	printf("Flash: chip erasing ");
-	
+
 	flash_erase_bank(1, 0x52002000);
-	
-	// The same, two steps, for the second bank if exists	
+
+	// The same, two steps, for the second bank if exists
 	if(hasSecondBank)
 	{
 	    flash_erase_bank(2, 0x52002100);
-	}	
-	
+	}
+
     printf("done [%ums] \n", GetTickCount() - time);
     return 0;
 }
@@ -358,21 +358,21 @@ function flash_erase_bank(bank, regbase)
 {
     local result;
     local time = GetTickCount();
-	
+
 	// 1. Check and clear (optional) all the error flags due to previous programming/erase
     if(flash_get_clear_status(regbase) )
     {
         errorf("Error: Flash error bank%d 0x%x", bank, itrfApi.value32 & 0x07EE0000);
         return -1;
     }
-	
+
 	// 2. Unlock the two FLASH_CR1/2 registers and FLASH_OPTCR register
-	flash_unlock(regbase);	
-	
+	flash_unlock(regbase);
+
 	//  3. BER1 and  START1 to launch bank erase
     result = itrfApi.writeMem32(regbase + 0x0C,  0x08 | 0x2 ); if(result<0) return result;
-	result = itrfApi.writeMem32(regbase + 0x0C,  0x88 | 0x2 ); if(result<0) return result;	
-	
+	result = itrfApi.writeMem32(regbase + 0x0C,  0x88 | 0x2 ); if(result<0) return result;
+
 	// 4. Then wait until QW bit are cleared in the corresponding FLASH_SR1/2
     do{
         result = itrfApi.readMem32(regbase + 0x10); if(result<0) return result;
@@ -384,10 +384,10 @@ function flash_erase_bank(bank, regbase)
             errorf("Error: Mass erase timeout flash bank%d\n", bank);
             return -1;
         }
-    }while ( itrfApi.value32 &  0x05 );	
-	
+    }while ( itrfApi.value32 &  0x05 );
+
 	// 5. Lock the flash banks again
-	flash_lock(regbase);	
+	flash_lock(regbase);
 }
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -443,7 +443,7 @@ function flash_unlock(regbase)
             errorf("Error: can't unlock flash!\n");
             return -1;
         }
-					
+
         result = itrfApi.writeMem32(regbase + 0x08, 0x08192a3b); if(result<0) return result;
         result = itrfApi.writeMem32(regbase + 0x08, 0x4c5d6e7f); if(result<0) return result;
 
@@ -453,7 +453,7 @@ function flash_unlock(regbase)
         {
             errorf("Error: can't unlock flash!\n");
             return -1;
-        }		
+        }
     }
 
     return 0;
@@ -470,11 +470,11 @@ function flash_lock(regbase)
     result = itrfApi.writeMem32(regbase + 0x0C, 0x01);
     if(result<0)
         return result;
-		
+
     result = itrfApi.writeMem32(regbase + 0x18, 0x01);
     if(result<0)
         return result;
-		
+
     return 0;
 }
 

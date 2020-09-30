@@ -57,22 +57,22 @@ function stm32_device(deviceId)
             break;
 
     }
-	
+
     // Inform the user
-    printf("Detected FLASH : 0x%X\nConfigured RAM : 0x%X\n", flash_size, ram_size);	
-	
+    printf("Detected FLASH : 0x%X\nConfigured RAM : 0x%X\n", flash_size, ram_size);
+
 	// The user specified the size of flash memory
 	if (isScriptObject("FLASH_SIZE") && FLASH_SIZE>0)
     {
 	  flash_size = (FLASH_SIZE & 0xffff) * 1024;
-	  printf("CLI set  FLASH : 0x%X\n", flash_size);	  
+	  printf("CLI set  FLASH : 0x%X\n", flash_size);
 	}
-	
+
 	// The user specified the size of ram memory
 	if (isScriptObject("RAM_SIZE") && RAM_SIZE>0)
     {
 	  ram_size = (RAM_SIZE & 0xffff) * 1024;
-	  printf("CLI set    RAM : 0x%X\n", ram_size);	  
+	  printf("CLI set    RAM : 0x%X\n", ram_size);
 	}
 
     devApi.memmap( format( mem_template,  flash_size,
@@ -80,7 +80,7 @@ function stm32_device(deviceId)
                                           flash_size,
                                           page_size) );
 
-    require("stmicro/flash/stm32f4_flash.script");
+    require("stmicro/flash/stm32f4_fl.script");
     return 0;
 }
 

@@ -150,12 +150,12 @@ function stm32_device(deviceId)
             break;
 
         case 0x438 : // CHIPID_STM32_F334
-            ram_size = 0x20000;
+            ram_size = 0x4000;
             devApi.memmap( mem_template_F4 );
             break;
 
         case 0x439 : // CHIPID_STM32_F3_SMALL
-            ram_size = 0x10000;
+            ram_size = 0x1000;
             devApi.memmap( mem_template_F4 );
             break;
 
@@ -173,7 +173,7 @@ function stm32_device(deviceId)
     printf("Detected FLASH : 0x%X\nConfigured RAM : 0x%X\n", flash_size, ram_size);
 
     // Include flash loader script
-    require("stmicro/flash/stm32f7f4_fl.script");
+    require("stmicro/flash/stm32HW_fl.script");
 
     // Return "NO_ERROR"
     return 0;
