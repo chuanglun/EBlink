@@ -5,21 +5,23 @@ EBlink ARM Cortex-M debug tool with squirrel scripting device support
 
  - New: Windows installer with windows context menu handler (32 and 64 bits) for file flashing [.hex,.elf and .srec] and core control (reset,halt and resume) or GDB server launch. 
  
- [ Download windows installer V3.0.4 ](https://www.embitz.org/EBlinkInstaller3.0.4.zip)  (MD5: 9435a5995d410989da004eddab9184cc )
+ [ Download windows installer V3.1.0 ](https://www.embitz.org/EBlinkInstaller3.1.0.zip)  (MD5: 0fda31bf9ed5a6f29d55552d953b501a )
  
 ![alt text](https://www.embitz.org/context2.png)  
 
 
 Upcomming 3.1
  - Add: Support of flash <file>.mod file. An .mod file is the same as an Intel hex but it will be treated as a modification rather than absolute flash content. So the .mod content is placed over the original flash content already in the MCU, e.g. serial numbers, checksum or configuration parameters.
- - Fix: Flash verify cursor animation was not using the animation engine.
  - Add: ITM cell support 
 
 
-Changes (25-9-2020) Release 3.0
- - Added: STM32WB55xx support
- - Fixed: spaces in names of folders and files
- - Fixed: Silent error handling of script functions returning error code < -1 (which means "user not informed yet")
+Changes (30-9-2020) Release 3.1
+- Added: stlink 16bit memory support
+- Moded: EBlink squirrel supports const with << operator
+- Fixed: stm32l4 
+- Fixed: stm32l0 and stm32l1 
+- Moded: lot of rewrites of the flashing functions. External bootloaders are removed
+- Fixed: Flash verify cursor animation was not using the animation engine.
 
    
  ##### When to consider EBlink instead of OpenOCD:
