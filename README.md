@@ -13,7 +13,7 @@ EBlink ARM Cortex-M debug tool with squirrel scripting device support
 Upcomming 
  - Add: Support of flash <file>.mod file. An .mod file is the same as an Intel hex but it will be treated as a modification rather than absolute flash content. So the .mod content is placed over the original flash content already in the MCU, e.g. serial numbers, checksum or configuration parameters.
  - Add: ITM cell support 
- - Mod: Cleaned flash scripts with exception handling try{}catch{} instead of result examination
+ - Mod: Cleaned flash scripts with exception handling try{}catch{} with builtin functions as _n_throw and _n_throw_e to throw an exception on negative (<ERROR_OK) values
 
 ```c++
 function flash_done()
