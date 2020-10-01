@@ -13,7 +13,29 @@ EBlink ARM Cortex-M debug tool with squirrel scripting device support
 Upcomming 
  - Add: Support of flash <file>.mod file. An .mod file is the same as an Intel hex but it will be treated as a modification rather than absolute flash content. So the .mod content is placed over the original flash content already in the MCU, e.g. serial numbers, checksum or configuration parameters.
  - Add: ITM cell support 
+ - Mod: Cleaned flash scripts with exception handling try{}catch{} instead of result examination
 
+```c++
+function flash_done()
+{
+    try{
+        // Restore the original probe speed if changed
+        if(savedProbeSpeed > 0)
+            _n_throw( itrfApi.setSpeed(savedProbeSpeed) )
+
+        // Relock the flash by setting the FLASH_CR_LOCK in the flash CR register
+        _n_throw( itrfApi.writeMem32(FLASH_BASE + FLASH_CR, FLASH_CR_LOCK ) )
+        return ERROR_OK
+    }
+    
+    // Catch all the lock errors
+    catch(e){      
+       if(e < -1)
+           errorf("Error: locking flash failed!\n")
+       return -1
+    }   
+}
+```
 
 Changes (30-9-2020) Release 3.1
 - Added: stlink 16bit memory support
