@@ -16,25 +16,31 @@ Upcomming
  - Mod: Cleaned flash scripts with exception handling with EBlink builtin functions as **_n_throw** and **_n_throw_e** to throw an exception on negative (<ERROR_OK) values
 Such as:
 ```c++
-function flash_done()
+function flash_unlock()
 {
     try{
-        // Restore the original probe speed if changed
-        if(savedProbeSpeed > 0)
-            _n_throw( itrfApi.setSpeed(savedProbeSpeed) )
+        _n_throw( itrfApi.readMem32(FLASH_BASE + FLASH_CR) )
 
-        // Relock the flash by setting the FLASH_CR_LOCK in the flash CR register
-        _n_throw( itrfApi.writeMem32(FLASH_BASE + FLASH_CR, FLASH_CR_LOCK ) )
+        if(itrfApi.value32 & FLASH_CR_LOCK )
+        {
+            // Unlock Flash
+            _n_throw( itrfApi.writeMem32(FLASH_BASE + FLASH_KEY, FLASH_KEY1 ) )
+            _n_throw( itrfApi.writeMem32(FLASH_BASE + FLASH_KEY, FLASH_KEY2 ) )
+
+            _n_throw( itrfApi.readMem32(FLASH_BASE + FLASH_CR) )
+            if(itrfApi.value32 & FLASH_CR_LOCK )
+               _n_throw(-2)
+        }
         return ERROR_OK
     }
     
-    // Catch all the lock errors
+    // Catch all the unlock errors
     // Exception is as EBlink error handling convention 
     // < -1 = error user not yet informed
-    //   -1 = error user already informed
+    //   -1 = error user already informed    
     catch(e){      
        if(e < -1)
-           errorf("Error: locking flash failed!\n")
+           errorf("Error: unlocking flash failed!\n")
        return -1
     }   
 }
