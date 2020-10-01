@@ -29,6 +29,9 @@ function flash_done()
     }
     
     // Catch all the lock errors
+    // Exception is as EBlink error handling convention 
+    // < -1 = error user not yet informed
+    //   -1 = error user already informed
     catch(e){      
        if(e < -1)
            errorf("Error: locking flash failed!\n")
