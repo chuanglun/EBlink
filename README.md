@@ -15,7 +15,7 @@ Upcomming
  - Add: ITM cell support 
 
 Changes (2-10-2020) Release 3.2
-- Total rewriten flash scripts (dual bank etc). Easy to read an to modify
+- Total rewriten flash scripts (dual bank etc). 
 
    
  ##### When to consider EBlink instead of OpenOCD:
