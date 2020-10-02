@@ -20,7 +20,7 @@ const mem_template_L4 = @@"
   <memory type=\"ram\" start=\"0x20000000\" length=\"0x%x\"/>
 
   <memory type=\"flash\" start=\"0x08000000\" length=\"0x%x\">
-   <property name=\"blocksize\">0x800</property>
+   <property name=\"blocksize\">0x%x</property>
    <property name=\"secstart\">0</property>
   </memory>
 
@@ -48,6 +48,7 @@ function stm32_device(deviceId)
 
     local result;
     local flash_size;
+    local page_size;
     local ram_size;
 
     // Enable debug clocks: DBG_STANDBY & DBG_STOP & DBG_SLEEP - RM0090 Page 1676/1705
@@ -66,30 +67,34 @@ function stm32_device(deviceId)
         case 0x461 : // CHIPID_STM32_L49X/L4A
             if( (flash_size == (1024*1024)) & readDualBankOption(21) )
             {
-                hasDualBank = true
-                flash_size = flash_size/2                
+                hasDualBank = true               
             }            
             ram_size = 0x18000;
+            page_size = 0x800;
             break;
 
         case 0x435 : // CHIPID_STM32_L43X
             ram_size = 0xC000;
+            page_size = 0x800;            
             break;           
         
         case 0x462 : // CHIPID_STM32_L45X/L46X
             ram_size = 0xC000;
+            page_size = 0x800;            
             break; 
 
         case 0x464 : // CHIPID_STM32_L41X/L42X
             ram_size = 0xC000;
+            page_size = 0x800;            
             break;            
         
         case 0x470 : // CHIPID_STM32_L4R/L4S
         case 0x471 : // CHIPID_STM32_L4P5/L4Q5x
+            page_size = 0x2000;
             if( (flash_size == (1024*1024)) & readDualBankOption(21) )
             {
-                hasDualBank = true
-                flash_size = flash_size/2                
+                hasDualBank = true 
+                page_size = 0x1000;                
             }    
             ram_size = 0x18000;
             break;              
@@ -115,7 +120,7 @@ function stm32_device(deviceId)
       printf("CLI set    RAM : 0x%X\n", ram_size);
     }
 
-    devApi.memmap(format( mem_template_L4, ram_size, flash_size));
+    devApi.memmap(format( mem_template_L4, ram_size, flash_size, page_size));
 
     // Include flash loader script
     require("stmicro/flash/wb_l4_gx.script");
