@@ -297,7 +297,7 @@ function flash_unlock()
 //   - If this function is not defined, sector by sector erase is used by EBlink.
 //   - This is an isolated function, flash_start and flash_done are not called by EBlink
 //
-function nflash_erase_chip()
+function flash_erase_chip()
 {
     local targetApi = :: TargetAPI() // Our interface to the target class
 
