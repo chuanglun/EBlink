@@ -31,6 +31,7 @@ const mem_template_F4 = @@"
   <memory type=\"flash\" start=\"0x08020000\" length=\"0xE0000\">
    <property name=\"blocksize\">0x20000</property>
   </memory>
+  
   <memory type=\"ram\" start=\"0x40000000\" length=\"0x1fffffff\"/>
   <memory type=\"ram\" start=\"0x60000000\" length=\"0x7fffffff\"/>
   <memory type=\"ram\" start=\"0xe0000000\" length=\"0x1fffffff\"/>
@@ -99,6 +100,19 @@ const mem_template_F4_HD = @@"
   <memory type=\"flash\" start=\"0x08020000\" length=\"0xE0000\">
     <property name=\"blocksize\">0x20000</property>
   </memory>
+  
+ <!-- Sectors 12..15 page size 16kB -->
+  <memory type=\"flash\" start=\"0x08100000\" length=\"0x10000\">
+   <property name=\"blocksize\">0x4000</property>
+  </memory>
+ <!-- Sectors 16 page size 64kB -->
+  <memory type=\"flash\" start=\"0x08110000\" length=\"0x10000\">
+   <property name=\"blocksize\">0x10000</property>
+  </memory>
+ <!-- Sectors 17..23 page size 128kB -->
+  <memory type=\"flash\" start=\"0x08120000\" length=\"0xE0000\">
+    <property name=\"blocksize\">0x20000</property>
+  </memory>  
 
  <!-- peripheral regs -->
   <memory type=\"ram\" start=\"0x40000000\" length=\"0x1FFFFFFF\"/>
@@ -174,10 +188,10 @@ function stm32_device(deviceId)
             devApi.memmap( mem_template_F4 );
             break;
 
-		case 0x441 : // CHIPID_STM32_F412
+        case 0x441 : // CHIPID_STM32_F412
             ram_size = 0x40000;
             devApi.memmap( mem_template_F4 );
-            break;		
+            break;      
 
         case 0x458 : // CHIPID_STM32_F410
             ram_size = 0x8000;
@@ -187,13 +201,13 @@ function stm32_device(deviceId)
         default:
         break;
     }
-	
+    
 
     // Inform the user
     printf("Detected FLASH : 0x%X\nConfigured RAM : 0x%X\n", flash_size, ram_size);
 
     // Include flash loader script
-    require("stmicro/flash/stm32f7f4_fl.script");
+    require("stmicro/flash/f7_f4_f2.script");
 
     // Return "NO_ERROR"
     return 0;

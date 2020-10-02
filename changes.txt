@@ -1,3 +1,6 @@
+Changes (2-10-2020) Release 3.2
+- Total rewriten flash algo's (with dual bank etc)
+
 Changes (30-9-2020) Release 3.1
 - Added: stlink 16bit memory support
 - Moded: EBlink squirrel supports const with << operator

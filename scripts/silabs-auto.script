@@ -45,19 +45,19 @@ function main()
     local devApi = ::DeviceAPI(); // We only use the device class wrapper in this function
     local result;
 
-	// Check if the right script API is supported
-	if( VERSION < 3.1)
-	{
-	   errorf("Error:\nIncompatiable EBlink version %.1f\nPlease update EBlink\n", VERSION);
-	   return -1;
-	}	
-	
+    // Check if the right script API is supported
+    if( VERSION < 3.2)
+    {
+       errorf("Error:\nIncompatiable EBlink version %.1f\nPlease update EBlink\n", VERSION);
+       return -1;
+    }   
+    
     // Get the family ID and part number
     result = itrfApi.readMem32(0x0FE081FC);
     if(  (result < 0 ) || (itrfApi.value32 == 0) )
     {
         errorf("Error: can't access target device!\n");
-        return -1;	// We have already throw an error so use -1 (otherwise < -1)
+        return -1;  // We have already throw an error so use -1 (otherwise < -1)
     }
 
     // Isolate the family ID and part number from the 32 bits register value
@@ -216,9 +216,9 @@ function main()
 
 
     default:        
-		printf("\n\nPlease report this ID so that we can add it.\n");
-        errorf("Error unsupported Silabs fam ID: %d\n", famId);		
-        return -1;	// We have already throw an error so use -1.
+        printf("\n\nPlease report this ID so that we can add it.\n");
+        errorf("Error unsupported Silabs fam ID: %d\n", famId);     
+        return -1;  // We have already throw an error so use -1.
     }
 
     // Get the MEM_INFO_PAGE_SIZE
@@ -231,18 +231,18 @@ function main()
 
     flashSize = itrfApi.value32 & 0xFFFF;
     local ramSize = (itrfApi.value32 >> 16) & 0xFFFF;
-	
-	// The user specified the size of flash memory
-	if (isScriptObject("FLASH_SIZE") && FLASH_SIZE>0)
+    
+    // The user specified the size of flash memory
+    if (isScriptObject("FLASH_SIZE") && FLASH_SIZE>0)
     {
-	  flashSize = FLASH_SIZE & 0xffff;
-	}
-	
-	// The user specified the size of ram memory
-	if (isScriptObject("RAM_SIZE") && RAM_SIZE>0)
+      flashSize = FLASH_SIZE & 0xffff;
+    }
+    
+    // The user specified the size of ram memory
+    if (isScriptObject("RAM_SIZE") && RAM_SIZE>0)
     {
-	  ramSize = RAM_SIZE & 0xffff;
-	}
+      ramSize = RAM_SIZE & 0xffff;
+    }
 
     printf("Detected FLASH %d Kbyte - Page %d bytes\n", flashSize, pageSize);
     printf("Detected RAM   %d Kbyte\n", ramSize);

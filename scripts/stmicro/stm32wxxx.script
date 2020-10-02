@@ -27,6 +27,9 @@ const mem_template = @@"
   <memory type=\"rom\" start=\"0x1fffc000\" length=\"0x10\"/>
  </memory-map>";
  
+// The parameters for the flash script
+const FLASH_BASE 0x58004000
+hasDualBank <- false // Can be set by upper scripts is we have dual bank support
  
 /////////////////////////////////////////////////////
 //
@@ -47,7 +50,7 @@ function stm32_device(deviceId)
     result = itrfApi.writeMem32(0xE0042004, 7);
 
     // Stop watchdog counters during halt
-	// DBGMCU_APB1_FZR1 |= DBG_IWDG_STOP | DBG_WWDG_STOP
+    // DBGMCU_APB1_FZR1 |= DBG_IWDG_STOP | DBG_WWDG_STOP
     result = itrfApi.writeMem32(0xE004203C, 0x00001800);
 
     // Get the flash size by reading the info register
@@ -56,28 +59,34 @@ function stm32_device(deviceId)
     flash_size = (flash_size & 0xffff) * 1024;
 
     switch(deviceId) {
-        case 0x495 : // CHIPID_STM32_WB55
+        case 0x495 : // CHIPID_STM32_WB5x
+        case 0x496 : // CHIPID_STM32_WB3x
             page_size = 0x1000;
+            ram_size = 0x40000;
+            break;
+            
+        case 0x497 : // CHIPID_STM32_WLEx
+            page_size = 0x800;
             ram_size = 0x40000;
             break;
     }
 
     // Inform the user
     printf("Detected FLASH : 0x%X (shared between two cpu's)\nConfigured RAM : 0x%X\n", flash_size, ram_size);
-	
+    
     // The user specified the size of flash memory
-	if (isScriptObject("FLASH_SIZE") && FLASH_SIZE>0)
+    if (isScriptObject("FLASH_SIZE") && FLASH_SIZE>0)
     {
-	  flash_size = (FLASH_SIZE & 0xffff) * 1024;
-	  printf("CLI set  FLASH : 0x%X\n", flash_size);	  
-	}
-	
-	// The user specified the size of ram memory
-	if (isScriptObject("RAM_SIZE") && RAM_SIZE>0)
+      flash_size = (FLASH_SIZE & 0xffff) * 1024;
+      printf("CLI set  FLASH : 0x%X\n", flash_size);      
+    }
+    
+    // The user specified the size of ram memory
+    if (isScriptObject("RAM_SIZE") && RAM_SIZE>0)
     {
-	  ram_size = (RAM_SIZE & 0xffff) * 1024;
-	  printf("CLI set    RAM : 0x%X\n", ram_size);	  
-	}
+      ram_size = (RAM_SIZE & 0xffff) * 1024;
+      printf("CLI set    RAM : 0x%X\n", ram_size);    
+    }
 
 
     devApi.memmap( format( mem_template,  flash_size,
@@ -86,7 +95,7 @@ function stm32_device(deviceId)
                                           page_size) );
 
     // include flash loader
-    require("stmicro/flash/stm32wbxx_fl.script");
+    require("stmicro/flash/wx_l4_gx.script");
 
     return 0;
 }

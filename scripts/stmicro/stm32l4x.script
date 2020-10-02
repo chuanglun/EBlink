@@ -32,7 +32,9 @@ const mem_template_L4 = @@"
  </memory-map>";
 
 
-
+// The parameters for the flash script
+const FLASH_BASE 0x40022000
+hasDualBank <- false // Can be set by upper scripts is we have dual bank support
 
 /////////////////////////////////////////////////////
 //
@@ -60,45 +62,77 @@ function stm32_device(deviceId)
 
     // Set the memory map according the device ID
       switch(deviceId) {
-        case 0x415 : // CHIPID_STM32_L4
+        case 0x415 : // CHIPID_STM32_L47/L48
+        case 0x461 : // CHIPID_STM32_L49X/L4A
+            if( (flash_size == (1024*1024)) & readDualBankOption(21) )
+            {
+                hasDualBank = true
+                flash_size = flash_size/2                
+            }            
             ram_size = 0x18000;
-            //devApi.memmap( mem_template_F4 );
             break;
 
         case 0x435 : // CHIPID_STM32_L43X
             ram_size = 0xC000;
-            //devApi.memmap(mem_template_F4_HD);
-            break;
+            break;           
+        
+        case 0x462 : // CHIPID_STM32_L45X/L46X
+            ram_size = 0xC000;
+            break; 
+
+        case 0x464 : // CHIPID_STM32_L41X/L42X
+            ram_size = 0xC000;
+            break;            
+        
+        case 0x470 : // CHIPID_STM32_L4R/L4S
+        case 0x471 : // CHIPID_STM32_L4P5/L4Q5x
+            if( (flash_size == (1024*1024)) & readDualBankOption(21) )
+            {
+                hasDualBank = true
+                flash_size = flash_size/2                
+            }    
+            ram_size = 0x18000;
+            break;              
+        
         default:
         break;
     }
 
     // Inform the user
-    printf("Detected FLASH : 0x%X\nConfigured RAM : 0x%X\n", flash_size, ram_size);
+    printf("Detected FLASH : 0x%X%s\nConfigured RAM : 0x%X\n", flash_size, (hasDualBank ? " - Dualbank" :""), sram_size); 
 
-	// The user specified the size of flash memory
-	if (isScriptObject("FLASH_SIZE") && FLASH_SIZE>0)
+    // The user specified the size of flash memory
+    if (isScriptObject("FLASH_SIZE") && FLASH_SIZE>0)
     {
-	  flash_size = (FLASH_SIZE & 0xffff) * 1024;
-	  printf("CLI set  FLASH : 0x%X\n", flash_size);
-	}
+      flash_size = (FLASH_SIZE & 0xffff) * 1024;
+      printf("CLI set  FLASH : 0x%X\n", flash_size);
+    }
 
-	// The user specified the size of ram memory
-	if (isScriptObject("RAM_SIZE") && RAM_SIZE>0)
+    // The user specified the size of ram memory
+    if (isScriptObject("RAM_SIZE") && RAM_SIZE>0)
     {
-	  ram_size = (RAM_SIZE & 0xffff) * 1024;
-	  printf("CLI set    RAM : 0x%X\n", ram_size);
-	}
+      ram_size = (RAM_SIZE & 0xffff) * 1024;
+      printf("CLI set    RAM : 0x%X\n", ram_size);
+    }
 
     devApi.memmap(format( mem_template_L4, ram_size, flash_size));
 
     // Include flash loader script
-    require("stmicro/flash/stm32l4_fl.script");
+    require("stmicro/flash/wb_l4_gx.script");
 
     // Return "NO_ERROR"
     return 0;
 }
 
-
+////////////////////////////////////////
+//
+//  Helper function to get the dual bank
+//  option state
+//
+function readDualBankOption(bit)
+{
+     itrfApi.readMem32(FLASH_BASE+0x20)
+     return (itrfApi.value32 & (1<<bit) ? true: false)
+}
 
 

@@ -13,46 +13,9 @@ EBlink ARM Cortex-M debug tool with squirrel scripting device support
 Upcomming 
  - Add: Support of flash <file>.mod file. An .mod file is the same as an Intel hex but it will be treated as a modification rather than absolute flash content. So the .mod content is placed over the original flash content already in the MCU, e.g. serial numbers, checksum or configuration parameters.
  - Add: ITM cell support 
- - Mod: Cleaned flash scripts with exception handling with EBlink builtin functions as **_n_throw** and **_n_throw_e** to throw an exception on negative (<ERROR_OK) values
-Such as:
-```c++
-function flash_unlock()
-{
-    try{
-        _n_throw( itrfApi.readMem32(FLASH_BASE + FLASH_CR) )
 
-        if(itrfApi.value32 & FLASH_CR_LOCK )
-        {
-            // Unlock Flash
-            _n_throw( itrfApi.writeMem32(FLASH_BASE + FLASH_KEY, FLASH_KEY1 ) )
-            _n_throw( itrfApi.writeMem32(FLASH_BASE + FLASH_KEY, FLASH_KEY2 ) )
-
-            _n_throw( itrfApi.readMem32(FLASH_BASE + FLASH_CR) )
-            if(itrfApi.value32 & FLASH_CR_LOCK )
-               _n_throw(-2)
-        }
-        return ERROR_OK
-    }
-    
-    // Catch all the unlock errors
-    // Exception is as EBlink error handling convention 
-    // < -1 = error user not yet informed
-    //   -1 = error user already informed    
-    catch(e){      
-       if(e < -1)
-           errorf("Error: unlocking flash failed!\n")
-       return -1
-    }   
-}
-```
-
-Changes (30-9-2020) Release 3.1
-- Added: stlink 16bit memory support
-- Moded: EBlink squirrel supports const with << operator
-- Fixed: stm32l4 
-- Fixed: stm32l0 and stm32l1 
-- Moded: lot of rewrites of the flashing functions. External bootloaders are removed
-- Fixed: Flash verify cursor animation was not using the animation engine.
+Changes (2-10-2020) Release 3.2
+- Total rewriten flash scripts (dual bank etc). Easy to read an to modify
 
    
  ##### When to consider EBlink instead of OpenOCD:

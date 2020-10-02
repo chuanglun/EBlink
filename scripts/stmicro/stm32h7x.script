@@ -57,14 +57,14 @@ const mem_template_H7 = @@"
     <!-- bootrom -->
     <memory type=\"rom\" start=\"0x00100000\" length=\"0xEDC0\"/>
 
-	<memory type=\"rom\" start=\"0x1fff0000\" length=\"0x20\"/>
-	
+    <memory type=\"rom\" start=\"0x1fff0000\" length=\"0x20\"/>
+    
     <!-- option byte area (virtual sector) -->
     <memory type=\"flash\" start=\"0x1ff20000\" length=\"32\">
-	    <property name=\"blocksize\">32</property>
-		<property name=\"secstart\">999</property>
-	</memory>
-	
+        <property name=\"blocksize\">32</property>
+        <property name=\"secstart\">999</property>
+    </memory>
+    
 </memory-map>";
 
 
@@ -75,7 +75,7 @@ const mem_template_2MB = @@"
         <property name=\"blocksize\">0x20000</property>
     </memory>";
 
-hasSecondBank <- false;	 // Global boolean used by flash script
+hasSecondBank <- false;  // Global boolean used by flash script
 
 /////////////////////////////////////////////////////
 //
@@ -98,22 +98,22 @@ function stm32_device(deviceId)
     result = itrfApi.writeMem32(0x5c001004, 7);
 
     // Stop watchdog counters during halt: DBGMCU_APB3FZ2 |= WWDG1
-	itrfApi.readMem32(0xE00E1038)
+    itrfApi.readMem32(0xE00E1038)
     result = itrfApi.writeMem32(0xE00E1038, itrfApi.value32 | 0x40);
-	
+    
     // Stop watchdog counters during halt: DBGMCU_APB1LFZ2 |= WWDG2
-	itrfApi.readMem32(0xE00E1040)
-    result = itrfApi.writeMem32(0xE00E1040, itrfApi.value32 | 0x800);	
-	
+    itrfApi.readMem32(0xE00E1040)
+    result = itrfApi.writeMem32(0xE00E1040, itrfApi.value32 | 0x800);   
+    
     // Stop watchdog counters during halt: DBGMCU_APB4FZ2 |= WDGLSD1 | WDGLSD2
-	itrfApi.readMem32(0xE00E1058)
-    result = itrfApi.writeMem32(0xE00E1058, itrfApi.value32 | 0xC0000)	
+    itrfApi.readMem32(0xE00E1058)
+    result = itrfApi.writeMem32(0xE00E1058, itrfApi.value32 | 0xC0000)  
 
-	// If IWDG runs as HARDWARE watchdog (44.3.4) erase
-	// will be aborted by the Watchdog and erase fails!
-	// Setting IWDG_KR to 0xaaaa does not seem to help!*/
-	result = itrfApi.readMem32(0x52002020);
-	if( !(itrfApi.value32 & (1<<4) ) )
+    // If IWDG runs as HARDWARE watchdog (44.3.4) erase
+    // will be aborted by the Watchdog and erase fails!
+    // Setting IWDG_KR to 0xaaaa does not seem to help!*/
+    result = itrfApi.readMem32(0x52002020);
+    if( !(itrfApi.value32 & (1<<4) ) )
         printf("Hardware IWDG running. Expect failure. Set IWDG1_SW!\n");
 
     // Get the flash size by reading the info register
@@ -128,29 +128,29 @@ function stm32_device(deviceId)
             break;
 
     }
-	
+    
     // Inform the user
-    printf("Detected FLASH : 0x%X\nConfigured RAM : 0x%X\n", flash_size, ram_size);	
-	
-	// The user specified the size of flash memory
-	if (isScriptObject("FLASH_SIZE") && FLASH_SIZE>0)
+    printf("Detected FLASH : 0x%X\nConfigured RAM : 0x%X\n", flash_size, ram_size); 
+    
+    // The user specified the size of flash memory
+    if (isScriptObject("FLASH_SIZE") && FLASH_SIZE>0)
     {
-	  flash_size = (FLASH_SIZE & 0xffff) * 1024;
-	  printf("CLI set  FLASH : 0x%X\n", flash_size);	  
-	}
-	
-	// The user specified the size of ram memory
-	if (isScriptObject("RAM_SIZE") && RAM_SIZE>0)
+      flash_size = (FLASH_SIZE & 0xffff) * 1024;
+      printf("CLI set  FLASH : 0x%X\n", flash_size);      
+    }
+    
+    // The user specified the size of ram memory
+    if (isScriptObject("RAM_SIZE") && RAM_SIZE>0)
     {
-	  ram_size = (RAM_SIZE & 0xffff) * 1024;
-	  printf("CLI set    RAM : 0x%X\n", ram_size);		  
-	}
+      ram_size = (RAM_SIZE & 0xffff) * 1024;
+      printf("CLI set    RAM : 0x%X\n", ram_size);        
+    }
 
     if(flash_size>0x100000)
     {
       flash_1bank = 0x100000;
       string_2MB = mem_template_2MB;
-	  hasSecondBank = true;
+      hasSecondBank = true;
     }
     else
     {
@@ -161,7 +161,7 @@ function stm32_device(deviceId)
     // Generate XML and put it in EBlink's device object
     devApi.memmap( format(mem_template_H7, flash_1bank, string_2MB));
 
-    require("stmicro/flash/stm32h7_fl.script");
+    require("stmicro/flash/h7.script");
 
     // No errors
     return 0;

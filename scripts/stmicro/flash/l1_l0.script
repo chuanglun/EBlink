@@ -1,0 +1,252 @@
+/////////////////////////////////////////////////////////////////////////////////
+//
+//                   stm32L1x stm32L0x
+//
+
+// Needed global script input: FLASH_BASE and FLASH_HP
+
+const FLASH_TIMEOUT   2000 // Generic 2sec flash timeout
+
+// stm32lx flash register locations
+const FLASH_ACR       0x00
+const FLASH_CR        0x04
+const FLASH_PDKEYR    0x08
+const FLASH_PEKEYR    0x0C
+const FLASH_PRGKEYR   0x10
+const FLASH_OPTKEYR   0x14
+const FLASH_SR        0x18
+const FLASH_OBR       0x1C
+const FLASH_WRPR      0x20
+
+// FLASH_CR bits
+const FLASH_CR_PELOCK      (1<<0)
+const FLASH_CR_PRGLOCK     (1<<1)
+const FLASH_CR_OPTLOCK     (1<<2)
+const FLASH_CR_PROG        (1<<3)
+const FLASH_CR_DATA        (1<<4)
+const FLASH_CR_FTDW        (1<<8)
+const FLASH_CR_ERASE       (1<<9)
+const FLASH_CR_FPRG        (1<<10)
+const FLASH_CR_EOPIE       (1<<16)
+const FLASH_CR_ERRIE       (1<<17)
+const FLASH_CR_OBL_LAUNCH  (1<<18)
+
+// FLASH_SR bits
+const FLASH_SR_BSY       (1<<0)
+const FLASH_SR_EOP       (1<<1)
+const FLASH_SR_ENDHV     (1<<2)
+const FLASH_SR_READY     (1<<3)
+const FLASH_SR_WRPERR    (1<<8)
+const FLASH_SR_PGAERR    (1<<9)
+const FLASH_SR_SIZERR    (1<<10)
+const FLASH_SR_OPTVERR   (1<<11)
+const FLASH_SR_NOTZERO   (1<<16)
+
+// Unlock keys
+const PEKEY1          0x89ABCDEF
+const PEKEY2          0x02030405
+const PRGKEY1         0x8C9DAEBF
+const PRGKEY2         0x13141516
+const OPTKEY1         0xFBEAD9C8
+const OPTKEY2         0x24252627
+
+
+const MAX_FLASH_SPEED 4000  // 4MHz is max speed for direct programming (we think)
+
+savedProbeSpeed <-0   // Our current probe speed 0= not checked, -1 = checked not changed, > 0 = original speed
+
+
+/////////////////////////////////////////////////////////////////////////////////
+//
+//   Unlock the flash
+//
+function flash_start()
+{
+    local targetApi = :: TargetAPI() // Our interface to the target class
+
+    try{
+        // Be sure that the core is halted
+        _n_throw( targetApi.halt() )
+
+        // Read flash lock status
+        _n_throw( itrfApi.readMem32(FLASH_BASE|FLASH_CR) )
+
+        // Check if it's locked by the FLASH_CR_LOCK flag
+        if( itrfApi.value32 & (FLASH_CR_PELOCK|FLASH_CR_PRGLOCK) )
+        {
+            // Unlock
+            _n_throw( itrfApi.writeMem32(FLASH_BASE|FLASH_PEKEYR,PEKEY1) )
+            _n_throw( itrfApi.writeMem32(FLASH_BASE|FLASH_PEKEYR,PEKEY2) )
+
+            // Read flash CR again to check FLASH_CR_LOCK if it's unlocked
+            _n_throw( itrfApi.readMem32(FLASH_BASE|FLASH_CR) )
+            if( itrfApi.value32 & FLASH_CR_PELOCK )
+                _n_throw(-2)
+
+            // Unlock flash program
+            _n_throw( itrfApi.writeMem32(FLASH_BASE|FLASH_PRGKEYR,PRGKEY1) )
+            _n_throw( itrfApi.writeMem32(FLASH_BASE|FLASH_PRGKEYR,PRGKEY2) )
+
+            // check CR.prglock is cleared
+            _n_throw( itrfApi.readMem32(FLASH_BASE|FLASH_CR) )
+            if( itrfApi.value32 & FLASH_CR_PRGLOCK )
+                _n_throw( -2)
+        }
+        return ERROR_OK
+    }
+
+    // Catch all the sector write errors
+    catch(e){
+       if(e < -1)
+           errorf("Error unlocking flash!\n")
+       return -1
+    }
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+//
+//   Erase sequence according ST user manual
+//
+function flash_erase(sector, address)
+{
+    try{
+        // Set the ERASE and PROG bits in the FLASH_CR register to enable page erasing
+        _n_throw( itrfApi.writeMem32(FLASH_BASE|FLASH_CR, FLASH_CR_ERASE|FLASH_CR_PROG) )
+
+        // Write a 32-bit word value in an address of the selected page to start the erase sequence
+        _n_throw( itrfApi.writeMem32(address, 0 ) )
+
+        //  Wait until the BSY bit is reset in the FLASH_SR register
+        checkBusy(FLASH_TIMEOUT)
+
+        //  Reset the ERASE bits in the FLASH_CR register to disable the page erase
+        _n_throw( itrfApi.writeMem32(FLASH_BASE|FLASH_CR, 0) )
+
+        return ERROR_OK
+    }
+
+    // Catch all the sector erase errors
+    catch(e){
+       if(e < -1)
+           errorf("ERROR: erasing sector %d failed\n", sector)
+       return -1
+    }
+}
+
+
+
+/////////////////////////////////////////////////////////////////////////////////
+//
+//  The length is always equals to the page to be programmed in bytes because trim is set off.
+//  We don't use a flash loader here. We just write the pages word by word.
+//  Because every word needs to be transported by USB, we don't check the busy
+//  flag in between because we are not that fast.
+//
+function flash_write(sector, address, buffer)
+{
+    try{
+        // Adjust the probe speed to the maximum for direct write
+        if( savedProbeSpeed == 0)
+        {
+            local probeSpeed = itrfApi.getSpeed()
+            if(probeSpeed > MAX_FLASH_SPEED )
+            {
+                savedProbeSpeed = probeSpeed
+                itrfApi.setSpeed(MAX_FLASH_SPEED)
+            }
+            else
+            {
+                // We checked and don't changed the probe speed
+                savedProbeSpeed = -1
+            }
+        }
+
+        // Enable the program  FPRG and PRG in FLASH_CR
+        _n_throw( itrfApi.writeMem32( FLASH_BASE|FLASH_CR, FLASH_CR_FPRG |FLASH_CR_PROG ) )
+
+        // Do we have to use half page writes, is defined at parent device script
+        if(FLASH_HP)
+        {
+            // Write halfpages, the buffer byteLength is always the same as sector size (no sector trim)
+            local halfPageSize = buffer.byteLength/2
+            _n_throw( itrfApi.writeMem(address, buffer, 0, halfPageSize, 32 ) )
+            checkBusy(FLASH_TIMEOUT)
+            _n_throw( itrfApi.writeMem(address+halfPageSize, buffer, halfPageSize, halfPageSize, 32 ) )
+        }
+        else
+        {
+            for(local count = 0; count < buffer.byteLength; count += 4)
+            {
+                _n_throw( itrfApi.writeMem32(address, buffer.un32(count) ) )
+                address += 4
+            }
+        }
+
+        //  Wait until the BSY bit is reset in the FLASH_SR register
+        checkBusy(FLASH_TIMEOUT)
+
+        // Disable the program flag FPRG in FLASH_CR
+        _n_throw( itrfApi.writeMem32(FLASH_BASE|FLASH_CR, 0x00) )
+
+        return ERROR_OK
+    }
+
+    // Catch all the sector write errors
+    catch(e){
+       if(e < -1)
+           errorf("ERROR: writing sector %d failed\n", sector)
+       return -1
+    }
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+//
+//
+//
+function flash_done()
+{
+    try{
+        // Restore the original probe speed if changed
+        if(savedProbeSpeed > 0)
+            itrfApi.setSpeed(savedProbeSpeed)
+
+        //  Locks the NVM by setting PELOCK in CR
+        _n_throw( itrfApi.writeMem32(FLASH_BASE|FLASH_CR, FLASH_CR_PELOCK) )
+
+        return ERROR_OK
+    }
+
+    catch(e){
+       if(e < -1)
+           errorf("Error locking flash!\n")
+       return -1
+    }
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////
+//
+//
+//
+function checkBusy(timeout)
+{
+    // Wait until the BSY bit is reset in the FLASH_SR register
+    local time = GetTickCount()
+    do{
+        if(GetTickCount() - time > timeout)
+            _n_throw(-500)
+
+        _n_throw( itrfApi.readMem32(FLASH_BASE|FLASH_SR) )
+    }while ( itrfApi.value32 & FLASH_SR_BSY )
+
+    // Check for errors
+    if( itrfApi.value32 & (FLASH_SR_NOTZERO | FLASH_SR_SIZERR | FLASH_SR_PGAERR |  FLASH_SR_WRPERR) )
+        _n_throw(-501)
+
+    //  Check the EOP flag in the FLASH_SR register
+    if( !(itrfApi.value32 & FLASH_SR_EOP) )
+        _n_throw(-502)
+}
+
+
+

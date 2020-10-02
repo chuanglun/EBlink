@@ -1,0 +1,310 @@
+/////////////////////////////////////////////////////////////////////////////////
+//
+//                 stm32F7xx stm32F4xxx  stm32F2xxx
+//
+//
+// TODO: - Multi bank
+//       - options
+//
+const FLASH_ACR     0x40023c00
+const FLASH_KEYR    0x40023c04
+const FLASH_OPTKEYR 0x40023c08
+const FLASH_SR      0x40023c0C
+const FLASH_CR      0x40023c10
+const FLASH_OPTCR   0x40023c14
+const FLASH_OPTCR1  0x40023c18
+const FLASH_OPTCR2  0x40023c1c
+
+// FLASH_CR register bits
+const FLASH_CR_PG		(1 << 0)
+const FLASH_CR_SER		(1 << 1)
+const FLASH_CR_MER		(1 << 2)
+const FLASH_CR_PSIZE8	(0 << 8)
+const FLASH_CR_PSIZE16	(1 << 8)
+const FLASH_CR_PSIZE32	(2 << 8)
+const FLASH_CR_PSIZE64	(3 << 8)
+const FLASH_CR_MER1		(1 << 15)
+const FLASH_CR_STRT		(1 << 16)
+const FLASH_CR_EOPIE	(1 << 24)
+const FLASH_CR_ERRIE	(1 << 25)
+const FLASH_CR_LOCK		(1 << 31)
+
+ // FLASH_SR register bits
+const FLASH_SR_BSY      (1 << 16)
+const FLASH_SR_PGSERR   (1 << 7) // Programming sequence error
+const FLASH_SR_PGPERR   (1 << 6) // Programming parallelism error
+const FLASH_SR_PGAERR   (1 << 5) // Programming alignment error
+const FLASH_SR_WRPERR   (1 << 4) // Write protection error
+const FLASH_SR_OPERR    (1 << 1) // Operation error
+
+FLASH_ERROR <- (FLASH_SR_PGSERR | FLASH_SR_PGPERR | FLASH_SR_PGAERR |
+                FLASH_SR_WRPERR | FLASH_SR_OPERR)
+
+// STM32_FLASH_OPTCR register bits
+const OPTCR_LOCK     (1 << 0)
+const OPTCR_START    (1 << 1)
+const OPTCR_NDBANK   (1 << 29)    // not dual bank mode
+const OPTCR_DB1M     (1 << 30)    // 1 MiB devices dual flash bank option
+const OPTCR_SPRMOD   (1 << 31)    // switches PCROPi/nWPRi interpretation
+
+// STM32_FLASH_OPTCR2 register bits
+const OPTCR2_PCROP_RDP    (1 << 31)   /* erase PCROP zone when decreasing RDP */
+
+// register unlock keys
+const KEY1           0x45670123
+const KEY2           0xCDEF89AB
+
+ // option register unlock key
+const OPTKEY1        0x08192A3B
+const OPTKEY2        0x4C5D6E7F
+
+pgWidth <- 0;
+pgSize  <- 0;
+
+/////////////////////////////////////////////////////////////////////////////////
+//
+//   Unlock the flash
+//
+function flash_start()
+{
+    local targetApi = :: TargetAPI() // Our interface to the target class
+    local voltage
+
+    try{
+        // Be sure that the core is halted
+        _n_throw( targetApi.halt() )
+
+        flash_unlock()
+
+        // Check the voltage and set the right flash strategy
+        voltage = itrfApi.targetVoltage();
+        if(voltage  < 1.8)
+        {
+           _n_throw(-101)
+        }
+        else if(voltage  < 2.1)
+        {
+            // Low voltage is 8 bits
+            pgWidth = 8;
+            pgSize  = 0;
+        }
+        else if(voltage  < 2.7)
+        {
+            // Mid voltage is 16 bits
+            // REMARK: some probes don't support 16bit direct memory access
+            //         you could change this part to use the lower 8 bits voltage instead
+            pgWidth = 16;
+            pgSize  = (1<<8);
+        }
+        else
+        {
+            // Higher voltage is 32 bits
+            pgWidth = 32;
+            pgSize  = (2<<8);
+        }
+
+        return ERROR_OK
+    }
+
+    // Catch all the lock errors
+    catch(e){
+       if(e == -100)
+           errorf("Error: can't unlock flash!\n")
+       else if(e == -101)
+           errorf("Error: Current STM32F4x/STM32F7x flash algorithm needs at least 1.8V\nTarget voltage is %.2f V\n", voltage )
+       else if(e < -1)
+           errorf("Error: target initializing!\n")
+       return -1
+    }
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////
+//
+//   Sector erase sequence according ST user manual (Unlocking is already done by flash_start )
+//
+function flash_erase(sector, address)
+{
+    try{
+        // Check for large memory devices
+        local secReg = sector
+        if(sector>= 12)
+            secReg = (sector-12) | 0x10
+
+        // (1) Check that no Flash memory operation is ongoing by checking the BSY bit in the FLASH_SR register
+        // ....We skip this because every action is ending with this check
+
+        // (2) Set the SER bit and select the sector out of the 8 in the main memory block) you wish to erase (SNB) in the FLASH_CR register
+        // (3) Set the STRT bit in the FLASH_CR register also
+        _n_throw( itrfApi.writeMem32(FLASH_CR, (secReg<<3) | pgSize | FLASH_CR_SER | FLASH_CR_STRT) )
+
+
+        // (4) Wait for the BSY bit to be cleared
+        flash_check_busy(15000)
+
+        return ERROR_OK
+    }
+
+    // Catch all the sector erase errors
+    catch(e){
+       if(e < -1)
+           errorf("ERROR: erasing sector %d failed\n", sector)
+       return -1
+    }
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////
+//
+//  Flash the sector according the parallelism determined at flash_start
+//
+function flash_write(sector, address, buffer)
+{
+    try{
+        // Enable the program flag PG in flash_CR together with the right parallelism
+        _n_throw( itrfApi.writeMem32(FLASH_CR, pgSize | FLASH_CR_PG ) )
+
+        // Make length multiple of pgWidth bits.
+        if(buffer.byteLength & (pgWidth-1))
+            buffer.byteLength = buffer.byteLength + (pgWidth - (buffer.byteLength & (pgWidth-1)))
+
+        // Write the buffer with the program width which belongs to the current voltage
+        _n_throw( itrfApi.writeBuf(address, buffer, pgWidth ) )
+
+        // Wait for ready (timeout 5 sec)
+        flash_check_busy(5000)
+
+        // Check for error
+        _n_throw( itrfApi.readMem32(FLASH_SR) )
+
+        // Evaluate the result
+        if ( itrfApi.value32 & FLASH_ERROR )
+            _n_throw( -2)
+
+        // Disable the program flag  PG in flash_CR
+        _n_throw( itrfApi.writeMem32(FLASH_CR, 0) )
+
+        return ERROR_OK
+    }
+
+    // Catch all the sector write errors
+    catch(e){
+       if( e== INTERFACE_NOT_SUPPORTED)
+            errorf("ERROR: probe doesn't support 16bit memory access!\nPlease change or update probe.")
+       else if(e < -1)
+           errorf("ERROR: writing sector %d failed\n", sector)
+       return -1
+    }
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+//
+//
+//
+function flash_done()
+{
+    // Relock the flash by setting the FLASH_CR_LOCK in the flash CR register
+    return itrfApi.writeMem32(FLASH_CR, FLASH_CR_LOCK)
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////
+//
+//   Erase the whole chip
+//   - If this function is not defined, sector by sector erase is used.
+//   - This is an isolated function, flash_start and flash_done are not called by EB-link
+//
+function flash_erase_chip()
+{
+    local targetApi = :: TargetAPI() // Our interface to the target class
+    local deviceApi = :: DeviceAPI() // Our interface to the device class
+
+    try{
+        // Be sure that the core is halted
+        _n_throw( targetApi.halt() )
+
+        // Enable the flash engine
+        flash_unlock()
+
+        // Chip erase sequence according ST user manual
+        //
+        // (1) Check that no Flash memory operation is ongoing by checking the BSY bit in the FLASH_SR register
+        // ....We skip this because every action is ending with this check
+
+        // (2)(3)Set the MER and STRT bit in the FLASH_CR register
+        if(deviceApi.sectorCount() > 12)
+            _n_throw( itrfApi.writeMem32(FLASH_CR, pgSize | FLASH_CR_MER | FLASH_CR_MER1 | FLASH_CR_STRT) )
+        else
+            _n_throw( itrfApi.writeMem32(FLASH_CR, pgSize | FLASH_CR_MER | FLASH_CR_STRT) )
+
+        // (4) Wait for the BSY bit to be cleared (worst case at low voltage > 40sec)
+        flash_check_busy(40000)
+
+        // Check for error
+        _n_throw( itrfApi.readMem32(FLASH_SR) )
+
+        // Evaluate the result
+        if ( itrfApi.value32 & FLASH_ERROR )
+            _n_throw( -2)
+
+        _n_throw( itrfApi.writeMem32(FLASH_CR, FLASH_CR_LOCK) )
+
+        printf("Flash: chip erased.\n");
+        return ERROR_OK
+    }
+
+    // Catch all the mass erase errors
+    catch(e){
+       if(e < -1)
+           errorf("ERROR: mass erase failed\n")
+       return -1
+    }
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+//
+//
+//
+function flash_check_busy(timeout)
+{
+    local time = GetTickCount()
+    do
+    {
+        CursorAnimate();
+
+        // Check timeout
+        if( (GetTickCount() - time) > timeout)
+            _n_throw(-666)
+
+        _n_throw( itrfApi.readMem32(FLASH_SR) )
+    } while ( itrfApi.value32 &  FLASH_SR_BSY )
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////
+//
+//
+//
+function flash_unlock()
+{
+    // Read flash lock status in FLASH_CR
+    _n_throw( itrfApi.readMem32(FLASH_CR) )
+
+    // Check if it's locked by the FLASH_CR_LOCK flag
+    if( itrfApi.value32 & FLASH_CR_LOCK )
+    {
+        // Write flash KEYR
+        _n_throw( itrfApi.writeMem32(FLASH_KEYR,KEY1) )
+        _n_throw( itrfApi.writeMem32(FLASH_KEYR,KEY2) )
+
+        // Read flash CR again to check FLASH_CR_LOCK if it's unlocked
+        _n_throw( itrfApi.readMem32(FLASH_CR) )
+        if( itrfApi.value32 & FLASH_CR_LOCK )
+          _n_throw( -100)
+    }
+}
+
+
+
+
+
