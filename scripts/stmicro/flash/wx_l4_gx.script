@@ -57,7 +57,7 @@ FLASH_ERROR <- ( FLASH_SR_PGSERR | FLASH_SR_SIZERR  | FLASH_SR_PGAERR |
 const MAX_FLASH_SPEED 4000  // 4MHz is max speed (we only tested it with V2 )
 
 savedProbeSpeed <-0   // Our current probe speed 0= not checked, -1 = checked not changed, > 0 = original speed
-halfOfSectors   <-0
+halfOfSectors   <-0   // The half of the number of sectors of the current device
 /////////////////////////////////////////////////////////////////////////////////
 //
 // EBlink callback
@@ -68,8 +68,8 @@ function flash_start()
 {
     local targetApi = ::TargetAPI()
     local deviceApi = ::DeviceAPI()
-    
-    halfOfSectors = deviceApi.sectorCount() / 2
+
+    halfOfSectors = deviceApi.sectorCount()/2
 
     try{
         // Be sure that the core is halted
@@ -81,10 +81,8 @@ function flash_start()
         do{
             // Timeout of 1sec
             if(GetTickCount() - time > 1000)
-            {
-                errorf("Error: Can't stop the target\n");
-                return -1;
-            }
+                _n_throw(-300)
+
             _n_throw( targetApi.poll() )
         } while(targetApi.getState() != TARGET_HALTED )
 
@@ -94,7 +92,9 @@ function flash_start()
 
     // Catch all the lock errors
     catch(e){
-       if(e < -1)
+       if(e == -300)
+           errorf("Error: Can't stop the target\n")
+       else if(e < -1)
            errorf("Error: target initializing!\n")
        return -1
     }
@@ -110,11 +110,13 @@ function flash_start()
 function flash_erase(sector, address)
 {
     try{
-        
+
         local eraseFlags = FLASH_CR_PER | FLASH_CR_STRT
-        
-        if(hasDualBank && (sector >= halfOfSectors) )                
-            eraseFlags  = eraseFlags | ( (sector-halfOfSectors)<< FLASH_CR_PAGE_SHIFT | FLASH_CR_BKER )        
+
+        if(hasDualBank && (sector >= halfOfSectors) )
+        {
+            eraseFlags  = eraseFlags | ( (sector-halfOfSectors)<< FLASH_CR_PAGE_SHIFT | FLASH_CR_BKER )
+        }
         else
             eraseFlags  = eraseFlags | (sector<< FLASH_CR_PAGE_SHIFT )
 
@@ -129,7 +131,7 @@ function flash_erase(sector, address)
         _n_throw( itrfApi.writeMem32(FLASH_BASE + FLASH_CR, eraseFlags ) )
 
         // 5. Wait until the BSY bit of the flash_SR
-        // 10.000 msec timeout sometimes erasing can take long
+        // 10.000 msec timeoucd ..t sometimes erasing can take long
         flash_check_busy(10000)
         return ERROR_OK
     }
@@ -243,7 +245,8 @@ function flash_check_busy(timeout)
         if(GetTickCount() - time > timeout)
             _n_throw(-300)
 
-    } while ( itrfApi.value32 & FLASH_SR_BSY);
+    } while ( itrfApi.value32 & FLASH_SR_BSY)
+
 
     if( itrfApi.value32 & FLASH_ERROR )
         _n_throw(-302)
@@ -330,7 +333,10 @@ function flash_erase_chip()
     // Catch all the sector write errors
     catch(e){
         if(e < -1)
+        {
+           printf("failed\n")
            errorf("ERROR: mass erase failed\n")
+        }
         return -1
     }
 }

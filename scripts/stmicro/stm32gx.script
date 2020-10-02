@@ -37,7 +37,7 @@ const mem_template_dual = @@"
   <property name=\"blocksize\">0x%x</property>
   <property name=\"secstart\">0</property>
  </memory> 
- <memory type=\"flash\" start=\"0x08400000\" length=\"0x%x\">
+ <memory type=\"flash\" start=\"0x08040000\" length=\"0x%x\">
   <property name=\"blocksize\">0x%x</property>
  </memory> 
  <memory type=\"ram\" start=\"0x40000000\" length=\"0x1fffffff\"/>
@@ -90,12 +90,15 @@ function stm32_device(deviceId)
             break;      
         
     case 0x469 : // STM32G47xxx/48xxx   (cat 3)         
-            page_size =  0x800;  
+            page_size = 0x1000;  // 4K single bank
             cram_size = 0x8000;  // 32K
             sram_size = 0x20000; // 128K
             hasDualBank = readDualBankOption()
             if(hasDualBank)
+            {
+                page_size =  0x800;  // 2K
                 flash_size = flash_size/2
+            }
             break;      
     }
     
