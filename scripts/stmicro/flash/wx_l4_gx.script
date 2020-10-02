@@ -57,6 +57,8 @@ FLASH_ERROR <- ( FLASH_SR_PGSERR | FLASH_SR_SIZERR  | FLASH_SR_PGAERR |
 const MAX_FLASH_SPEED 4000  // 4MHz is max speed (we only tested it with V2 )
 
 savedProbeSpeed <-0   // Our current probe speed 0= not checked, -1 = checked not changed, > 0 = original speed
+
+numberOfSectors <-0
 /////////////////////////////////////////////////////////////////////////////////
 //
 // EBlink callback
@@ -65,8 +67,11 @@ savedProbeSpeed <-0   // Our current probe speed 0= not checked, -1 = checked no
 //
 function flash_start()
 {
-    local targetApi = ::TargetAPI();
+    local targetApi = ::TargetAPI()
+    local deviceApi = ::DeviceAPI()
 
+    numberOfSectors = deviceApi.sectorCount();
+    
     try{
         // Be sure that the core is halted
         _n_throw( targetApi.halt()   )
@@ -106,15 +111,24 @@ function flash_start()
 function flash_erase(sector, address)
 {
     try{
-
+        // Default flags
         local eraseFlags = FLASH_CR_PER | FLASH_CR_STRT
-
-        // The sectors in bank 1 are starting from 256 (see xml memory map)
-        if(sector > 255)
-            eraseFlags  = eraseFlags | ( (256-sector)<< FLASH_CR_PAGE_SHIFT | FLASH_CR_BKER )
+        
+        if(hasDualBank) 
+        {            
+            // Check in which bank we are
+            local bnkSz = numberOfSectors/2
+            if(sector >= bnkSz)
+            {
+                eraseFlags  = eraseFlags | ( (sector-bnkSz)<< FLASH_CR_PAGE_SHIFT | FLASH_CR_BKER )
+            }
+        }
         else
+        {
+            // Single bank
             eraseFlags  = eraseFlags | (sector<< FLASH_CR_PAGE_SHIFT )
-
+        }
+        
         // 1. Check that no Flash memory operation is ongoing by checking the BSY1 in the SR
         // (we already check that on the end of every flash action)
 
@@ -283,7 +297,7 @@ function flash_unlock()
 //   - If this function is not defined, sector by sector erase is used by EBlink.
 //   - This is an isolated function, flash_start and flash_done are not called by EBlink
 //
-function flash_erase_chip()
+function nflash_erase_chip()
 {
     local targetApi = :: TargetAPI() // Our interface to the target class
 
