@@ -57,8 +57,7 @@ FLASH_ERROR <- ( FLASH_SR_PGSERR | FLASH_SR_SIZERR  | FLASH_SR_PGAERR |
 const MAX_FLASH_SPEED 4000  // 4MHz is max speed (we only tested it with V2 )
 
 savedProbeSpeed <-0   // Our current probe speed 0= not checked, -1 = checked not changed, > 0 = original speed
-
-numberOfSectors <-0
+halfOfSectors   <-0
 /////////////////////////////////////////////////////////////////////////////////
 //
 // EBlink callback
@@ -69,9 +68,9 @@ function flash_start()
 {
     local targetApi = ::TargetAPI()
     local deviceApi = ::DeviceAPI()
-
-    numberOfSectors = deviceApi.sectorCount();
     
+    halfOfSectors = deviceApi.sectorCount() / 2
+
     try{
         // Be sure that the core is halted
         _n_throw( targetApi.halt()   )
@@ -111,24 +110,14 @@ function flash_start()
 function flash_erase(sector, address)
 {
     try{
-        // Default flags
+        
         local eraseFlags = FLASH_CR_PER | FLASH_CR_STRT
         
-        if(hasDualBank) 
-        {            
-            // Check in which bank we are
-            local bnkSz = numberOfSectors/2
-            if(sector >= bnkSz)
-            {
-                eraseFlags  = eraseFlags | ( (sector-bnkSz)<< FLASH_CR_PAGE_SHIFT | FLASH_CR_BKER )
-            }
-        }
+        if(hasDualBank && (sector >= halfOfSectors) )                
+            eraseFlags  = eraseFlags | ( (sector-halfOfSectors)<< FLASH_CR_PAGE_SHIFT | FLASH_CR_BKER )        
         else
-        {
-            // Single bank
             eraseFlags  = eraseFlags | (sector<< FLASH_CR_PAGE_SHIFT )
-        }
-        
+
         // 1. Check that no Flash memory operation is ongoing by checking the BSY1 in the SR
         // (we already check that on the end of every flash action)
 
