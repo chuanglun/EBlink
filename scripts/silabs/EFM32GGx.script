@@ -34,23 +34,23 @@ Offset Name Type Description
 //
 function flash_start()
 {
-    local result;
+    local result
 
-printf("start flash\n");
+printf("start flash\n")
 
      // Be sure that the core is halted
-    result = targetApi.halt();
-    if(result<0) return result;
+    result = targetApi.halt()
+    if(result<0) return result
 
     // Unlock MSC
-    result = itrfApi.writeMem32(0x400C003C, 0x1B71);
-    if(result<0) return result;
+    result = itrfApi.writeMem32(0x400C003C, 0x1B71)
+    if(result<0) return result
 
     // Enable WREN in  MSC_WRITECTRL
-    itrfApi.readMem32(0x400E0008);
-    result = itrfApi.writeMem32(0x400C0008, itrfApi.value32 | 0x01 );
+    itrfApi.readMem32(0x400E0008)
+    result = itrfApi.writeMem32(0x400C0008, itrfApi.value32 | 0x01 )
 
-    return result;
+    return result
 }
 
 
@@ -60,26 +60,26 @@ printf("start flash\n");
 //
 function flash_erase(sector, address)
 {
-    local result;
+    local result
 
-    //MSC->ADDRB = address;
-    result = itrfApi.writeMem32(0x400C0010, address);
-    if(result<0) return result;
+    //MSC->ADDRB = address
+    result = itrfApi.writeMem32(0x400C0010, address)
+    if(result<0) return result
 
-    // MSC->WRITECMD = MSC_WRITECMD_LADDRIM;
-    result = itrfApi.writeMem32(0x400C000C, 0x01);
-    if(result<0) return result;
+    // MSC->WRITECMD = MSC_WRITECMD_LADDRIM
+    result = itrfApi.writeMem32(0x400C000C, 0x01)
+    if(result<0) return result
 
-    //MSC->WRITECMD = MSC_WRITECMD_ERASEPAGE;
-    result = itrfApi.writeMem32(0x400C000C, 0x02);
-    if(result<0) return result;
+    //MSC->WRITECMD = MSC_WRITECMD_ERASEPAGE
+    result = itrfApi.writeMem32(0x400C000C, 0x02)
+    if(result<0) return result
 
-    //while ( MSC->STATUS & MSC_STATUS_BUSY );
+    //while ( MSC->STATUS & MSC_STATUS_BUSY )
     do{
-         result = itrfApi.readMem32(0x400C001C);
-    }while ( (result >= 0) && (itrfApi.value32 &  0x01 ) );
+         result = itrfApi.readMem32(0x400C001C)
+    }while ( (result >= 0) && (itrfApi.value32 &  0x01 ) )
 
-    return result;
+    return result
 }
 
 
@@ -90,41 +90,41 @@ function flash_erase(sector, address)
 //
 function flash_write(sector, address, buffer)
 {
-    local result;
-    local idx = 0;
+    local result
+    local idx = 0
 
-    //while ( MSC->STATUS & MSC_STATUS_BUSY );
+    //while ( MSC->STATUS & MSC_STATUS_BUSY )
     do{
-         result = itrfApi.readMem32(0x400C001C);
-    }while ( (result >= 0) && (itrfApi.value32 &  0x01 ) );
+         result = itrfApi.readMem32(0x400C001C)
+    }while ( (result >= 0) && (itrfApi.value32 &  0x01 ) )
 
     // Write the destination address in MSC_ADDRB
-    result = itrfApi.writeMem32(0x400C0010, address);
-    if(result<0) return result;
+    result = itrfApi.writeMem32(0x400C0010, address)
+    if(result<0) return result
 
-    // MSC->WRITECMD = MSC_WRITECMD_LADDRIM;
-    result = itrfApi.writeMem32(0x400C000C, 0x01);
-    if(result<0) return result;
+    // MSC->WRITECMD = MSC_WRITECMD_LADDRIM
+    result = itrfApi.writeMem32(0x400C000C, 0x01)
+    if(result<0) return result
 
     // Write the flash content and use the auto address increment
     // of the MSC engine.
     while( idx < buffer.byteLength )
     {
         // Write word to MSC_DATA
-        result = itrfApi.writeMem32( 0x400C0018, buffer.un32(idx) ) ;
-        if(result<0) return result;
+        result = itrfApi.writeMem32( 0x400C0018, buffer.un32(idx) )
+        if(result<0) return result
 
         // Initiate write with auto increment, 1 to WRITETRIG in MSC_WRITECMD
-        result = itrfApi.writeMem32(0x400C000C, 0x10);
-        if(result<0) return result;
-        idx += 4;
+        result = itrfApi.writeMem32(0x400C000C, 0x10)
+        if(result<0) return result
+        idx += 4
     }
 
 
-    // End writing  MSC->WRITECMD = MSC_WRITECMD_WRITEEND;
-    result = itrfApi.writeMem32(0x400E000C, 0x04);
+    // End writing  MSC->WRITECMD = MSC_WRITECMD_WRITEEND
+    result = itrfApi.writeMem32(0x400E000C, 0x04)
 
-    return result;
+    return result
 }
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -133,22 +133,22 @@ function flash_write(sector, address, buffer)
 //
 function flash_done()
 {
-    local result = 0;
+    local result = 0
 
-    //while ( MSC->STATUS & MSC_STATUS_BUSY );
+    //while ( MSC->STATUS & MSC_STATUS_BUSY )
     do{
-         result = itrfApi.readMem32(0x400C001C);
-    }while ( (result >= 0) && (itrfApi.value32 &  0x01 ) );
+         result = itrfApi.readMem32(0x400C001C)
+    }while ( (result >= 0) && (itrfApi.value32 &  0x01 ) )
 
     // Disable flash writing WREN in MSC_WRITECTRL
-    //itrfApi.readMem32(0x400E0008);
-    result = itrfApi.writeMem32(0x400C0008, 0 ); //itrfApi.value32 & 0xFFFFFFFE );
-    if(result<0) return result;
+    //itrfApi.readMem32(0x400E0008)
+    result = itrfApi.writeMem32(0x400C0008, 0 ) //itrfApi.value32 & 0xFFFFFFFE )
+    if(result<0) return result
 
     // Lock MSC
-    result = itrfApi.writeMem32(0x400C003C, 0x0 );
+    result = itrfApi.writeMem32(0x400C003C, 0x0 )
 
-    return result;
+    return result
 }
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -160,45 +160,45 @@ function flash_done()
 //
 function flash_erase_chip()
 {
-    local result;
+    local result
 
     // Unlock device, see above
-    result = flash_start();
-    if(result<0) return result;
+    result = flash_start()
+    if(result<0) return result
 
     // MSC->MASSLOCK = MSC_MASSLOCK_LOCKKEY_UNLOCK
-    result = itrfApi.writeMem32(0x400C0054, 0x631A);
-    if(result<0) return result;
+    result = itrfApi.writeMem32(0x400C0054, 0x631A)
+    if(result<0) return result
 
     // Erase first 512K block
-    //MSC->WRITECMD = MSC_WRITECMD_ERASEMAIN0;
-    result = itrfApi.writeMem32(0x400C000C, 0x100);
-    if(result<0) return result;
+    //MSC->WRITECMD = MSC_WRITECMD_ERASEMAIN0
+    result = itrfApi.writeMem32(0x400C000C, 0x100)
+    if(result<0) return result
 
-    //while ( MSC->STATUS & MSC_STATUS_BUSY );
+    //while ( MSC->STATUS & MSC_STATUS_BUSY )
     do{
-         result = itrfApi.readMem32(0x400C001C);
-         if(result<0) return result;
-    }while ( itrfApi.value32 &  0x01 );
+         result = itrfApi.readMem32(0x400C001C)
+         if(result<0) return result
+    }while ( itrfApi.value32 &  0x01 )
 
     // Second 512K block if this is available
     if( flashSize > 512 )
     {
-       //MSC->WRITECMD = MSC_WRITECMD_ERASEMAIN1;
-       result = itrfApi.writeMem32(0x400C000C, 0x200);
-       if(result<0) return result;
+       //MSC->WRITECMD = MSC_WRITECMD_ERASEMAIN1
+       result = itrfApi.writeMem32(0x400C000C, 0x200)
+       if(result<0) return result
 
-       //while ( MSC->STATUS & MSC_STATUS_BUSY );
+       //while ( MSC->STATUS & MSC_STATUS_BUSY )
        do{
-            result = itrfApi.readMem32(0x400C001C);
-            if(result<0) return result;
-        }while ( itrfApi.value32 &  0x01 );
+            result = itrfApi.readMem32(0x400C001C)
+            if(result<0) return result
+        }while ( itrfApi.value32 &  0x01 )
     }
 
     // Lock the flash, see above
-    result = flash_done();
+    result = flash_done()
 
     // Inform the user what we did
-    printf("Flash: -- chip erased --\n");
-    return result;
+    printf("Flash: -- chip erased --\n")
+    return result
 }

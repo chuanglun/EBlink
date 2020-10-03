@@ -24,16 +24,16 @@ const mem_template = @@"
  <memory type=\"flash\" start=\"0x0fe00000\" length=\"0x14000\">
    <property name=\"blocksize\">0x800</property>
  </memory>
- </memory-map>";
+ </memory-map>"
 
 
  ///////////////////////////////////////////////////////
  //
  //   Global variables also for all included scripts
  //
-itrfApi   <- InterfAPI(); // Global so that all included scripts files also have access
-targetApi <- TargetAPI(); // Global interface to the target class, our reset_post need it and this is faster than local defined
-flashSize <- 0;           // Global flash size, is also used for mass erase
+itrfApi   <- InterfAPI() // Global so that all included scripts files also have access
+targetApi <- TargetAPI() // Global interface to the target class, our reset_post need it and this is faster than local defined
+flashSize <- 0           // Global flash size, is also used for mass erase
 
 
 /////////////////////////////////////////////////////
@@ -42,214 +42,214 @@ flashSize <- 0;           // Global flash size, is also used for mass erase
 //
 function main()
 {
-    local devApi = ::DeviceAPI(); // We only use the device class wrapper in this function
-    local result;
+    local devApi = ::DeviceAPI() // We only use the device class wrapper in this function
+    local result
 
     // Check if the right script API is supported
     if( VERSION < 3.2)
     {
-       errorf("Error:\nIncompatiable EBlink version %.1f\nPlease update EBlink\n", VERSION);
-       return -1;
-    }   
-    
+       errorf("Error:\nIncompatiable EBlink version %.1f\nPlease update EBlink\n", VERSION)
+       return -1
+    }
+
     // Get the family ID and part number
-    result = itrfApi.readMem32(0x0FE081FC);
+    result = itrfApi.readMem32(0x0FE081FC)
     if(  (result < 0 ) || (itrfApi.value32 == 0) )
     {
-        errorf("Error: can't access target device!\n");
-        return -1;  // We have already throw an error so use -1 (otherwise < -1)
+        errorf("Error: can't access target device!\n")
+        return -1  // We have already throw an error so use -1 (otherwise < -1)
     }
 
     // Isolate the family ID and part number from the 32 bits register value
-    local famId     = (itrfApi.value32 >> 16) & 0xFF;
-    local partValue = itrfApi.value32 & 0xFFFF;
+    local famId     = (itrfApi.value32 >> 16) & 0xFF
+    local partValue = itrfApi.value32 & 0xFFFF
 
     // Now that we have the family ID, parse it and set the right target type
     // and include the script file with the right flashing routines
     switch(famId)
     {
     case 16 : // EFR32MG1P EFR32 Mighty Gecko Gen1 Device Family
-        printf("Silabs Mighty Gecko - EFR32MG1P%d\n", partValue);
-        require("silabs/EFR32xG1.script");
-        break;
+        printf("Silabs Mighty Gecko - EFR32MG1P%d\n", partValue)
+        require("silabs/EFR32xG1.script")
+        break
     case 17 : //  EFR32MG1B EFR32 Mighty Gecko Gen1 Device Family
-        printf("Silabs Mighty Gecko Gen1 - EFR32MG1B%d\n", partValue);
-        require("silabs/EFR32xG1.script");
-        break;
+        printf("Silabs Mighty Gecko Gen1 - EFR32MG1B%d\n", partValue)
+        require("silabs/EFR32xG1.script")
+        break
     case 18 : //  EFR32MG1V EFR32 Mighty Gecko Gen1 Device Family
-        printf("Silabs Mighty Gecko Gen1 -  EFR32MG1V%d\n", partValue);
-        require("silabs/EFR32xG1.script");
-        break;
+        printf("Silabs Mighty Gecko Gen1 -  EFR32MG1V%d\n", partValue)
+        require("silabs/EFR32xG1.script")
+        break
     case 19 : //  EFR32BG1P EFR32 Blue Gecko Gen1 Device Family
-        printf("Silabs Blue Gecko Gen1 - EFR32BG1P%d\n", partValue);
-        require("silabs/EFR32xG1.script");
-        break;
+        printf("Silabs Blue Gecko Gen1 - EFR32BG1P%d\n", partValue)
+        require("silabs/EFR32xG1.script")
+        break
     case 20 : //  EFR32BG1B EFR32 Blue Gecko Gen1 Device Family
-        printf("Silabs Blue Gecko Gen1 - EFR32BG1B%d\n", partValue);
-        require("silabs/EFR32xG1.script");
-        break;
+        printf("Silabs Blue Gecko Gen1 - EFR32BG1B%d\n", partValue)
+        require("silabs/EFR32xG1.script")
+        break
     case 21 : //  EFR32BG1V EFR32 Blue Gecko Gen1 Device Family
-        printf("Silabs Blue Gecko Gen1 - EFR32BG1V%d\n", partValue);
-        require("silabs/EFR32xG1.script");
-        break;
+        printf("Silabs Blue Gecko Gen1 - EFR32BG1V%d\n", partValue)
+        require("silabs/EFR32xG1.script")
+        break
     case 25 : //  EFR32FG1P EFR32 Flex Gecko Gen1 Device Family
-        printf("Silabs Flex Gecko Gen1 - EFR32FG1P%d\n", partValue);
-        require("silabs/EFR32xG1.script");
-        break;
+        printf("Silabs Flex Gecko Gen1 - EFR32FG1P%d\n", partValue)
+        require("silabs/EFR32xG1.script")
+        break
     case 26 : //  EFR32FG1B EFR32 Flex Gecko Gen1 Device Family
-        printf("Silabs Flex Gecko Gen1 - EFR32FG1B%d\n", partValue);
-        require("silabs/EFR32xG1.script");
-        break;
+        printf("Silabs Flex Gecko Gen1 - EFR32FG1B%d\n", partValue)
+        require("silabs/EFR32xG1.script")
+        break
     case 27 : //  EFR32FG1V EFR32 Flex Gecko Gen1 Device Family
-        printf("Silabs Flex Gecko Gen1 - EFR32FG1V%d\n", partValue);
-        require("silabs/EFR32xG1.script");
-        break;
+        printf("Silabs Flex Gecko Gen1 - EFR32FG1V%d\n", partValue)
+        require("silabs/EFR32xG1.script")
+        break
     case 40 : //  EFR32MG13P EFR32 Mighty Gecko Family Series 1 Device Config 3
-        printf("Silabs EFR32 Mighty Gecko Family Series 1 Config 3 - EFR32MG13P%d\n", partValue);
-        require("silabs/EFR32xG13.script");
-        break;
+        printf("Silabs EFR32 Mighty Gecko Family Series 1 Config 3 - EFR32MG13P%d\n", partValue)
+        require("silabs/EFR32xG13.script")
+        break
     case 41 : //  EFR32MG13B EFR32 Mighty Gecko Family Series 1 Device Config 3
-        printf("Silabs EFR32 Mighty Gecko Family Series 1 Config 3 - EFR32MG13B%d\n", partValue);
-        require("silabs/EFR32xG13.script");
-        break;
+        printf("Silabs EFR32 Mighty Gecko Family Series 1 Config 3 - EFR32MG13B%d\n", partValue)
+        require("silabs/EFR32xG13.script")
+        break
     case 42 : //  EFR32MG13V EFR32 Mighty Gecko Family Series 1 Device Config 3
-        printf("Silabs EFR32 Mighty Gecko Family Series 1 Config 3 - EFR32MG13V%d\n", partValue);
-        require("silabs/EFR32xG13.script");
-        break;
+        printf("Silabs EFR32 Mighty Gecko Family Series 1 Config 3 - EFR32MG13V%d\n", partValue)
+        require("silabs/EFR32xG13.script")
+        break
     case 43 : // EFR32BG13P EFR32 Blue Gecko Family Series 1 Device Config 3
-        printf("Silabs EFR32 Blue Gecko Family Series 1 Config 3 - EFR32BG13P%d\n", partValue);
-        require("silabs/EFR32xG13.script");
-        break;
+        printf("Silabs EFR32 Blue Gecko Family Series 1 Config 3 - EFR32BG13P%d\n", partValue)
+        require("silabs/EFR32xG13.script")
+        break
     case 44 : //  EFR32BG13B EFR32 Blue Gecko Family Series 1 Device Config 3
-        printf("Silabs EFR32 Blue Gecko Family Series 1 Config 3 - EFR32BG13B%d\n", partValue);
-        require("silabs/EFR32xG13.script");
-        break;
+        printf("Silabs EFR32 Blue Gecko Family Series 1 Config 3 - EFR32BG13B%d\n", partValue)
+        require("silabs/EFR32xG13.script")
+        break
     case 45 : // EFR32BG13V EFR32 Blue Gecko Family Series 1 Device Config 3
-        printf("Silabs EFR32 Blue Gecko Family Series 1 Config 3 - EFR32BG13V%d\n", partValue);
-        require("silabs/EFR32xG13.script");
-        break;
+        printf("Silabs EFR32 Blue Gecko Family Series 1 Config 3 - EFR32BG13V%d\n", partValue)
+        require("silabs/EFR32xG13.script")
+        break
     case 49 : // EFR32FG13P EFR32 Flex Gecko Family Series 1 Device Config 3
-        printf("Silabs EFR32 Flex Gecko Family Series 1 Config 3 - EFR32FG13P%d\n", partValue);
-        require("silabs/EFR32xG13.script");
-        break;
+        printf("Silabs EFR32 Flex Gecko Family Series 1 Config 3 - EFR32FG13P%d\n", partValue)
+        require("silabs/EFR32xG13.script")
+        break
     case 50 : // EFR32FG13B EFR32 Flex Gecko Family Series 1 Device Config 3
-        printf("Silabs EFR32 Flex Gecko Family Series 1 Config 3 - EFR32FG13B%d\n", partValue);
-        require("silabs/EFR32xG13.script");
-        break;
+        printf("Silabs EFR32 Flex Gecko Family Series 1 Config 3 - EFR32FG13B%d\n", partValue)
+        require("silabs/EFR32xG13.script")
+        break
     case 51 : // EFR32FG13V EFR32 Flex Gecko Family Series 1 Device Config 3
-        printf("Silabs EFR32 Flex Gecko Family Series 1 Config 3 - EFR32FG13V%d\n", partValue);
-        require("silabs/EFR32xG13.script");
-        break;
+        printf("Silabs EFR32 Flex Gecko Family Series 1 Config 3 - EFR32FG13V%d\n", partValue)
+        require("silabs/EFR32xG13.script")
+        break
     case 52 : //  EFR32MG14P EFR32 Mighty Gecko Family Series 1 Device Config 4
-        printf("Silabs EFR32 Mighty Gecko Family Series 1 Config 4 - EFR32MG14P%d\n", partValue);
-        require("silabs/EFR32xG14.script");
-        break;
+        printf("Silabs EFR32 Mighty Gecko Family Series 1 Config 4 - EFR32MG14P%d\n", partValue)
+        require("silabs/EFR32xG14.script")
+        break
     case 53 : //  EFR32MG14B EFR32 Mighty Gecko Family Series 1 Device Config 4
-        printf("Silabs EFR32 Mighty Gecko Family Series 1 Config 4 - EFR32MG14B%d\n", partValue);
-        require("silabs/EFR32xG14.script");
-        break;
+        printf("Silabs EFR32 Mighty Gecko Family Series 1 Config 4 - EFR32MG14B%d\n", partValue)
+        require("silabs/EFR32xG14.script")
+        break
     case 54 : //  EFR32MG14V EFR32 Mighty Gecko Family Series 1 Device Config 4
-        printf("Silabs EFR32 Mighty Gecko Family Series 1 Config 4 - EFR32MG14V%d\n", partValue);
-        require("silabs/EFR32xG14.script");
-        break;
+        printf("Silabs EFR32 Mighty Gecko Family Series 1 Config 4 - EFR32MG14V%d\n", partValue)
+        require("silabs/EFR32xG14.script")
+        break
     case 55 : //  EFR32BG14P EFR32 Blue Gecko Family Series 1 Device Config 4
-        printf("Silabs EFR32 Blue Gecko Family Series 1 Config 4 - EFR32BG14P%d\n", partValue);
-        require("silabs/EFR32xG14.script");
-        break;
+        printf("Silabs EFR32 Blue Gecko Family Series 1 Config 4 - EFR32BG14P%d\n", partValue)
+        require("silabs/EFR32xG14.script")
+        break
     case 56 : //  EFR32BG14B EFR32 Blue Gecko Family Series 1 Device Config 4
-        printf("Silabs EFR32 Blue Gecko Family Series 1 Config 4 - EFR32BG14B%d\n", partValue);
-        require("silabs/EFR32xG14.script");
-        break;
+        printf("Silabs EFR32 Blue Gecko Family Series 1 Config 4 - EFR32BG14B%d\n", partValue)
+        require("silabs/EFR32xG14.script")
+        break
     case 57 : //  EFR32BG14V EFR32 Blue Gecko Family Series 1 Device Config 4
-        printf("Silabs EFR32 Blue Gecko Family Series 1 Config 4 - EFR32BG14V%d\n", partValue);
-        require("silabs/EFR32xG14.script");
-        break;
+        printf("Silabs EFR32 Blue Gecko Family Series 1 Config 4 - EFR32BG14V%d\n", partValue)
+        require("silabs/EFR32xG14.script")
+        break
     case 61 : //  EFR32FG14P EFR32 Flex Gecko Family Series 1 Device Config 4
-        printf("Silabs EFR32 Flex Gecko Family Series 1 Config 4 - EFR32FG14P%d\n", partValue);
-        require("silabs/EFR32xG14.script");
-        break;
+        printf("Silabs EFR32 Flex Gecko Family Series 1 Config 4 - EFR32FG14P%d\n", partValue)
+        require("silabs/EFR32xG14.script")
+        break
     case 62 : //  EFR32FG14B EFR32 Flex Gecko Family Series 1 Device Config 4
-        printf("Silabs EFR32 Flex Gecko Family Series 1 Config 4 - EFR32FG14B%d\n", partValue);
-        require("silabs/EFR32xG14.script");
-        break;
+        printf("Silabs EFR32 Flex Gecko Family Series 1 Config 4 - EFR32FG14B%d\n", partValue)
+        require("silabs/EFR32xG14.script")
+        break
     case 63 : //  EFR32FG14V EFR32 Flex Gecko Family Series 1 Device Config 4
-        printf("Silabs EFR32 Flex Gecko Family Series 1 Config 4 - EFR32FG14V%d\n", partValue);
-        require("silabs/EFR32xG14.script");
-        break;
+        printf("Silabs EFR32 Flex Gecko Family Series 1 Config 4 - EFR32FG14V%d\n", partValue)
+        require("silabs/EFR32xG14.script")
+        break
     case 71 : //  EFM32G EFM32 Gecko Device Family
-        printf("Silabs Gecko - EFM32G%d\n", partValue);
-        break;
+        printf("Silabs Gecko - EFM32G%d\n", partValue)
+        break
     case 72 : //  EFM32GG EFM32 Giant Gecko Device Family
-        printf("Silabs Giant Gecko - EFM32GG%d\n", partValue);
-        require("silabs/EFM32GGx.script");
-        break;
+        printf("Silabs Giant Gecko - EFM32GG%d\n", partValue)
+        require("silabs/EFM32GGx.script")
+        break
     case 73 : //  EFM32TG EFM32 Tiny Gecko Device Family
-        printf("Silabs Tiny Gecko - EFM32TG%d\n", partValue);
-        break;
+        printf("Silabs Tiny Gecko - EFM32TG%d\n", partValue)
+        break
     case 74 : //  EFM32LG EFM32 Leopard Gecko Device Family
-        printf("Silabs Leopard Gecko - EFM32LG%d\n", partValue);
-        break;
+        printf("Silabs Leopard Gecko - EFM32LG%d\n", partValue)
+        break
     case 75 : //  EFM32WG EFM32 Wonder Gecko Device Family
-        printf("Silabs Wonder Gecko - EFM32WG%d\n", partValue);
-        break;
+        printf("Silabs Wonder Gecko - EFM32WG%d\n", partValue)
+        break
     case 76 : //  EFM32ZG EFM32 Zero Gecko Device Family
-        printf("Silabs Zero Gecko - EFM32ZG%d\n", partValue);
-        break;
+        printf("Silabs Zero Gecko - EFM32ZG%d\n", partValue)
+        break
     case 77 : //  EFM32HG EFM32 Happy Gecko Device Family
-        printf("Silabs Happy Gecko - EFM32HG%d\n", partValue);
-        break;
+        printf("Silabs Happy Gecko - EFM32HG%d\n", partValue)
+        break
     case 81 : //  EFM32PG1B EFM32 Pearl Gecko Gen1 Device Family
-        printf("Silabs Pearl Gecko Gen1 - EFM32PG1B%d\n", partValue);
-        break;
+        printf("Silabs Pearl Gecko Gen1 - EFM32PG1B%d\n", partValue)
+        break
     case 83 : //  EFM32JG1B EFM32 Jade Gecko Gen1 Device Family
-        printf("Silabs Jade Gecko Gen1 - EFM32JG1B%d\n", partValue);
-        break;
+        printf("Silabs Jade Gecko Gen1 - EFM32JG1B%d\n", partValue)
+        break
     case 120 : //  EZR32LG EZR32 Leopard Gecko Device Family
-        printf("Silabs Leopard Gecko - EZR32LG%d\n", partValue);
-        break;
+        printf("Silabs Leopard Gecko - EZR32LG%d\n", partValue)
+        break
     case 121 : //  EZR32WG EZR32 Wonder Gecko Device Family
-        printf("Silabs Wonder Gecko - EZR32WG%d\n", partValue);
-        break;
+        printf("Silabs Wonder Gecko - EZR32WG%d\n", partValue)
+        break
     case 122 : //  EZR32HG EZR32 Happy Gecko Device Family
-        printf("Silabs Happy Gecko - EZR32HG%d\n", partValue);
-        break;
+        printf("Silabs Happy Gecko - EZR32HG%d\n", partValue)
+        break
 
 
-    default:        
-        printf("\n\nPlease report this ID so that we can add it.\n");
-        errorf("Error unsupported Silabs fam ID: %d\n", famId);     
-        return -1;  // We have already throw an error so use -1.
+    default:
+        printf("\n\nPlease report this ID so that we can add it.\n")
+        errorf("Error unsupported Silabs fam ID: %d\n", famId)
+        return -1  // We have already throw an error so use -1.
     }
 
     // Get the MEM_INFO_PAGE_SIZE
-    result = itrfApi.readMem32(0x0FE081E4);
-    itrfApi.value32 = (itrfApi.value32 >> 24) & 0xFF;
-    local pageSize = pow(2, ((itrfApi.value32+10) & 0xFF));
+    result = itrfApi.readMem32(0x0FE081E4)
+    itrfApi.value32 = (itrfApi.value32 >> 24) & 0xFF
+    local pageSize = pow(2, ((itrfApi.value32+10) & 0xFF))
 
     // Get the MEM_INFO_FLASH and MEM_INFO_RAM
-    result = itrfApi.readMem32(0x0FE081F8 );
+    result = itrfApi.readMem32(0x0FE081F8 )
 
-    flashSize = itrfApi.value32 & 0xFFFF;
-    local ramSize = (itrfApi.value32 >> 16) & 0xFFFF;
-    
+    flashSize = itrfApi.value32 & 0xFFFF
+    local ramSize = (itrfApi.value32 >> 16) & 0xFFFF
+
     // The user specified the size of flash memory
     if (isScriptObject("FLASH_SIZE") && FLASH_SIZE>0)
     {
-      flashSize = FLASH_SIZE & 0xffff;
+      flashSize = FLASH_SIZE & 0xffff
     }
-    
+
     // The user specified the size of ram memory
     if (isScriptObject("RAM_SIZE") && RAM_SIZE>0)
     {
-      ramSize = RAM_SIZE & 0xffff;
+      ramSize = RAM_SIZE & 0xffff
     }
 
-    printf("Detected FLASH %d Kbyte - Page %d bytes\n", flashSize, pageSize);
-    printf("Detected RAM   %d Kbyte\n", ramSize);
+    printf("Detected FLASH %d Kbyte - Page %d bytes\n", flashSize, pageSize)
+    printf("Detected RAM   %d Kbyte\n", ramSize)
 
     // Build the XML memory map and set it active.
-    devApi.memmap( format( mem_template,  flashSize*1024, pageSize, ramSize*1024 ));
-    return 0;
+    devApi.memmap( format( mem_template,  flashSize*1024, pageSize, ramSize*1024 ))
+    return ERROR_OK
 }
 
 
@@ -271,13 +271,13 @@ function  reset_post(resetType)
     if( resetType != USER_RESET)
     {
         // Set the Stack pointer according the Vector table entry
-        itrfApi.readMem32(0x00000000);
-        targetApi.writeReg("SP", itrfApi.value32);
+        itrfApi.readMem32(0x00000000)
+        targetApi.writeReg("SP", itrfApi.value32)
 
         // Set the Program pointer according the Vector table entry
-        itrfApi.readMem32(0x00000004);
-        targetApi.writeReg("PC", itrfApi.value32);
+        itrfApi.readMem32(0x00000004)
+        targetApi.writeReg("PC", itrfApi.value32)
     }
-    return 0;
+    return ERROR_OK
 }
 

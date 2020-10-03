@@ -47,14 +47,14 @@ const mem_template_F7 = @@"
  <memory type=\"rom\" start=\"0x00100000\" length=\"0xEDC0\"/>
  <!-- option byte area -->
  <memory type=\"rom\" start=\"0x1fff0000\" length=\"0x20\"/>
-</memory-map>";
+</memory-map>"
 
 
 const mem_template_2MB = @@"
 <!-- Sectors 8..11 128kB each -->
 <memory type=\"flash\" start=\"0x08100000\" length=\"0x100000\">
 <property name=\"blocksize\">0x40000</property>
-</memory>";
+</memory>"
 
 /////////////////////////////////////////////////////
 //
@@ -64,73 +64,73 @@ const mem_template_2MB = @@"
 //
 function stm32_device(deviceId)
 {
-    local devApi = ::DeviceAPI();
+    local devApi = ::DeviceAPI()
 
-    local result;
-    local flash_size;
-    local page_size;
-    local ram_size;
-    local string_2MB;
+    local result
+    local flash_size
+    local page_size
+    local ram_size
+    local string_2MB
 
     // Enable debug clocks: DBG_STANDBY & DBG_STOP & DBG_SLEEP - RM0090 Page 1676/1705
-    result = itrfApi.writeMem32(0xE0042004, 7);
+    result = itrfApi.writeMem32(0xE0042004, 7)
 
     // Stop watchdog counters during halt: DBGMCU_APB1_FZ = DBG_IWDG_STOP | DBG_WWDG_STOP
-    result = itrfApi.writeMem32(0xE0042008, 0x00001800);
+    result = itrfApi.writeMem32(0xE0042008, 0x00001800)
 
     // Get the flash size by reading the info register
     if(deviceId == 0x452)
-        result = itrfApi.readMem32(0x1FF07A22);
+        result = itrfApi.readMem32(0x1FF07A22)
     else
-        result = itrfApi.readMem32(0x1ff0f442);
+        result = itrfApi.readMem32(0x1ff0f442)
 
-    flash_size = itrfApi.value32 >>16;
-    flash_size = (flash_size & 0xffff) * 1024;
+    flash_size = itrfApi.value32 >>16
+    flash_size = (flash_size & 0xffff) * 1024
 
     switch(deviceId) {
 
     case 0x449 : // CHIPID_STM32_F7
-            ram_size = 0x50000;
-            break;
+            ram_size = 0x50000
+            break
 
     case 0x451 : // CHIPID_STM32_F7xx
-            ram_size = 0x80000;
-            break;
+            ram_size = 0x80000
+            break
 
     case 0x452 : // CHIPID_STM32_F72x
-            ram_size = 0x80000;
-            break;
+            ram_size = 0x80000
+            break
 
     }
-    
+
     // Inform the user
-    printf("Detected FLASH : 0x%X\nConfigured RAM : 0x%X\n", flash_size, ram_size); 
-    
+    printf("Detected FLASH : 0x%X\nConfigured RAM : 0x%X\n", flash_size, ram_size)
+
     // The user specified the size of flash memory
     if (isScriptObject("FLASH_SIZE") && FLASH_SIZE>0)
     {
-      flash_size = (FLASH_SIZE & 0xffff) * 1024;
-      printf("CLI set  FLASH : 0x%X\n", flash_size);      
+      flash_size = (FLASH_SIZE & 0xffff) * 1024
+      printf("CLI set  FLASH : 0x%X\n", flash_size)
     }
-    
+
     // The user specified the size of ram memory
     if (isScriptObject("RAM_SIZE") && RAM_SIZE>0)
     {
-      ram_size = (RAM_SIZE & 0xffff) * 1024;
-      printf("CLI set    RAM : 0x%X\n", ram_size);        
+      ram_size = (RAM_SIZE & 0xffff) * 1024
+      printf("CLI set    RAM : 0x%X\n", ram_size)
     }
 
     if(flash_size>0x100000)
-      string_2MB = mem_template_2MB;
+      string_2MB = mem_template_2MB
      else
-      string_2MB = "";
+      string_2MB = ""
 
-    devApi.memmap( format(mem_template_F7, ram_size, string_2MB));
+    devApi.memmap( format(mem_template_F7, ram_size, string_2MB))
 
 
-    require("stmicro/flash/f7_f4_f2.script");
+    require("stmicro/flash/f7_f4_f2.script")
 
-    return 0;
+    return ERROR_OK
 }
 
 

@@ -31,13 +31,13 @@ const mem_template_F4 = @@"
   <memory type=\"flash\" start=\"0x08020000\" length=\"0xE0000\">
    <property name=\"blocksize\">0x20000</property>
   </memory>
-  
+
   <memory type=\"ram\" start=\"0x40000000\" length=\"0x1fffffff\"/>
   <memory type=\"ram\" start=\"0x60000000\" length=\"0x7fffffff\"/>
   <memory type=\"ram\" start=\"0xe0000000\" length=\"0x1fffffff\"/>
   <memory type=\"rom\" start=\"0x1fff0000\" length=\"0x7800\"/>
   <memory type=\"rom\" start=\"0x1fffc000\" length=\"0x10\"/>
- </memory-map>";
+ </memory-map>"
 
 //*************************************************************
 //*****             Memory map of the F4 DE                ****
@@ -65,7 +65,7 @@ const mem_template_F4_DE = @@"
  <memory type=\"rom\" start=\"0x1fff0000\" length=\"0x7800\"/>
  <memory type=\"rom\" start=\"0x1fff7800\" length=\"0x210\"/>
  <memory type=\"rom\" start=\"0x1fffc000\" length=\"0x10\"/>
-</memory-map>";
+</memory-map>"
 
 //*************************************************************
 //*****   Memory map of the F4 HD devices (e.g. STM32F429) ****
@@ -100,7 +100,7 @@ const mem_template_F4_HD = @@"
   <memory type=\"flash\" start=\"0x08020000\" length=\"0xE0000\">
     <property name=\"blocksize\">0x20000</property>
   </memory>
-  
+
  <!-- Sectors 12..15 page size 16kB -->
   <memory type=\"flash\" start=\"0x08100000\" length=\"0x10000\">
    <property name=\"blocksize\">0x4000</property>
@@ -112,7 +112,7 @@ const mem_template_F4_HD = @@"
  <!-- Sectors 17..23 page size 128kB -->
   <memory type=\"flash\" start=\"0x08120000\" length=\"0xE0000\">
     <property name=\"blocksize\">0x20000</property>
-  </memory>  
+  </memory>
 
  <!-- peripheral regs -->
   <memory type=\"ram\" start=\"0x40000000\" length=\"0x1FFFFFFF\"/>
@@ -121,7 +121,7 @@ const mem_template_F4_HD = @@"
   <memory type=\"ram\" start=\"0xE0000000\" length=\"0x1FFFFFFF\"/>
   <memory type=\"rom\" start=\"0x1FFF0000\" length=\"0x7800\"/>
   <memory type=\"rom\" start=\"0x1FFFC000\" length=\"0x10\"/>
-</memory-map>";
+</memory-map>"
 
 
 
@@ -133,84 +133,83 @@ const mem_template_F4_HD = @@"
 //
 function stm32_device(deviceId)
 {
-    local devApi = ::DeviceAPI();
+    local devApi = ::DeviceAPI()
 
-    local result;
-    local flash_size;
-    local ram_size;
+    local result
+    local flash_size
+    local ram_size
 
     // Enable debug clocks: DBG_STANDBY & DBG_STOP & DBG_SLEEP - RM0090 Page 1676/1705
-    result = itrfApi.writeMem32(0xE0042004, 7);
+    result = itrfApi.writeMem32(0xE0042004, 7)
 
     // Stop watchdog counters during halt: DBGMCU_APB1_FZ = DBG_IWDG_STOP | DBG_WWDG_STOP
-    result = itrfApi.writeMem32(0xE0042008, 0x00001800);
+    result = itrfApi.writeMem32(0xE0042008, 0x00001800)
 
     // Get the flash size
     result = itrfApi.readMem32(0x1FFF7A22)
-    flash_size = itrfApi.value32 >>16;
-    flash_size = (flash_size & 0xffff) *1024;
+    flash_size = itrfApi.value32 >>16
+    flash_size = (flash_size & 0xffff) *1024
 
 
     // Set the memory map according the device ID
       switch(deviceId) {
         case 0x413 : // CHIPID_STM32_F4
-            ram_size = 0x30000;
-            devApi.memmap( mem_template_F4 );
-            break;
+            ram_size = 0x30000
+            devApi.memmap( mem_template_F4 )
+            break
 
         case 0x419 : // CHIPID_STM32_F4_HD
-            ram_size = 0x30000;
-            devApi.memmap(mem_template_F4_HD);
-            break;
+            ram_size = 0x30000
+            devApi.memmap(mem_template_F4_HD)
+            break
 
         case 0x421 : // CHIPID_STM32_F446
-            ram_size = 0x20000;
-            devApi.memmap( mem_template_F4 );
-            break;
+            ram_size = 0x20000
+            devApi.memmap( mem_template_F4 )
+            break
 
         case 0x423 : // CHIPID_STM32_F4_LP
-            ram_size = 0x10000;
-            devApi.memmap( mem_template_F4 );
-            break;
+            ram_size = 0x10000
+            devApi.memmap( mem_template_F4 )
+            break
 
         case 0x431 : // CHIPID_STM32_F411RE
-            ram_size = 0x20000;
-            devApi.memmap( mem_template_F4 );
-            break;
+            ram_size = 0x20000
+            devApi.memmap( mem_template_F4 )
+            break
 
         case 0x433 : // CHIPID_STM32_F4_DE
-            ram_size = 0x18000;
-            devApi.memmap( mem_template_F4_DE );
-            break;
+            ram_size = 0x18000
+            devApi.memmap( mem_template_F4_DE )
+            break
 
         case 0x434 : // CHIPID_STM32_F4_DSI
-            ram_size = 0x40000;
-            devApi.memmap( mem_template_F4 );
-            break;
+            ram_size = 0x40000
+            devApi.memmap( mem_template_F4 )
+            break
 
         case 0x441 : // CHIPID_STM32_F412
-            ram_size = 0x40000;
-            devApi.memmap( mem_template_F4 );
-            break;      
+            ram_size = 0x40000
+            devApi.memmap( mem_template_F4 )
+            break
 
         case 0x458 : // CHIPID_STM32_F410
-            ram_size = 0x8000;
-            devApi.memmap( mem_template_F4 );
-            break;
+            ram_size = 0x8000
+            devApi.memmap( mem_template_F4 )
+            break
 
         default:
-        break;
+        break
     }
-    
+
 
     // Inform the user
-    printf("Detected FLASH : 0x%X\nConfigured RAM : 0x%X\n", flash_size, ram_size);
+    printf("Detected FLASH : 0x%X\nConfigured RAM : 0x%X\n", flash_size, ram_size)
 
     // Include flash loader script
-    require("stmicro/flash/f7_f4_f2.script");
+    require("stmicro/flash/f7_f4_f2.script")
 
-    // Return "NO_ERROR"
-    return 0;
+    return ERROR_OK
 }
 
 

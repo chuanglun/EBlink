@@ -21,8 +21,7 @@ const mem_template = @@"
  <memory type=\"ram\" start=\"0xe0000000\" length=\"0x1fffffff\"/>
 <!-- option byte area -->
  <memory type=\"rom\" start=\"0x1ffff800\" length=\"0x10\"/>
-</memory-map>
-";
+</memory-map>"
 
 /////////////////////////////////////////////////////
 //
@@ -32,95 +31,95 @@ const mem_template = @@"
 //
 function stm32_device(deviceId)
 {
-    local devApi = ::DeviceAPI();
+    local devApi = ::DeviceAPI()
 
-    local result;
-    local flash_size;
-    local page_size;
-    local ram_size;
+    local result
+    local flash_size
+    local page_size
+    local ram_size
 
     // Enable debug clocks: DBG_STANDBY & DBG_STOP & DBG_SLEEP - RM0090 Page 1676/1705
-    result = itrfApi.writeMem32(0xE0042004, 7);
+    result = itrfApi.writeMem32(0xE0042004, 7)
 
     // Stop watchdog counters during halt: DBGMCU_APB1_FZ = DBG_IWDG_STOP | DBG_WWDG_STOP
-    result = itrfApi.writeMem32(0xE0042008, 0x00001800);
+    result = itrfApi.writeMem32(0xE0042008, 0x00001800)
 
     // Get the flash size by reading the info register
     result = itrfApi.readMem32(0x1ffff7e0)
-    flash_size = itrfApi.value32 & 0xFFFF;
-    flash_size = (flash_size & 0xffff) * 1024;
+    flash_size = itrfApi.value32 & 0xFFFF
+    flash_size = (flash_size & 0xffff) * 1024
 
     switch(deviceId) {
         case 0x410 : // CHIPID_STM32_F1_MEDIUM
-            flash_size = 0x20000; // Override, chip has bug!!!
-            page_size = 0x400;
-            ram_size = 0x5000;
-            break;
+            flash_size = 0x20000 // Override, chip has bug!!!
+            page_size = 0x400
+            ram_size = 0x5000
+            break
 
         case 0x412 : // CHIPID_STM32_F1_LOW
-            page_size = 0x400;
-            ram_size = 0x2800;
-            break;
+            page_size = 0x400
+            ram_size = 0x2800
+            break
 
         case 0x414 : // CHIPID_STM32_F1_HIGH
-            page_size = 0x800;
-            ram_size = 0x10000;
-            break;
+            page_size = 0x800
+            ram_size = 0x10000
+            break
 
         case 0x418 : // CHIPID_STM32_F1_CONN
-            page_size = 0x800;
-            ram_size = 0x10000;
-            break;
+            page_size = 0x800
+            ram_size = 0x10000
+            break
 
         case 0x420 : // CHIPID_STM32_F1_VL_MEDIUM_LOW
             //medium and low devices have the same chipID ram size depends on flash size.
             //STM32F100xx datasheet Doc ID 16455 Table 2
-            page_size = 0x400;
+            page_size = 0x400
             if( flash_size < (64*1024) )
-                ram_size = 0x1000;
+                ram_size = 0x1000
             else
-                ram_size = 0x2000;
-            break;
+                ram_size = 0x2000
+            break
 
         case 0x428 : // CHIPID_STM32_F1_VL_HIGH
-            page_size = 0x800;
-            ram_size = 0x8000;
-            break;
+            page_size = 0x800
+            ram_size = 0x8000
+            break
 
         case 0x430 : // CHIPID_STM32_F1_XL
-            page_size = 0x800;
-            ram_size = 0x18000;
-            break;
+            page_size = 0x800
+            ram_size = 0x18000
+            break
 
     }
 
     // Inform the user
-    printf("Detected FLASH : 0x%X\nConfigured RAM : 0x%X\n", flash_size, ram_size);
-    
+    printf("Detected FLASH : 0x%X\nConfigured RAM : 0x%X\n", flash_size, ram_size)
+
     // The user specified the size of flash memory
     if (isScriptObject("FLASH_SIZE") && FLASH_SIZE>0)
     {
-      flash_size = (FLASH_SIZE & 0xffff) * 1024;
-      printf("CLI set  FLASH : 0x%X\n", flash_size);      
+      flash_size = (FLASH_SIZE & 0xffff) * 1024
+      printf("CLI set  FLASH : 0x%X\n", flash_size)
     }
-    
+
     // The user specified the size of ram memory
     if (isScriptObject("RAM_SIZE") && RAM_SIZE>0)
     {
-      ram_size = (RAM_SIZE & 0xffff) * 1024;
-      printf("CLI set    RAM : 0x%X\n", ram_size);    
+      ram_size = (RAM_SIZE & 0xffff) * 1024
+      printf("CLI set    RAM : 0x%X\n", ram_size)
     }
 
 
     devApi.memmap( format( mem_template,  flash_size,
                                           ram_size,
                                           flash_size,
-                                          page_size) );
+                                          page_size) )
 
     // Half Word flash loader script
-    require("stmicro/flash/f3_f1_f0.script");
+    require("stmicro/flash/f3_f1_f0.script")
 
-    return 0;
+    return ERROR_OK
 }
 
 
