@@ -1,11 +1,9 @@
 /////////////////////////////////////////////////////
 //
-//                   STM32G4x
+//                   STM32Gx
 //
-
-// For now, only single bank is supported!!!
-// ToDo: - dual bank
-//       - option programming
+// ToDo: - option programming
+//
 
 /////////////////////////////////////////////////////
 //
@@ -70,24 +68,31 @@ function stm32_device(deviceId)
     flash_size = itrfApi.value32 & ~3
     flash_size = (flash_size & 0xffff) * 1024
 
+
+    printf("STmicro family : STM32G")
     switch(deviceId)
     {
-    case 0x460 : // STM32G07xxx/08xxx
+    case 0x460 :
+            printf("07/08xx\n")
             page_size = 0x800
             ram_size = 0x9000 // 36Kbyte
             break
 
-    case 0x466 : // STM32G03xxx/04xxx
+    case 0x466 :
+            printf("03/04xx\n")
             page_size = 0x800
             ram_size = 0x2000 // 8Kbyte
             break
-    case 0x468 : // STM32G431xx/441xx  (cat 2)
+ 
+    case 0x468 :
+            printf("43/44xx\n")
             page_size = 0x800
             cram_size = 0x2800 // 10K
             sram_size = 0x8000 // 32K
             break
 
-    case 0x469 : // STM32G47xxx/48xxx   (cat 3)
+    case 0x469 :
+            printf("47/48xx\n")
             page_size = 0x1000  // 4K single bank
             cram_size = 0x8000  // 32K
             sram_size = 0x20000 // 128K

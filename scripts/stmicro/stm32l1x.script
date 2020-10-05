@@ -45,27 +45,32 @@ function stm32_device(deviceId)
     // Enable debug clocks: DBG_STANDBY & DBG_STOP & DBG_SLEEP - RM0090 Page 1676/1705
     // result = itrfApi.writeMem32(0x40015804, 6)
 
+    printf("STmicro family : STM32L1xx ")
     switch(deviceId)
     {
-        case 0x416 : // CHIPID_STM32_L1_MEDIUM
+        case 0x416 :
+            printf("Cat.1 - Low/Medium Density)\n")
             page_size  = 0x100
             ram_size   = 0x4000
             fsize_addr = 0x1FF8004C
             break
 
-        case 0x427 : // CHIPID_STM32_L1_MEDIUM_PLUS
+        case 0x427 :
+            printf("(Cat.3 - Medium+ Density)\n")        
             page_size  = 0x100
             ram_size   = 0x8000
             fsize_addr = 0x1FF800CC
             break
 
-        case 0x429 : // CHIPID_STM32_L1_CAT2
+        case 0x429 :
+            printf("(Cat.2)\n")        
             page_size  = 0x100
             ram_size   = 0x8000
             fsize_addr = 0x1FF8004C
             break
 
-        case 0x436 : // CHIPID_STM32_L1_HIGH
+        case 0x436 :
+            printf("(Cat.4/Cat.3 - Medium+/High Density)\n")
             // Get the flash size by reading the info register
             result = itrfApi.readMem32(0x1ff800cc)
             flash_size = itrfApi.value32 & ~3
@@ -82,7 +87,8 @@ function stm32_device(deviceId)
             fsize_addr = 0x1FF800CC
             break
 
-        case 0x437 : // CHIPID_STM32_L152_RE
+        case 0x437 :
+            printf("(Cat.5/Cat.6)\n")        
             page_size  = 0x100
             ram_size   = 80 * 1024
             fsize_addr = 0x1FF800CC

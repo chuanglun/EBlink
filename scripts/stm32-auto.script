@@ -68,7 +68,7 @@ function main()
 //
 function set_target(deviceId)
 {
-    printf("STmicro device : 0x%X\n", deviceId)
+    tracef("STmicro device : 0x%X\n", deviceId)
 
     switch(deviceId)
     {
@@ -186,7 +186,9 @@ function set_target(deviceId)
         break
 
     // Cortex M7
-    case 0x450 : // CHIPID_STM32H7
+    case 0x450 : // CHIPID_STM32H74/5
+    case 0x480 : // CHIPID_STM32H7A/B
+    case 0x483 : // CHIPID_STM32H72/3
         require("stmicro/stm32h7x.script")
         break
 

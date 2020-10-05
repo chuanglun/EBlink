@@ -120,12 +120,22 @@ function stm32_device(deviceId)
     result = itrfApi.readMem32(0x1ff1e880)
     flash_size = (itrfApi.value32 & 0xffff) * 1024
 
-
+    printf("STmicro family : STM32H")
     switch(deviceId) {
-
-    case 0x450 : // CHIPID_STM32_H7XXXX
+        case 0x450 : 
+            printf("74x/75x\n") 
             ram_size = 0x80000
             break
+        
+        case 0x480 :
+            printf("7Ax/7Bx\n") 
+            ram_size = 0x80000
+            break
+
+        case 0x483 :        
+            printf("72x/73x\n") 
+            ram_size = 0x80000
+            break        
 
     }
 

@@ -152,54 +152,61 @@ function stm32_device(deviceId)
 
 
     // Set the memory map according the device ID
-      switch(deviceId) {
+    printf("STmicro family : STM32F4")
+    switch(deviceId) {
         case 0x413 : // CHIPID_STM32_F4
+            printf("0x/41x\n")
             ram_size = 0x30000
             devApi.memmap( mem_template_F4 )
             break
 
         case 0x419 : // CHIPID_STM32_F4_HD
+            printf("2x/43x\n")
             ram_size = 0x30000
             devApi.memmap(mem_template_F4_HD)
             break
 
         case 0x421 : // CHIPID_STM32_F446
+            printf("46\n")
             ram_size = 0x20000
             devApi.memmap( mem_template_F4 )
             break
 
         case 0x423 : // CHIPID_STM32_F4_LP
+            printf("01xB/C (Low Power)\n")
             ram_size = 0x10000
             devApi.memmap( mem_template_F4 )
             break
 
         case 0x431 : // CHIPID_STM32_F411RE
+            printf("11\n")
             ram_size = 0x20000
             devApi.memmap( mem_template_F4 )
             break
 
         case 0x433 : // CHIPID_STM32_F4_DE
+            printf("01xD/E\n")
             ram_size = 0x18000
             devApi.memmap( mem_template_F4_DE )
             break
 
         case 0x434 : // CHIPID_STM32_F4_DSI
+            printf("69/479\n")
             ram_size = 0x40000
             devApi.memmap( mem_template_F4 )
             break
 
         case 0x441 : // CHIPID_STM32_F412
+        printf("69/479\n")
             ram_size = 0x40000
             devApi.memmap( mem_template_F4 )
             break
 
         case 0x458 : // CHIPID_STM32_F410
+            printf("10\n")
             ram_size = 0x8000
             devApi.memmap( mem_template_F4 )
             break
-
-        default:
-        break
     }
 
 

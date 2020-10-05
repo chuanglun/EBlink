@@ -49,8 +49,10 @@ function stm32_device(deviceId)
     flash_size = itrfApi.value32 & ~3
     flash_size = (flash_size & 0xffff) * 1024
 
+    printf("STmicro family : STM32F")
     switch(deviceId) {
         case 0x411 : // CHIPID_STM32_F2
+            printf("2xx\n")
             page_size = 0x400
             ram_size = 0x20000
             break

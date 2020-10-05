@@ -110,29 +110,35 @@ function stm32_device(deviceId)
     flash_size = (flash_size & 0xffff) *1024
 
     // Set the memory map according the device ID
+      printf("STmicro family : STM32F3")
       switch(deviceId) {
         case 0x422 : // CHIPID_STM32_F3
+            printf("02/3xB/C\n")
             ram_size = 0x30000
             devApi.memmap( mem_template_F3 )
             break
 
         case 0x432 : // CHIPID_STM32_F37x
+            printf("7x\n")
             ram_size = 0x30000
             page_size = 0x4000
             devApi.memmap(mem_template_F3_HD)
             break
 
         case 0x438 : // CHIPID_STM32_F334
+            printf("3x\n")
             ram_size = 0x4000
             devApi.memmap( mem_template_F3 )
             break
 
         case 0x439 : // CHIPID_STM32_F3_SMALL
+            printf("02x6/8\n")
             ram_size = 0x1000
             devApi.memmap( mem_template_F3 )
             break
 
         case 0x446 : // CHIPID_STM32_F303_HIGH
+            printf("03xD/E\n")
             ram_size = 0x20000
             devApi.memmap( mem_template_F3 )
             break
