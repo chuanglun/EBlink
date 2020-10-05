@@ -102,7 +102,7 @@ name: STlink - STmicro V2/3 interface driver
         jtag         : use Jtag
         speed=<speed>: Set the interface maximum speed
         serial=<serial> : Select probe explicit on usb serial
-        device=<usb_bus>:<usb_addr> : Select probe explicit
+        device=<usb_bus>:<usb_addr> : Select probe explicit on bus
 
         e.g.  -I stlink,dr,speed=3000
 
