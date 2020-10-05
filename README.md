@@ -15,7 +15,7 @@ Upcomming
  - Add: ITM cell support 
 
 Changes (5-10-2020) Release 3.3
-- Added: Windows, notify and quit when is USB removed
+- Added: Windows, notify and quit when USB is removed
 - Added: Interface selection based on serial
 - Moded: Some streamlining in the flash engine 
 
