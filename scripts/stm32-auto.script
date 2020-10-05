@@ -217,6 +217,12 @@ function set_target(deviceId)
 //
 function  reset_post(resetType)
 {
+    // Check if there is an user defined post reset hook, the user
+    // can add his own reset strategy with -S <myscript> as last
+    // defined script on the cli.
+    if (isScriptObject("reset_post_hook"))
+        return reset_post_hook(resetType);
+
     local targetApi = :: TargetAPI() // Our interface to the target class
 
     // We don't use this if the reset is a user_script type. In that

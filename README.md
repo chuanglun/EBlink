@@ -14,8 +14,10 @@ Upcomming
  - Add: Support of flash <file>.mod file. An .mod file is the same as an Intel hex but it will be treated as a modification rather than absolute flash content. So the .mod content is placed over the original flash content already in the MCU, e.g. serial numbers, checksum or configuration parameters.
  - Add: ITM cell support 
 
-Changes (2-10-2020) Release 3.2
-- Total rewriten flash scripts (dual bank etc). 
+Changes (5-10-2020) Release 3.3
+- Added: Windows, notify and quit when is USB removed
+- Added: Interface selection based on serial
+- Moded: Some streamlining in the flash engine 
 
    
  ##### When to consider EBlink instead of OpenOCD:
@@ -98,6 +100,7 @@ name: STlink - STmicro V2/3 interface driver
         speed=nnn    : Interface speed (default max possible)
         swd          : use SWD (default)
         jtag         : use Jtag
+        speed=<speed>: Select probe explicit on usb serial
         device=<usb_bus>:<usb_addr> : Select probe explicit
 
         e.g.  -I stlink,dr,speed=3000
