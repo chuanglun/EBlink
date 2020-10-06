@@ -12,9 +12,8 @@ EBlink ARM Cortex-M debug tool with squirrel scripting device support
 
 Upcomming 
  - Prio 1 : Reference manual EBlink script
- - Support of flash <file>.mod file. An .mod file is the same as an Intel hex but it will be treated as a modification rather than absolute flash content. So the .mod content is placed over the original flash content already in the MCU, e.g. serial numbers, checksum or configuration parameters.
- - ITM support stlink
- - Linux interface lost handling 
+ - Linux interface lost handling
+ - ITM support stlink 
  - Finilize cmsis-dap
 
 Changes (5-10-2020) Release 3.4
