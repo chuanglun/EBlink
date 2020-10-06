@@ -12,6 +12,7 @@ EBlink ARM Cortex-M debug tool with squirrel scripting device support
 
 Upcomming 
  - Prio 1 : Reference manual EBlink script
+ - Options writing from cli, transparent channel to flash script option handling function
  - Linux interface lost handling
  - ITM support stlink 
  - Finilize cmsis-dap
