@@ -5,19 +5,22 @@ EBlink ARM Cortex-M debug tool with squirrel scripting device support
 
  - New: Windows installer with windows context menu handler (32 and 64 bits) for file flashing [.hex,.elf and .srec] and core control (reset,halt and resume) or GDB server launch. 
  
- [ Download windows installer V3.3.1 ](https://www.embitz.org/EBlinkInstaller3.3.1.zip)  (MD5: f33818ff211536b96e657cb7cf242dba )
+ [ Download windows installer V3.4 ](https://www.embitz.org/EBlinkInstaller3.4.zip)  (MD5: a066a4becc8160de4d39f1505b03290a )
  
 ![alt text](https://www.embitz.org/context2.png)  
 
 
 Upcomming 
- - Add: Support of flash <file>.mod file. An .mod file is the same as an Intel hex but it will be treated as a modification rather than absolute flash content. So the .mod content is placed over the original flash content already in the MCU, e.g. serial numbers, checksum or configuration parameters.
- - Add: ITM cell support 
+ - Support of flash <file>.mod file. An .mod file is the same as an Intel hex but it will be treated as a modification rather than absolute flash content. So the .mod content is placed over the original flash content already in the MCU, e.g. serial numbers, checksum or configuration parameters.
+ - ITM support stlink
+ - Linux interface lost handling 
+ - Finilize cmsis-dap
 
-Changes (5-10-2020) Release 3.3
-- Added: Windows, notify and quit when USB is removed
-- Added: Interface selection based on serial
-- Moded: Some streamlining in the flash engine 
+Changes (5-10-2020) Release 3.4
+- Added: script debugf,noticef for printing on different verbose level
+- Moded: Default verbose level is 4, verbose level 5 is with notice info (so also e.g. device codes of stm32)
+- Moded: Windows console disabled quick edit (selection blocks stdout and stderr)
+- Fixes: script bugs with stm32gx and some minor changes 
 
    
  ##### When to consider EBlink instead of OpenOCD:

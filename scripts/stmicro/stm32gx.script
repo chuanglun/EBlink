@@ -56,7 +56,7 @@ const mem_dual_cram = @@"
 
 // The parameters for the flash script
 const FLASH_BASE 0x40022000
-hasDualBank <- false // Can be set by upper scripts is we have dual bank support
+hasDualBank <- false // Enables dual bank support
 
 /////////////////////////////////////////////////////
 //
@@ -80,7 +80,7 @@ function stm32_device(deviceId)
     // Get the flash size by reading the info register
     result = itrfApi.readMem32(0x1fff75e0)
     if(result<0) return result;
-    
+
     flash_size = itrfApi.value32 & ~3
     flash_size = (flash_size & 0xffff) * 1024
 
@@ -99,7 +99,7 @@ function stm32_device(deviceId)
             page_size = 0x800
             sram_size = 0x2000 // 8Kbyte
             break
- 
+
     case 0x468 :
             printf("43/44xx\n")
             page_size = 0x800
@@ -155,13 +155,13 @@ function stm32_device(deviceId)
                                                        sram_size,
                                                        flash_size,
                                                        page_size) )
-        else                                                                                              
+        else
             devApi.memmap( format( mem_single_cram, flash_size,
                                                     cram_size,
                                                     sram_size,
                                                     flash_size,
                                                     page_size) )
-                                                   
+
     }
 
     // Flash loader script

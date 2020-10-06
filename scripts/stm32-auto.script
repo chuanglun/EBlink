@@ -68,7 +68,7 @@ function main()
 //
 function set_target(deviceId)
 {
-    tracef("STmicro device : 0x%X\n", deviceId)
+    noticef("STmicro device : 0x%X\n", deviceId)
 
     switch(deviceId)
     {
