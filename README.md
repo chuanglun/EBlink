@@ -16,7 +16,7 @@ Upcomming
  - ITM support stlink 
  - Finilize cmsis-dap
 
-Changes (5-10-2020) Release 3.4
+Changes (6-10-2020) Release 3.4
 - Added: script debugf,noticef for printing on different verbose level
 - Moded: Default verbose level is 4, verbose level 5 is with notice info (so also e.g. device codes of stm32)
 - Moded: Windows console disabled quick edit (selection blocks stdout and stderr)
