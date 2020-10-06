@@ -15,7 +15,7 @@ Upcomming
  - Options writing from cli, transparent channel to flash script option handling function
  - Linux interface lost handling
  - ITM support stlink 
- - Finilize cmsis-dap
+ - Finalize cmsis-dap
 
 Changes (6-10-2020) Release 3.4
 - Added: script debugf,noticef for printing on different verbose level
