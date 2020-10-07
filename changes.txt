@@ -1,3 +1,8 @@
+Changes (7-10-2020) Release 3.5
+- Moded: Script F3 and F4 modified
+- Moded: Windows EBlink context menu not on Recycle bin etc
+- Moded: Clean shutdown win32 and linux after interface lost
+
 Changes (6-10-2020) Release 3.4
 - Added: script debugf,noticef for printing on different verbose level
 - Moded: Default verbose level is 4, verbose level 5 is with notice info (so also e.g. device codes of stm32)
