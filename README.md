@@ -15,7 +15,6 @@ Upcomming
  - Prio 1 : Reference manual EBlink script
  - Nightly builds windows installer to update scripts in installer (version of the installer reflects executable version)
  - Options writing from cli, transparent channel to flash script option handling function
- - Linux interface lost handling
  - ITM support stlink 
  - Finalize cmsis-dap
 
