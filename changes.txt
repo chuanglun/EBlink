@@ -1,4 +1,8 @@
-Changes (7-10-2020) Release 3.5
+Changes (7-10-2020) Release 3.6
+- Added : Serial numbers of old STlinkV2 handling. STmicro changed the USB serial format later.
+- Fized : Multiple interfaces selected by interface serial
+
+Changes (7-10-2020) Release 3.5 - stable
 - Moded: Script F3 and F4 modified
 - Moded: Windows EBlink context menu not on Recycle bin etc
 - Moded: Clean shutdown win32 and linux after interface lost

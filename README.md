@@ -5,7 +5,7 @@ EBlink ARM Cortex-M debug tool with squirrel scripting device support
 
  - New: Windows installer with windows context menu handler (32 and 64 bits) for file flashing [.hex,.elf and .srec] and core control (reset,halt and resume) or GDB server launch. 
  
- [ Windows installer V3.5 - stable ](https://www.embitz.org/EBlinkInstaller.zip)  (MD5: 88cf7f591ef71d70f556a93db19fc178 ) **The installer always has the latest script commits.** Just download and use the latest installer, which will uninstall the current if needed, to update EBlink at the same installation location as the previous.
+ [ Windows installer V3.6 - stable ](https://www.embitz.org/EBlinkInstaller.zip)  (MD5: 61b6a5944d9fbbff6fe2d9ff89e74caa ) **The installer always has the latest script commits.** Just download and use the latest installer, which will uninstall the current if needed, to update EBlink at the same installation location as the previous.
  
  
 ![alt text](https://www.embitz.org/context2.png)  
@@ -18,10 +18,9 @@ Upcomming
  - ITM support stlink 
  - Finalize cmsis-dap
 
-Changes (7-10-2020) Release 3.5
-- Moded: Script F3 and F4 modified
-- Moded: Windows EBlink context menu not on Recycle bin etc
-- Moded: Clean shutdown win32 and linux after interface lost
+Changes (7-10-2020) Release 3.6
+- Added : Serial numbers of old STlinkV2 handling. STmicro changed the USB serial format later.
+- Fized : Multiple interfaces selected by interface serial
 
    
  ##### When to consider EBlink instead of OpenOCD:
