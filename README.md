@@ -3,9 +3,7 @@
 
 EBlink ARM Cortex-M debug tool with squirrel scripting device support
 
- - New: Windows installer with windows context menu handler (32 and 64 bits) for file flashing [.hex,.elf and .srec] and core control (reset,halt and resume) or GDB server launch. 
- 
- [ Windows installer ](https://www.embitz.org)
+[ Windows installer ](https://www.embitz.org) available with windows desktop context menu's.
 
 ![alt text](https://www.embitz.org/context2.png)  
 
