@@ -30,6 +30,13 @@ const mem_template = @@"
  </memory-map>"
 
 
+const DBGMCU_CR      0xE0042004
+const DBGMCU_APB1_FZ 0xE0042008
+
+const DBG_SLEEP     (1<<0)
+const DBG_STOP      (1<<1)
+const DBG_STANDBY   (1<<2)
+
 /////////////////////////////////////////////////////
 //
 //  Entry point of this script called by parent script
@@ -44,11 +51,11 @@ function stm32_device(deviceId)
     local ram_size
     local page_size = 0x800 // Default page size
 
-    // Enable debug clocks: DBG_STANDBY & DBG_STOP & DBG_SLEEP - RM0090 Page 1676/1705
-    local result = itrfApi.writeMem32(0xE0042004, 7)
+    // Enable debug clocks: DBG_STANDBY & DBG_STOP & DBG_SLEEP
+    local result = itrfApi.writeMem32(DBGMCU_CR, DBG_STANDBY | DBG_STOP | DBG_SLEEP  )
 
     // Stop watchdog counters during halt: DBGMCU_APB1_FZ = DBG_IWDG_STOP | DBG_WWDG_STOP
-    result = itrfApi.writeMem32(0xE0042008, 0x00001800)
+    result = itrfApi.writeMem32(DBGMCU_APB1_FZ, 0x00001800)
     if(result<0) return result
 
     // Get the flash size

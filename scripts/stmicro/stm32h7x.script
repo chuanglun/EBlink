@@ -77,6 +77,16 @@ const mem_template_2MB = @@"
 
 hasSecondBank <- false  // Global boolean used by flash script
 
+const DBGMCU_CR     0x5c001004
+
+const DBGSLEEP_D1   (1 << 0)
+const DBGSTOP_D1    (1 << 1)
+const DBGSTBY_D1    (1 << 2)
+const DBGSTOP_D3    (1 << 7)
+const DBGSTBY_D3    (1 << 8)
+const D1DBGCKEN     (1 << 21)
+const D3DBGCKEN     (1 << 22)
+
 /////////////////////////////////////////////////////
 //
 //  Entry point of this script called by parent script
@@ -95,7 +105,8 @@ function stm32_device(deviceId)
     local flash_1bank
 
     // Enable debug clocks: DBG_STANDBY & DBG_STOP & DBG_SLEEP - RM0090 Page 1676/1705
-    result = itrfApi.writeMem32(0x5c001004, 7)
+    itrfApi.readMem32(DBGMCU_CR)
+    result = itrfApi.writeMem32(DBGMCU_CR, itrfApi.value32 | DBGSLEEP_D1 | D1DBGCKEN)
 
     // Stop watchdog counters during halt: DBGMCU_APB3FZ2 |= WWDG1
     itrfApi.readMem32(0xE00E1038)
@@ -122,20 +133,20 @@ function stm32_device(deviceId)
 
     printf("STmicro family : STM32H")
     switch(deviceId) {
-        case 0x450 : 
-            printf("74x/75x\n") 
-            ram_size = 0x80000
-            break
-        
-        case 0x480 :
-            printf("7Ax/7Bx\n") 
+        case 0x450 :
+            printf("74x/75x\n")
             ram_size = 0x80000
             break
 
-        case 0x483 :        
-            printf("72x/73x\n") 
+        case 0x480 :
+            printf("7Ax/7Bx\n")
             ram_size = 0x80000
-            break        
+            break
+
+        case 0x483 :
+            printf("72x/73x\n")
+            ram_size = 0x80000
+            break
 
     }
 

@@ -38,11 +38,6 @@ function stm32_device(deviceId)
     local page_size
     local ram_size
 
-    // Enable debug clocks: DBG_STANDBY & DBG_STOP & DBG_SLEEP - RM0090 Page 1676/1705
-    result = itrfApi.writeMem32(0xE0042004, 7)
-
-    // Stop watchdog counters during halt: DBGMCU_APB1_FZ = DBG_IWDG_STOP | DBG_WWDG_STOP
-    result = itrfApi.writeMem32(0xE0042008, 0x00001800)
 
     // Get the flash size by reading the info register
     result = itrfApi.readMem32(0x1ffff7e0)
