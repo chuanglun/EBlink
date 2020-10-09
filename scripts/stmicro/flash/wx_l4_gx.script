@@ -218,6 +218,8 @@ function flash_done()
         // Restore the original probe speed if changed
         if(savedProbeSpeed > 0)
             itrfApi.setSpeed(savedProbeSpeed)
+        
+        savedProbeSpeed = 0 // Init for next session 
 
         // Write the CR register to lock (LOCK)
         _n_throw( itrfApi.readMem32(FLASH_BASE + FLASH_CR) )

@@ -1,4 +1,4 @@
-Changes (7-10-2020) Release 3.6
+Changes (8-10-2020) Release 3.6
 - Added : Serial numbers of old STlinkV2 handling. STmicro changed the USB serial format later.
 - Fized : Multiple interfaces selected by interface serial
 

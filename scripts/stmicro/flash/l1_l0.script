@@ -209,6 +209,8 @@ function flash_done()
         // Restore the original probe speed if changed
         if(savedProbeSpeed > 0)
             itrfApi.setSpeed(savedProbeSpeed)
+        
+        savedProbeSpeed = 0 // Init for next session 
 
         //  Locks the NVM by setting PELOCK in CR
         _n_throw( itrfApi.writeMem32(FLASH_BASE|FLASH_CR, FLASH_CR_PELOCK) )
