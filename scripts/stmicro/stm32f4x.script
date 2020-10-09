@@ -120,7 +120,7 @@ function stm32_device(deviceId)
     printf("STmicro family : STM32F4")
     switch(deviceId) {
         case 0x413 : // CHIPID_STM32_F4
-            printf("0x/41x\n")
+            printf("05/407/415/417\n")
             ram_size = 0x30000
             break
 
@@ -155,7 +155,7 @@ function stm32_device(deviceId)
             break
 
         case 0x441 : // CHIPID_STM32_F412
-        printf("69/479\n")
+        printf("12\n")
             ram_size = 0x40000
             break
 
