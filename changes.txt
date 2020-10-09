@@ -1,6 +1,9 @@
+Changes (9-10-2020) Release 3.7
+- Fixed : Bug large page size >64KB
+
 Changes (8-10-2020) Release 3.6
 - Added : Serial numbers of old STlinkV2 handling. STmicro changed the USB serial format later.
-- Fized : Multiple interfaces selected by interface serial
+- Fixed : Multiple interfaces selected by interface serial
 
 Changes (7-10-2020) Release 3.5 - stable
 - Moded: Script F3 and F4 modified

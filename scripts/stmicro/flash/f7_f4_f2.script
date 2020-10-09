@@ -16,18 +16,18 @@ const FLASH_OPTCR1  0x40023c18
 const FLASH_OPTCR2  0x40023c1c
 
 // FLASH_CR register bits
-const FLASH_CR_PG		(1 << 0)
-const FLASH_CR_SER		(1 << 1)
-const FLASH_CR_MER		(1 << 2)
-const FLASH_CR_PSIZE8	(0 << 8)
-const FLASH_CR_PSIZE16	(1 << 8)
-const FLASH_CR_PSIZE32	(2 << 8)
-const FLASH_CR_PSIZE64	(3 << 8)
-const FLASH_CR_MER1		(1 << 15)
-const FLASH_CR_STRT		(1 << 16)
-const FLASH_CR_EOPIE	(1 << 24)
-const FLASH_CR_ERRIE	(1 << 25)
-const FLASH_CR_LOCK		(1 << 31)
+const FLASH_CR_PG       (1 << 0)
+const FLASH_CR_SER      (1 << 1)
+const FLASH_CR_MER      (1 << 2)
+const FLASH_CR_PSIZE8   (0 << 8)
+const FLASH_CR_PSIZE16  (1 << 8)
+const FLASH_CR_PSIZE32  (2 << 8)
+const FLASH_CR_PSIZE64  (3 << 8)
+const FLASH_CR_MER1     (1 << 15)
+const FLASH_CR_STRT     (1 << 16)
+const FLASH_CR_EOPIE    (1 << 24)
+const FLASH_CR_ERRIE    (1 << 25)
+const FLASH_CR_LOCK     (1 << 31)
 
  // FLASH_SR register bits
 const FLASH_SR_BSY      (1 << 16)
@@ -60,6 +60,9 @@ const OPTKEY2        0x4C5D6E7F
 
 pgWidth <- 0;
 pgSize  <- 0;
+
+const MAX_FLASH_SPEED   10000  // 10MHz is max speed for direct programming (we think)
+savedProbeSpeed <-0  // Our current probe speed 0= not checked, -1 = checked not changed, > 0 = original speed
 
 /////////////////////////////////////////////////////////////////////////////////
 //
@@ -161,6 +164,23 @@ function flash_erase(sector, address)
 function flash_write(sector, address, buffer)
 {
     try{
+        // Did we already checked the current probe speed.
+        // For direct flash writing we can't be too fast.
+        if( savedProbeSpeed == 0)
+        {
+            local probeSpeed = itrfApi.getSpeed()
+            if(probeSpeed > MAX_FLASH_SPEED )
+            {
+                savedProbeSpeed = probeSpeed
+                _n_throw(itrfApi.setSpeed(MAX_FLASH_SPEED))
+            }
+            else
+            {
+                // We checked and don't changed the probe speed
+                savedProbeSpeed = -1
+            }
+        }
+
         // Enable the program flag PG in flash_CR together with the right parallelism
         _n_throw( itrfApi.writeMem32(FLASH_CR, pgSize | FLASH_CR_PG ) )
 
@@ -203,8 +223,24 @@ function flash_write(sector, address, buffer)
 //
 function flash_done()
 {
-    // Relock the flash by setting the FLASH_CR_LOCK in the flash CR register
-    return itrfApi.writeMem32(FLASH_CR, FLASH_CR_LOCK)
+    try{
+        // Restore the original probe speed if changed
+        if(savedProbeSpeed > 0)
+            _n_throw( itrfApi.setSpeed(savedProbeSpeed) )
+
+        savedProbeSpeed = 0 // Init for next session
+
+        // Relock the flash by setting the FLASH_CR_LOCK in the flash CR register
+        _n_throw( itrfApi.writeMem32(FLASH_CR, FLASH_CR_LOCK) )
+        return ERROR_OK
+    }
+
+    // Catch all the lock errors
+    catch(e){
+       if(e < -1)
+           errorf("Error: locking flash failed!\n")
+       return -1
+    }
 }
 
 
