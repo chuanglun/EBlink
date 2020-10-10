@@ -6,6 +6,9 @@
 // TODO: - Multi bank
 //       - options
 //
+
+require("stmicro/flash/errors.script")
+
 const FLASH_ACR     0x40023c00
 const FLASH_KEYR    0x40023c04
 const FLASH_OPTKEYR 0x40023c08
@@ -58,11 +61,15 @@ const KEY2           0xCDEF89AB
 const OPTKEY1        0x08192A3B
 const OPTKEY2        0x4C5D6E7F
 
+// Used for voltage depended program size selection
 pgWidth <- 0;
 pgSize  <- 0;
 
 const MAX_FLASH_SPEED   10000  // 10MHz is max speed for direct programming (we think)
 savedProbeSpeed <-0  // Our current probe speed 0= not checked, -1 = checked not changed, > 0 = original speed
+
+// Generic Flash Script errors
+//require("stmicro/flash/errors.script")
 
 /////////////////////////////////////////////////////////////////////////////////
 //
@@ -83,41 +90,40 @@ function flash_start()
         voltage = itrfApi.targetVoltage();
         if(voltage  < 1.8)
         {
-           _n_throw(-101)
+           _n_throw(ERROR_VOLTAGE)
         }
         else if(voltage  < 2.1)
         {
             // Low voltage is 8 bits
-            pgWidth = 8;
-            pgSize  = 0;
+            pgWidth = 8
+            pgSize  = FLASH_CR_PSIZE8
         }
         else if(voltage  < 2.7)
         {
             // Mid voltage is 16 bits
             // REMARK: some probes don't support 16bit direct memory access
             //         you could change this part to use the lower 8 bits voltage instead
-            pgWidth = 16;
-            pgSize  = (1<<8);
+            pgWidth = 16
+            pgSize  = FLASH_CR_PSIZE16
         }
         else
         {
             // Higher voltage is 32 bits
-            pgWidth = 32;
-            pgSize  = (2<<8);
+            pgWidth = 32
+            pgSize  = FLASH_CR_PSIZE32
         }
 
+        //Remark:  We don't support the 64bits yet
         return ERROR_OK
     }
 
     // Catch all the lock errors
     catch(e){
-       if(e == -100)
-           errorf("Error: can't unlock flash!\n")
-       else if(e == -101)
+       if(e == ERROR_VOLTAGE)
            errorf("Error: Current STM32F4x/STM32F7x flash algorithm needs at least 1.8V\nTarget voltage is %.2f V\n", voltage )
-       else if(e < -1)
-           errorf("Error: target initializing!\n")
-       return -1
+       else if(e < ERROR_NOTIFIED )
+           errorf("Error: target initializing! %s\n", flashError(e) )
+       return ERROR_NOTIFIED
     }
 }
 
@@ -150,9 +156,9 @@ function flash_erase(sector, address)
 
     // Catch all the sector erase errors
     catch(e){
-       if(e < -1)
-           errorf("ERROR: erasing sector %d failed\n", sector)
-       return -1
+       if(e < ERROR_NOTIFIED)
+           errorf("ERROR: erasing sector %d failed! %s\n", sector, flashError(e))
+       return ERROR_NOTIFIED
     }
 }
 
@@ -185,8 +191,7 @@ function flash_write(sector, address, buffer)
         _n_throw( itrfApi.writeMem32(FLASH_CR, pgSize | FLASH_CR_PG ) )
 
         // Make length multiple of pgWidth bits.
-        if(buffer.byteLength & (pgWidth-1))
-            buffer.byteLength = buffer.byteLength + (pgWidth - (buffer.byteLength & (pgWidth-1)))
+        buffer.setTrim(pgWidth)
 
         // Write the buffer with the program width which belongs to the current voltage
         _n_throw( itrfApi.writeBuf(address, buffer, pgWidth ) )
@@ -199,7 +204,7 @@ function flash_write(sector, address, buffer)
 
         // Evaluate the result
         if ( itrfApi.value32 & FLASH_ERROR )
-            _n_throw( -2)
+            _n_throw(ERROR_FLASH)
 
         // Disable the program flag  PG in flash_CR
         _n_throw( itrfApi.writeMem32(FLASH_CR, 0) )
@@ -209,11 +214,11 @@ function flash_write(sector, address, buffer)
 
     // Catch all the sector write errors
     catch(e){
-       if( e== INTERFACE_NOT_SUPPORTED)
+       if( e == INTERFACE_NOT_SUPPORTED)
             errorf("ERROR: probe doesn't support 16bit memory access!\nPlease change or update probe.")
-       else if(e < -1)
-           errorf("ERROR: writing sector %d failed\n", sector)
-       return -1
+       else if(e < ERROR_NOTIFIED)
+           errorf("ERROR: writing sector %d failed! %s\n", sector, flashError(e))
+       return ERROR_NOTIFIED
     }
 }
 
@@ -237,9 +242,9 @@ function flash_done()
 
     // Catch all the lock errors
     catch(e){
-       if(e < -1)
-           errorf("Error: locking flash failed!\n")
-       return -1
+       if(e < ERROR_NOTIFIED)
+           errorf("Error: locking flash failed! %s\n", flashError(e))
+       return ERROR_NOTIFIED
     }
 }
 
@@ -281,7 +286,7 @@ function flash_erase_chip()
 
         // Evaluate the result
         if ( itrfApi.value32 & FLASH_ERROR )
-            _n_throw( -2)
+            _n_throw(ERROR_FLASH)
 
         _n_throw( itrfApi.writeMem32(FLASH_CR, FLASH_CR_LOCK) )
 
@@ -291,9 +296,9 @@ function flash_erase_chip()
 
     // Catch all the mass erase errors
     catch(e){
-       if(e < -1)
-           errorf("ERROR: mass erase failed\n")
-       return -1
+       if(e < ERROR_NOTIFIED)
+           errorf("ERROR: mass erase failed! %s\n", flashError(e) )
+       return ERROR_NOTIFIED
     }
 }
 
@@ -310,7 +315,7 @@ function flash_check_busy(timeout)
 
         // Check timeout
         if( (GetTickCount() - time) > timeout)
-            _n_throw(-666)
+            _n_throw(ERROR_TIMEOUT)
 
         _n_throw( itrfApi.readMem32(FLASH_SR) )
     } while ( itrfApi.value32 &  FLASH_SR_BSY )
@@ -336,7 +341,7 @@ function flash_unlock()
         // Read flash CR again to check FLASH_CR_LOCK if it's unlocked
         _n_throw( itrfApi.readMem32(FLASH_CR) )
         if( itrfApi.value32 & FLASH_CR_LOCK )
-          _n_throw( -100)
+          _n_throw(ERROR_UNLOCK)
     }
 }
 

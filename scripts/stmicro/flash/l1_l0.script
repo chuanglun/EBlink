@@ -55,6 +55,8 @@ const MAX_FLASH_SPEED 4000  // 4MHz is max speed for direct programming (we thin
 
 savedProbeSpeed <-0   // Our current probe speed 0= not checked, -1 = checked not changed, > 0 = original speed
 
+// Generic Flash Script errors
+require("stmicro/flash/errors.script")
 
 /////////////////////////////////////////////////////////////////////////////////
 //
@@ -81,7 +83,7 @@ function flash_start()
             // Read flash CR again to check FLASH_CR_LOCK if it's unlocked
             _n_throw( itrfApi.readMem32(FLASH_BASE|FLASH_CR) )
             if( itrfApi.value32 & FLASH_CR_PELOCK )
-                _n_throw(-2)
+                _n_throw(ERROR_UNLOCK)
 
             // Unlock flash program
             _n_throw( itrfApi.writeMem32(FLASH_BASE|FLASH_PRGKEYR,PRGKEY1) )
@@ -90,16 +92,16 @@ function flash_start()
             // check CR.prglock is cleared
             _n_throw( itrfApi.readMem32(FLASH_BASE|FLASH_CR) )
             if( itrfApi.value32 & FLASH_CR_PRGLOCK )
-                _n_throw( -2)
+                _n_throw(ERROR_UNLOCK)
         }
         return ERROR_OK
     }
 
     // Catch all the sector write errors
     catch(e){
-       if(e < -1)
-           errorf("Error unlocking flash!\n")
-       return -1
+       if(e < ERROR_NOTIFIED)
+           errorf("Error unlocking flash! %s\n", flashError(e) )
+       return ERROR_NOTIFIED
     }
 }
 
@@ -127,9 +129,9 @@ function flash_erase(sector, address)
 
     // Catch all the sector erase errors
     catch(e){
-       if(e < -1)
-           errorf("ERROR: erasing sector %d failed\n", sector)
-       return -1
+       if(e < ERROR_NOTIFIED)
+           errorf("ERROR: erasing sector %d failed! %s\n", sector, flashError(e) )
+       return ERROR_NOTIFIED
     }
 }
 
@@ -167,15 +169,15 @@ function flash_write(sector, address, buffer)
         // Do we have to use half page writes, is defined at parent device script
         if(FLASH_HP)
         {
-            // Write halfpages, the buffer byteLength is always the same as sector size (no sector trim)
-            local halfPageSize = buffer.byteLength/2
+            // Write halfpages, the buffer size is always the same as sector size (no sector trim)
+            local halfPageSize = buffer.getSize()/2
             _n_throw( itrfApi.writeMem(address, buffer, 0, halfPageSize, 32 ) )
             checkBusy(FLASH_TIMEOUT)
             _n_throw( itrfApi.writeMem(address+halfPageSize, buffer, halfPageSize, halfPageSize, 32 ) )
         }
         else
         {
-            for(local count = 0; count < buffer.byteLength; count += 4)
+            for(local count = 0; count < buffer.getSize(); count += 4)
             {
                 _n_throw( itrfApi.writeMem32(address, buffer.un32(count) ) )
                 address += 4
@@ -193,9 +195,9 @@ function flash_write(sector, address, buffer)
 
     // Catch all the sector write errors
     catch(e){
-       if(e < -1)
-           errorf("ERROR: writing sector %d failed\n", sector)
-       return -1
+       if(e < ERROR_NOTIFIED)
+           errorf("ERROR: writing sector %d failed! %s\n", sector, flashError(e) )
+       return ERROR_NOTIFIED
     }
 }
 
@@ -209,8 +211,8 @@ function flash_done()
         // Restore the original probe speed if changed
         if(savedProbeSpeed > 0)
             itrfApi.setSpeed(savedProbeSpeed)
-        
-        savedProbeSpeed = 0 // Init for next session 
+
+        savedProbeSpeed = 0 // Init for next session
 
         //  Locks the NVM by setting PELOCK in CR
         _n_throw( itrfApi.writeMem32(FLASH_BASE|FLASH_CR, FLASH_CR_PELOCK) )
@@ -219,9 +221,9 @@ function flash_done()
     }
 
     catch(e){
-       if(e < -1)
+       if(e < ERROR_NOTIFIED)
            errorf("Error locking flash!\n")
-       return -1
+       return ERROR_NOTIFIED
     }
 }
 
@@ -236,18 +238,18 @@ function checkBusy(timeout)
     local time = GetTickCount()
     do{
         if(GetTickCount() - time > timeout)
-            _n_throw(-500)
+            _n_throw(ERROR_TIMEOUT)
 
         _n_throw( itrfApi.readMem32(FLASH_BASE|FLASH_SR) )
     }while ( itrfApi.value32 & FLASH_SR_BSY )
 
     // Check for errors
     if( itrfApi.value32 & (FLASH_SR_NOTZERO | FLASH_SR_SIZERR | FLASH_SR_PGAERR |  FLASH_SR_WRPERR) )
-        _n_throw(-501)
+        _n_throw(ERROR_FLASH)
 
     //  Check the EOP flag in the FLASH_SR register
     if( !(itrfApi.value32 & FLASH_SR_EOP) )
-        _n_throw(-502)
+        _n_throw(ERROR_FLASH)
 }
 
 

@@ -24,7 +24,7 @@ function main()
     local result
 
     // Check if the right script API is supported
-    if( VERSION < 3.2)
+    if( VERSION < 3.8)
     {
        errorf("Error:\n\nIncompatiable EBlink version %.1f\n\tPlease update\n", VERSION)
        return -1

@@ -37,6 +37,8 @@ const MAX_FLASH_SPEED   10000  // 10MHz is max speed for direct programming (we 
 
 savedProbeSpeed <-0  // Our current probe speed 0= not checked, -1 = checked not changed, > 0 = original speed
 
+// Generic Flash Script errors
+require("stmicro/flash/errors.script")
 
 /////////////////////////////////////////////////////////////////////////////////
 //
@@ -47,21 +49,18 @@ function flash_start()
 {
     local targetApi = :: TargetAPI() // Our interface to the target class
     try{
-
         // Be sure that the core is halted
         _n_throw( targetApi.halt() )
-
         // Unlock flash
         flash_unlock()
-
         return ERROR_OK
     }
 
     // Catch all the sector write errors
     catch(e){
-       if(e < -1)
-           errorf("ERROR: couldn't initialize target\n")
-       return -1
+       if(e < ERROR_NOTIFIED)
+           errorf("ERROR: couldn't initialize target! %s\n", flashError(e) )
+       return ERROR_NOTIFIED
     }
 }
 
@@ -89,14 +88,14 @@ function flash_erase(sector, address)
         do{
             // Check for time out
             if(GetTickCount() - time > 1000)
-               _n_throw(-2)
+               _n_throw(ERROR_TIMEOUT)
 
             _n_throw( itrfApi.readMem32(FLASH_BASE + FLASH_SR))
         }while ( itrfApi.value32 & FLASH_SR_BSY)
 
         //  (5) Check the EOP flag in the FLASH_SR register
         if( (itrfApi.value32 & FLASH_SR_EOP) == 0)
-            throw -2
+            throw ERROR_FLASH
 
         // (6) Clear EOP flag by software by writing EOP at 1
         _n_throw( itrfApi.writeMem32(FLASH_BASE + FLASH_SR, itrfApi.value32 | FLASH_SR_EOP) )
@@ -109,9 +108,9 @@ function flash_erase(sector, address)
 
     // Catch all the sector erase errors
     catch(e){
-       if(e < -1)
-           errorf("ERROR: erasing sector %d failed\n", sector)
-       return -1
+       if(e < ERROR_NOTIFIED)
+           errorf("ERROR: erasing sector %d failed! %s\n", sector, flashError(e) )
+       return ERROR_NOTIFIED
     }
 }
 
@@ -156,11 +155,9 @@ function flash_write(sector, address, buffer)
     catch(e){
        if(e ==  INTERFACE_NOT_SUPPORTED)
             errorf("This interface doesn't support direct 16bit memory access\nPlease update probe firmware or use other probe\n")
-
-       else if(e < -1)
-           errorf("ERROR: writing sector %d failed\n", sector)
-
-       return -1
+       else if(e < ERROR_NOTIFIED)
+           errorf("ERROR: writing sector %d failed! %s\n", sector, flashError(e) )
+       return ERROR_NOTIFIED
     }
 }
 
@@ -174,8 +171,8 @@ function flash_done()
         // Restore the original probe speed if changed
         if(savedProbeSpeed > 0)
             _n_throw( itrfApi.setSpeed(savedProbeSpeed) )
-        
-        savedProbeSpeed = 0 // Init for next session 
+
+        savedProbeSpeed = 0 // Init for next session
 
         // Relock the flash by setting the FLASH_CR_LOCK in the flash CR register
         _n_throw( itrfApi.writeMem32(FLASH_BASE + FLASH_CR, FLASH_CR_LOCK ) )
@@ -184,9 +181,9 @@ function flash_done()
 
     // Catch all the lock errors
     catch(e){
-       if(e < -1)
-           errorf("Error: locking flash failed!\n")
-       return -1
+       if(e < ERROR_NOTIFIED)
+           errorf("Error: locking flash failed! %s\n", flashError(e) )
+       return ERROR_NOTIFIED
     }
 }
 
@@ -205,7 +202,7 @@ function flash_unlock()
 
         _n_throw( itrfApi.readMem32(FLASH_BASE + FLASH_CR) )
         if(itrfApi.value32 & FLASH_CR_LOCK )
-           _n_throw(-2)
+           _n_throw(ERROR_UNLOCK)
     }
 }
 
@@ -243,14 +240,14 @@ function flash_erase_chip()
 
             // Check for time out of 30 seconds
             if(GetTickCount() - time > 3000)
-                _n_throw(-2)
+                _n_throw(ERROR_TIMEOUT)
 
             _n_throw( itrfApi.readMem32(FLASH_BASE + FLASH_SR) )
         }while ( itrfApi.value32 & FLASH_SR_BSY)
 
         // (4) Check the EOP flag in the FLASH_SR register
         if( (itrfApi.value32 & FLASH_SR_EOP) == 0)
-            _n_throw(-2)
+            _n_throw(ERROR_FLASH)
 
         // (5) Clear EOP flag by software by writing EOP at 1
         _n_throw( itrfApi.writeMem32(FLASH_BASE + FLASH_SR, itrfApi.value32 | FLASH_SR_EOP) )
@@ -267,8 +264,8 @@ function flash_erase_chip()
 
     // Catch all the mass erase errors
     catch(e){
-       if(e < -1)
-           errorf("ERROR: mass erase failed\n")
-       return -1
+       if(e < ERROR_NOTIFIED)
+           errorf("ERROR: mass erase failed! %s\n", flashError(e) )
+       return ERROR_NOTIFIED
     }
 }

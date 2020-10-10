@@ -1,0 +1,29 @@
+/////////////////////////////////////////////////////////////////////////////////
+//
+//                  Generic error codes for all flash scripts
+//
+//      Include this file for consistent error codes between all flash scripts
+//
+
+// Already defined by EBlink exectuable
+// ERROR_OK        0
+// ERROR_NOTIFIED -1
+
+// We can't use "const" here because it is not in upper scope apperently
+ERROR_UNLOCK  <-  -100
+ERROR_VOLTAGE <-  -101
+ERROR_FLASH   <-  -102
+ERROR_TIMEOUT <-  -103
+
+function flashError(error)
+{
+    switch(error){
+        case ERROR_UNLOCK:  return "[Unlock]"
+        case ERROR_VOLTAGE: return "[Low voltage]"
+        case ERROR_FLASH:   return "[Flash errors]"
+        case ERROR_TIMEOUT: return "[Timeout]"
+
+        // Error is system value, return as integer code
+        default: return format("[code %d]",error)
+    }
+}
