@@ -178,7 +178,7 @@ function flash_write(sector, address, buffer)
 
         // Check if the buffer size is multiple of 64bits
         // Flash loader works with multiple of 8 bytes.
-        buffer.setTrim(8)
+        buffer.trim(8)
 
         // Check and clear all error programming flags due to a previous programming. If not, PGSERR is set.
         clear_flash_errors()

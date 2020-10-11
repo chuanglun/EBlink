@@ -199,7 +199,7 @@ function flash_write(sector, address, buffer)
         regbase = FLASH_REG_BASE_B1 // Second flash bank
 
     // Flash loader works with multiple of 32 bytes.
-    buffer.setTrim(32)
+    buffer.trim(32)
 
     try{
         // Unlock flash

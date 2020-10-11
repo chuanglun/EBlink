@@ -69,7 +69,7 @@ const MAX_FLASH_SPEED   10000  // 10MHz is max speed for direct programming (we 
 savedProbeSpeed <-0  // Our current probe speed 0= not checked, -1 = checked not changed, > 0 = original speed
 
 // Generic Flash Script errors
-//require("stmicro/flash/errors.script")
+require("stmicro/flash/errors.script")
 
 /////////////////////////////////////////////////////////////////////////////////
 //
@@ -190,8 +190,8 @@ function flash_write(sector, address, buffer)
         // Enable the program flag PG in flash_CR together with the right parallelism
         _n_throw( itrfApi.writeMem32(FLASH_CR, pgSize | FLASH_CR_PG ) )
 
-        // Make length multiple of pgWidth bits.
-        buffer.setTrim(pgWidth)
+        // Trim the buffer on the right byte lengths
+        buffer.trim(pgWidth/8)
 
         // Write the buffer with the program width which belongs to the current voltage
         _n_throw( itrfApi.writeBuf(address, buffer, pgWidth ) )
