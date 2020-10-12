@@ -54,7 +54,7 @@ const FLASH_KEY2        0xCDEF89AB
 FLASH_ERROR <- ( FLASH_SR_PGSERR | FLASH_SR_SIZERR  | FLASH_SR_PGAERR |
                  FLASH_SR_WRPERR | FLASH_SR_PROGERR | FLASH_SR_OPERR )
 
-maxFlashSpeed   <- 8000 // 8MHz is max speed (we only tested it with V2 )
+maxFlashSpeed   <- 4000 // 4MHz is max speed (we only tested it with V2 )
 savedProbeSpeed <- 0    // Our current probe speed 0= not checked, -1 = checked not changed, > 0 = original speed
 halfOfSectors   <- 0    // The half of the number of sectors of the current device
 

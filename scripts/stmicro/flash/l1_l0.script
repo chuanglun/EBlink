@@ -50,7 +50,7 @@ const PRGKEY2         0x13141516
 const OPTKEY1         0xFBEAD9C8
 const OPTKEY2         0x24252627
 
-maxFlashSpeed   <- 8000 // 8MHz is max speed for direct programming (we think)
+maxFlashSpeed   <- 4000 // 4MHz is max speed for direct programming (we think)
 savedProbeSpeed <- 0    // Our current probe speed 0= not checked, -1 = checked not changed, > 0 = original speed
 
 // Generic Flash Script errors
