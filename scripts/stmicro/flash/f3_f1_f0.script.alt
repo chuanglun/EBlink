@@ -48,9 +48,8 @@ const EXT_LOADER_SIZE  48 //bytes
 const LOADER_ADDR      0x20000000
 const SCRATCH_ADDR     0x20000030  // The area for program upload
 
-const MAX_FLASH_SPEED  10000  // 10MHz is max speed for direct programming (we think)
-
-savedProbeSpeed <-0  // Our current probe speed 0= not checked, -1 = checked not changed, > 0 = original speed
+maxFlashSpeed   <-10000 // 10MHz is max speed for direct programming (we think)
+savedProbeSpeed <-0     // Our current probe speed 0= not checked, -1 = checked not changed, > 0 = original speed
 
 // Generic Flash Script errors
 require("stmicro/flash/errors.script")
@@ -63,6 +62,14 @@ require("stmicro/flash/errors.script")
 function flash_start()
 {
     local targetApi = :: TargetAPI() // Our interface to the target class
+
+    // Override the maximum flash speed from cli
+    if (isScriptObject("FLASH_SPEED") && FLASH_SPEED>0)
+    {
+        maxFlashSpeed = FLASH_SPEED
+        printf("Flash speed set: %d KHz\n", maxFlashSpeed)
+    }
+
     try{
 
         // Be sure that the core is halted
@@ -153,10 +160,10 @@ function flash_write(sector, address, buffer)
         if( savedProbeSpeed == 0)
         {
             local probeSpeed = itrfApi.getSpeed()
-            if(probeSpeed > MAX_FLASH_SPEED )
+            if(probeSpeed > maxFlashSpeed )
             {
                 savedProbeSpeed = probeSpeed
-                _n_throw(itrfApi.setSpeed(MAX_FLASH_SPEED))
+                _n_throw(itrfApi.setSpeed(maxFlashSpeed))
             }
             else
             {
