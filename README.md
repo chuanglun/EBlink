@@ -3,10 +3,6 @@
 
 EBlink ARM Cortex-M debug tool with squirrel scripting device support
 
-Upcomming:
-- Emulated breakpoints in flash. Because we use direct flash writing w/o external bootloaders, we can support emulated breakpoints by in-place bkpt instruction icw off-target instruction emulation. Usefull for devices with a limited number of HW-breakpoints.
-- CMSIS-DAP support finalized.
-
 [ Windows installer ](https://www.embitz.org) available with windows desktop context menu's.
 
 ![alt text](https://www.embitz.org/context2.png)  
