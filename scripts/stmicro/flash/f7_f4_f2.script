@@ -7,8 +7,6 @@
 //       - options
 //
 
-require("stmicro/flash/errors.script")
-
 const FLASH_ACR     0x40023c00
 const FLASH_KEYR    0x40023c04
 const FLASH_OPTKEYR 0x40023c08

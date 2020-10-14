@@ -28,7 +28,7 @@ function flashError(error)
         case ERROR_FLASH:   return "[Flash errors]"
         case ERROR_TIMEOUT: return "[Timeout]"
 
-        case INTERFACE_WAIT: return "\nInterface probably too fast!\nTry option [-D FLASH_SPEED=<KHz speed e.g. 4000>]\n"
+        case INTERFACE_WAIT: return "\nInterface probably too fast,\ntry cli option [-D FLASH_SPEED=<KHz speed e.g. 4000>]\n"
 
         // Error is system value, return as integer code
         default: return format("[code %d]",error)
