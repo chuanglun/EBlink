@@ -8,7 +8,7 @@ EBlink ARM Cortex-M debug tool with squirrel scripting device support
 ![alt text](https://www.embitz.org/context2.png)  
 
 __Project bucket list__
-- _Flash-breakpoints_ to increase the number of allowable HW-breakpoints. Now we don't use external loaders anymore this is in reach as soon as we have a good ARM instruction emulator.
+- _Flash-breakpoints_ to increase the number of allowable HW-breakpoints. Now we don't use external loaders anymore this is in reach as soon as we have a good ARM instruction emulator. Together with the speed of e.g. STlinkV3 and small page-size devices, this will be very convenient.
 - Complete _CMIS-DAP(v2)_, this is for 40% ready
 - Implement _SWO_ and _ITM_
    
