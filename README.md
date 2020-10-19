@@ -3,7 +3,7 @@
 
 EBlink ARM Cortex-M debug tool with squirrel scripting device support
 
-[ Windows installer ](https://www.embitz.org) available with windows desktop context menu's.
+[ Windows installer ](https://www.embitz.org) available with windows shell context menu.
 
 ![alt text](https://www.embitz.org/context3.png)  
 
