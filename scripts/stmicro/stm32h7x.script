@@ -63,6 +63,7 @@ const mem_template_H7 = @@"
     <memory type=\"flash\" start=\"0x1ff20000\" length=\"32\">
         <property name=\"blocksize\">32</property>
         <property name=\"secstart\">999</property>
+        <property name=\"sectype\">virtual</property>
     </memory>
 
 </memory-map>"
