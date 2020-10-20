@@ -75,6 +75,8 @@ const FLASH_REG_BASE_B1       0x52002100
 FLASH_ERROR <- (FLASH_WRPERR | FLASH_PGSERR | FLASH_STRBERR | FLASH_INCERR | FLASH_OPERR |
                       FLASH_RDPERR | FLASH_RDSERR | FLASH_SNECCERR | FLASH_DBECCERR)
 
+const MAX_FLASH_SPEED 10000 // 10MHz is max speed for direct programming (we think)
+
 // Generic Flash Script errors
 require("stmicro/flash/errors.script")
 
@@ -112,7 +114,7 @@ function flash_start()
     // Catch the errors
     catch(e){
        if(e < ERROR_NOTIFIED)
-           eerrorf("Error: target initializing! %s\n", flashError(e) )
+           errorf("Error: target initializing! %s\n", flashError(e) )
        return ERROR_NOTIFIED
     }
 }
@@ -142,7 +144,6 @@ function flash_erase(sector, address)
 
         // 1)  Check and clear (optional) all the error flags due to previous programming/erase
         flash_get_clear_status(regbase)
-
 
         // 2) Unlock the flash bank
         flash_unlock(regbase)
@@ -190,11 +191,11 @@ function flash_write(sector, address, buffer)
 {
     local regbase = FLASH_REG_BASE_B0 // first flash bank
 
-    // If this is the virtual option sector, go to write options
+    // If this is the virtual option sector, go to options write function
     if(sector == 999)
       return option_write(buffer)
 
-    // Select the right bank
+    // Select the right flash bank
     if (address >= FLASH_BANK1_ADDRESS)
         regbase = FLASH_REG_BASE_B1 // Second flash bank
 
@@ -208,28 +209,15 @@ function flash_write(sector, address, buffer)
         // Enable the program flag PG in flash_CR and 32bits parallelism
         _n_throw( itrfApi.writeMem32(regbase+FLASH_CR, FLASH_PSIZE_32 | FLASH_PG ) )
 
-        // STlink/V2 and V2.1 are rather slow, we can write direct
-        if( itrfApi.getName() != "STlink/V3" )
-        {
-            _n_throw( itrfApi.writeBuf(address, buffer, 32) )
-        }
-        else
-        {   // STlink/V3 is too fast for direct so we will program per 256 bits
-            for(local offset = 0; offset < buffer.trimmedSize(); )
-            {
-                // 1024 bits per time
-                _n_throw( itrfApi.writeMem(address, buffer, offset, 32, 32) )
-                address += 32
-                offset  += 32
+        // Lower the probe speed
+        local probeSpeed = itrfApi.getSpeed()
+        _n_throw(itrfApi.setSpeed(MAX_FLASH_SPEED))
 
-                // This is only needed for high speed (ICP) but in case the V3 will be faster
-                // in the future, we already catch it here.
-                if( itrfApi.getSpeed() > 25000  )
-                {
-                    flash_check_busy()
-                }
-            }
-        }
+        // Write the buffer direct to flash with 32 bits access
+        _n_throw( itrfApi.writeBuf(address, buffer, 32) )
+
+        // Restore probe speed
+        _n_throw( itrfApi.setSpeed(probeSpeed) )
 
         // Check and clear (optional) all the error flags due to previous programming/erase
         _n_throw( itrfApi.readMem32(regbase + FLASH_SR) )
@@ -373,7 +361,8 @@ function option_write(buffer)
 //
 function flash_done()
 {
-    return 0
+    // Nothing to cleanup
+    return ERROR_OK
 }
 
 
@@ -479,14 +468,6 @@ function flash_unlock(regbase)
         // Read flash CR again to check FLASH_CR_LOCK if it's unlocked
         _n_throw( itrfApi.readMem32(regbase + FLASH_CR) )
         if( itrfApi.value32 & FLASH_LOCK )
-            _n_throw(ERROR_UNLOCK)
-
-        _n_throw( itrfApi.writeMem32(regbase + FLASH_OPTKEYR, OPTKEY1) )
-        _n_throw( itrfApi.writeMem32(regbase + FLASH_OPTKEYR, OPTKEY2) )
-
-        // Read flash CR again to check FLASH_CR_LOCK if it's unlocked
-        _n_throw( itrfApi.readMem32(regbase + FLASH_OPTCR) )
-        if( itrfApi.value32 & OPT_LOCK )
             _n_throw(ERROR_UNLOCK)
     }
 }
