@@ -69,6 +69,10 @@ function flash_start()
         printf("Flash speed set: %d KHz\n", maxFlashSpeed)
     }
 
+    // Check that we don't go faster than the user selected on the cli
+    if(maxFlashSpeed > itrfApi.getSpeed())
+        maxFlashSpeed = itrfApi.getSpeed()
+
     try{
 
         // Be sure that the core is halted

@@ -51,7 +51,6 @@ const OPTKEY1         0xFBEAD9C8
 const OPTKEY2         0x24252627
 
 maxFlashSpeed   <- 4000 // 4MHz is max speed for direct programming (we think)
-savedProbeSpeed <- 0    // Our current probe speed 0= not checked, -1 = checked not changed, > 0 = original speed
 
 // Generic Flash Script errors
 require("stmicro/flash/errors.script")
@@ -70,6 +69,10 @@ function flash_start()
         maxFlashSpeed = FLASH_SPEED
         printf("Flash speed set: %d KHz\n", maxFlashSpeed)
     }
+
+    // Check that we don't go faster than the user selected on the cli
+    if(maxFlashSpeed > itrfApi.getSpeed())
+        maxFlashSpeed = itrfApi.getSpeed()
 
     try{
         // Be sure that the core is halted
@@ -152,24 +155,13 @@ function flash_erase(sector, address)
 function flash_write(sector, address, buffer)
 {
     try{
-        // Adjust the probe speed to the maximum for direct write
-        if( savedProbeSpeed == 0)
-        {
-            local probeSpeed = itrfApi.getSpeed()
-            if(probeSpeed > maxFlashSpeed )
-            {
-                savedProbeSpeed = probeSpeed
-                itrfApi.setSpeed(maxFlashSpeed)
-            }
-            else
-            {
-                // We checked and don't changed the probe speed
-                savedProbeSpeed = -1
-            }
-        }
 
         // Enable the program  FPRG and PRG in FLASH_CR
         _n_throw( itrfApi.writeMem32( FLASH_BASE|FLASH_CR, FLASH_CR_FPRG |FLASH_CR_PROG ) )
+
+        // Adjust the probe speed to the maximum for direct write
+        local probeSpeed = itrfApi.getSpeed()
+        itrfApi.setSpeed(maxFlashSpeed)
 
         // Do we have to use half page writes, is defined at parent device script
         if(FLASH_HP)
@@ -188,6 +180,9 @@ function flash_write(sector, address, buffer)
                 address += 4
             }
         }
+
+        // Restore probe speed
+        itrfApi.setSpeed(probeSpeed)
 
         //  Wait until the BSY bit is reset in the FLASH_SR register
         checkBusy(FLASH_TIMEOUT)
@@ -213,12 +208,6 @@ function flash_write(sector, address, buffer)
 function flash_done()
 {
     try{
-        // Restore the original probe speed if changed
-        if(savedProbeSpeed > 0)
-            itrfApi.setSpeed(savedProbeSpeed)
-
-        savedProbeSpeed = 0 // Init for next session
-
         //  Locks the NVM by setting PELOCK in CR
         _n_throw( itrfApi.writeMem32(FLASH_BASE|FLASH_CR, FLASH_CR_PELOCK) )
 

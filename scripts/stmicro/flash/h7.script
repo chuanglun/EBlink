@@ -95,6 +95,10 @@ function flash_start()
         printf("Flash speed set: %d KHz\n", maxFlashSpeed)
     }
 
+    // Check that we don't go faster than the user selected on the cli
+    if(maxFlashSpeed > itrfApi.getSpeed())
+        maxFlashSpeed = itrfApi.getSpeed()
+
     try{
         // Be sure that the core is halted
         _n_throw( targetApi.halt() )
@@ -363,17 +367,6 @@ function option_write(buffer)
        return ERROR_NOTIFIED
     }
 }
-
-/////////////////////////////////////////////////////////////////////////////////
-//
-//  Called by EBlink if flashing is done
-//
-function flash_done()
-{
-    // Nothing to cleanup
-    return ERROR_OK
-}
-
 
 /////////////////////////////////////////////////////////////////////////////////
 //
