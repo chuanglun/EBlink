@@ -3,10 +3,14 @@
 
 EBlink ARM Cortex-M debug tool with squirrel scripting device support
 
-[ Windows installer ](https://www.embitz.org) available with windows desktop context menu's.
+[ Windows installer ](https://www.embitz.org) available with windows shell context menu.
 
-![alt text](https://www.embitz.org/context2.png)  
+![alt text](https://www.embitz.org/context3.png)  
 
+__Project bucket list__
+- _Flash-breakpoints_ to increase the number of allowable breakpoints. Now we don't use external loaders anymore this is in reach as soon as we have a good ARM instruction emulator. Together with the speed of e.g. STlinkV3 and small page-size devices, this will be very convenient.
+- Complete _CMIS-DAP(v2)_, this is for 40% ready
+- Implement _SWO_ and _ITM_
    
  ##### When to consider EBlink instead of OpenOCD:
 - if you need live variables for e.g. Embitz (OpenOCD doesn't support live variables)
