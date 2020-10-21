@@ -23,6 +23,14 @@ const mem_template = @@"
  <memory type=\"rom\" start=\"0x1ffff800\" length=\"0x10\"/>
 </memory-map>"
 
+// Debug core registers
+const DBGMCU_CR        0x40015804
+const DBGMCU_APB1_FZ   0x40015808
+const DBGMCU_APB2_FZ   0x4001580C
+
+const DBG_STOP     (1<<1)
+const DBG_STANDBY  (1<<2)
+
 /////////////////////////////////////////////////////
 //
 //  Entry point of this script called by parent script
@@ -37,6 +45,8 @@ function stm32_device(deviceId)
     local flash_size
     local page_size
     local ram_size
+
+    result = itrfApi.writeMem32(DBGMCU_CR, DBG_STANDBY  )
 
     // Get the flash size by reading the info register
     result = itrfApi.readMem32(0x1ffff7cc)

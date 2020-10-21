@@ -82,7 +82,7 @@ function flash_write(sector, address, buffer)
 
     // Write the flash content and use the auto address increment
     // of the MSC engine.
-    while( idx < buffer.byteLength )
+    while( idx < buffer.getSize() )
     {
         // Write word to MSC_DATA
         result = itrfApi.writeMem32( 0x400E0018, buffer.un32(idx) )

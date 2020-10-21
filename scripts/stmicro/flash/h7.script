@@ -75,6 +75,11 @@ const FLASH_REG_BASE_B1       0x52002100
 FLASH_ERROR <- (FLASH_WRPERR | FLASH_PGSERR | FLASH_STRBERR | FLASH_INCERR | FLASH_OPERR |
                       FLASH_RDPERR | FLASH_RDSERR | FLASH_SNECCERR | FLASH_DBECCERR)
 
+maxFlashSpeed   <- 10000 // 10MHz is max speed for direct programming (we think)
+
+// Generic Flash Script errors
+require("stmicro/flash/errors.script")
+
 /////////////////////////////////////////////////////////////////////////////////
 //
 //   Unlock the flash and preload the flash loader called by EBlink
@@ -82,6 +87,17 @@ FLASH_ERROR <- (FLASH_WRPERR | FLASH_PGSERR | FLASH_STRBERR | FLASH_INCERR | FLA
 function flash_start()
 {
     local targetApi = ::TargetAPI()
+
+    // Override the maximum flash speed from cli
+    if (isScriptObject("FLASH_SPEED") && FLASH_SPEED>0)
+    {
+        maxFlashSpeed = FLASH_SPEED
+        printf("Flash speed set: %d KHz\n", maxFlashSpeed)
+    }
+
+    // Check that we don't go faster than the user selected on the cli
+    if(maxFlashSpeed > itrfApi.getSpeed())
+        maxFlashSpeed = itrfApi.getSpeed()
 
     try{
         // Be sure that the core is halted
@@ -95,26 +111,22 @@ function flash_start()
 
           // Timeout of 1sec
             if(GetTickCount() - time > 1000)
-              _n_throw(-300)
+              _n_throw(ERROR_TIMEOUT)
 
         } while(targetApi.getState() != TARGET_HALTED )
 
         // Check voltage
         if(itrfApi.targetVoltage() < 2.7)
-            _n_throw(-301)
+            _n_throw(ERROR_VOLTAGE)
 
         return ERROR_OK
     }
 
     // Catch the errors
     catch(e){
-      if(e == -300)
-          errorf("Error: Can't stop the target\n")
-       else if(e == -301)
-            errorf("Error: Current STM32H7x flash algorithm needs at least 2.7V\nTarget voltage is %.2f V\n", itrfApi.targetVoltage())
-       else if(e < -1)
-           errorf("ERROR: \n")
-       return -1
+       if(e < ERROR_NOTIFIED)
+           errorf("Error: target initializing! %s\n", flashError(e) )
+       return ERROR_NOTIFIED
     }
 }
 
@@ -144,7 +156,6 @@ function flash_erase(sector, address)
         // 1)  Check and clear (optional) all the error flags due to previous programming/erase
         flash_get_clear_status(regbase)
 
-
         // 2) Unlock the flash bank
         flash_unlock(regbase)
 
@@ -162,12 +173,12 @@ function flash_erase(sector, address)
 
             // Timeout of 5sec
             if(GetTickCount() - time > 5000)
-              _n_throw( -2)
+              _n_throw( ERROR_TIMEOUT)
         }while ( itrfApi.value32 &  (FLASH_QW | FLASH_BSY) )
 
         // Check for errors
         if(itrfApi.value32 & FLASH_ERROR )
-          _n_throw(-2)
+          _n_throw(ERROR_FLASH)
 
         // Lock the flash again
         flash_lock(regbase)
@@ -176,9 +187,9 @@ function flash_erase(sector, address)
     }
 
     catch(e){
-       if(e < -1)
-           errorf("Error: sector %d erase failed\n", sector)
-       return -1
+       if(e < ERROR_NOTIFIED)
+           errorf("Error: sector %d erase failed! %s\n", sector, flashError(e) )
+       return ERROR_NOTIFIED
     }
 }
 
@@ -191,17 +202,16 @@ function flash_write(sector, address, buffer)
 {
     local regbase = FLASH_REG_BASE_B0 // first flash bank
 
-    // If this is the virtual option sector, go to write options
+    // If this is the virtual option sector, go to options write function
     if(sector == 999)
       return option_write(buffer)
 
-    // Select the right bank
+    // Select the right flash bank
     if (address >= FLASH_BANK1_ADDRESS)
         regbase = FLASH_REG_BASE_B1 // Second flash bank
 
     // Flash loader works with multiple of 32 bytes.
-    if(buffer.byteLength & 31)
-        buffer.byteLength = buffer.byteLength + (32 - (buffer.byteLength & 31))
+    buffer.trim(32)
 
     try{
         // Unlock flash
@@ -210,33 +220,20 @@ function flash_write(sector, address, buffer)
         // Enable the program flag PG in flash_CR and 32bits parallelism
         _n_throw( itrfApi.writeMem32(regbase+FLASH_CR, FLASH_PSIZE_32 | FLASH_PG ) )
 
-        // STlink/V2 and V2.1 are rather slow, we can write direct
-        if( itrfApi.getName() != "STlink/V3" )
-        {
-            _n_throw( itrfApi.writeBuf(address, buffer, 32) )
-        }
-        else
-        {   // STlink/V3 is too fast for direct so we will program per 256 bits
-            for(local offset = 0; offset < buffer.byteLength; )
-            {
-                // 1024 bits per time
-                _n_throw( itrfApi.writeMem(address, buffer, offset, 32, 32) )
-                address += 32
-                offset  += 32
+        // Lower the probe speed
+        local probeSpeed = itrfApi.getSpeed()
+        _n_throw(itrfApi.setSpeed(maxFlashSpeed))
 
-                // This is only needed for high speed (ICP) but in case the V3 will be faster
-                // in the future, we already catch it here.
-                if( itrfApi.getSpeed() > 25000  )
-                {
-                    flash_check_busy()
-                }
-            }
-        }
+        // Write the buffer direct to flash with 32 bits access
+        _n_throw( itrfApi.writeBuf(address, buffer, 32) )
+
+        // Restore probe speed
+        _n_throw( itrfApi.setSpeed(probeSpeed) )
 
         // Check and clear (optional) all the error flags due to previous programming/erase
         _n_throw( itrfApi.readMem32(regbase + FLASH_SR) )
         if(itrfApi.value32 & FLASH_ERROR )
-           _n_throw(-300)
+           _n_throw(ERROR_FLASH)
 
         // Disable the program flag  PG in flash_CR
         _n_throw( itrfApi.writeMem32(regbase+ FLASH_CR, 0) )
@@ -248,9 +245,9 @@ function flash_write(sector, address, buffer)
     }
 
     catch(e){
-       if(e < -1)
-           errorf("Error: sector %d writing failed\n", sector)
-       return -1
+       if(e < ERROR_NOTIFIED)
+           errorf("Error: sector %d writing failed! %s\n", sector, flashError(e) )
+       return ERROR_NOTIFIED
     }
 }
 
@@ -278,10 +275,10 @@ function option_write(buffer)
     local regbase = FLASH_REG_BASE_B0 // first flash bank
 
     // Check if the buffer is valid
-    if(buffer.byteLength != 32)
+    if(buffer.getSize() != 32)
     {
-       errorf("Error: Option program length is %d, should be 32 bytes\n", buffer.byteLength)
-       return -1
+       errorf("Error: Option program length is %d, should be 32 bytes\n", buffer.getSize())
+       return ERROR_NOTIFIED
     }
 
     printf("\n\nStart writing option bytes virtual sector 999\n")
@@ -302,7 +299,7 @@ function option_write(buffer)
             // Reread flash FLASH_OPTCR to check if we are unlocked
             _n_throw( itrfApi.readMem32(regbase + FLASH_OPTCR) )
             if( itrfApi.value32 & OPT_LOCK  )
-              _n_throw( -300)
+              _n_throw(ERROR_UNLOCK)
         }
 
         //-------------- Program the options ---------
@@ -340,20 +337,22 @@ function option_write(buffer)
 
         local time = GetTickCount();
         do{
-            CursorAnimate();
+            AnimateCursor();
 
             // Timeout of 1sec
             if(GetTickCount() - time > 1000)
-                _n_throw( -301)
+                _n_throw( ERROR_TIMEOUT)
 
             // Read the FLASH_OPTSR_CUR to get the busy flag
             _n_throw( itrfApi.readMem32(regbase + FLASH_OPTSR_CUR) )
         }while ( itrfApi.value32 &  OPT_BSY )
 
+        AnimateDone()
+
         _n_throw( itrfApi.readMem32(regbase + FLASH_OPTSR_CUR) )
 
         if(itrfApi.value32 & OPT_OPTCHANGEERR)
-            _n_throw( -302)
+            _n_throw( ERROR_FLASH)
 
         // Relock the options bytes
         _n_throw( itrfApi.writeMem32(regbase + FLASH_OPTCR, OPT_LOCK) )
@@ -363,21 +362,11 @@ function option_write(buffer)
     }
 
     catch(e){
-       if(e < -1)
-           errorf("Error: options writing failed\n")
-       return -1
+       if(e < ERROR_NOTIFIED)
+           errorf("Error: options writing failed! %s\n", flashError(e) )
+       return ERROR_NOTIFIED
     }
 }
-
-/////////////////////////////////////////////////////////////////////////////////
-//
-//  Called by EBlink if flashing is done
-//
-function flash_done()
-{
-    return 0
-}
-
 
 /////////////////////////////////////////////////////////////////////////////////
 //
@@ -434,9 +423,9 @@ function flash_erase_bank(bank, regbase)
     }
 
     catch(e){
-       if(e < -1)
-           errorf("Error: mass erase error on bank %d\n", bank)
-       return -1
+       if(e < ERROR_NOTIFIED)
+           errorf("Error: mass erase bank %d! %s\n", bank, flashError(e) )
+       return ERROR_NOTIFIED
     }
 }
 
@@ -448,7 +437,7 @@ function flash_get_clear_status(regbase)
 {
     _n_throw( itrfApi.readMem32(regbase + FLASH_SR) )
     if( itrfApi.value32 & FLASH_ERROR )
-        _n_throw(-400)
+        _n_throw(ERROR_FLASH)
 }
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -464,7 +453,7 @@ function flash_unlock(regbase)
 
         // Timeout of 1sec
         if(GetTickCount() - time > 1000)
-            _n_throw(-300)
+            _n_throw(ERROR_TIMEOUT)
     }while ( itrfApi.value32 &  FLASH_BSY )
 
     // Read flash lock status in FLASH_CR
@@ -481,15 +470,7 @@ function flash_unlock(regbase)
         // Read flash CR again to check FLASH_CR_LOCK if it's unlocked
         _n_throw( itrfApi.readMem32(regbase + FLASH_CR) )
         if( itrfApi.value32 & FLASH_LOCK )
-            _n_throw(-301)
-
-        _n_throw( itrfApi.writeMem32(regbase + FLASH_OPTKEYR, OPTKEY1) )
-        _n_throw( itrfApi.writeMem32(regbase + FLASH_OPTKEYR, OPTKEY2) )
-
-        // Read flash CR again to check FLASH_CR_LOCK if it's unlocked
-        _n_throw( itrfApi.readMem32(regbase + FLASH_OPTCR) )
-        if( itrfApi.value32 & OPT_LOCK )
-            _n_throw(-302)
+            _n_throw(ERROR_UNLOCK)
     }
 }
 
@@ -513,14 +494,16 @@ function flash_check_busy(regbase, timeout)
     //Wait until QW bit are cleared in the corresponding FLASH_SR1/2
     local time = GetTickCount()
     do{
-        CursorAnimate()
+        AnimateCursor()
 
         // Timeout of 30sec (it can take quite long
         if(GetTickCount() - time > timeout)
-            _n_throw(-300)
+            _n_throw(ERROR_TIMEOUT)
 
         _n_throw( itrfApi.readMem32(regbase + FLASH_SR) )
     }while ( itrfApi.value32 &  (FLASH_QW|FLASH_BSY) )
+
+    AnimateDone()
 }
 
 
