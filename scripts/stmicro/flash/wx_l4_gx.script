@@ -55,7 +55,6 @@ FLASH_ERROR <- ( FLASH_SR_PGSERR | FLASH_SR_SIZERR  | FLASH_SR_PGAERR |
                  FLASH_SR_WRPERR | FLASH_SR_PROGERR | FLASH_SR_OPERR )
 
 maxFlashSpeed   <- 4000 // 4MHz is max speed (we only tested it with V2 )
-savedProbeSpeed <- 0    // Our current probe speed 0= not checked, -1 = checked not changed, > 0 = original speed
 halfOfSectors   <- 0    // The half of the number of sectors of the current device
 
 // Generic Flash Script errors
@@ -166,22 +165,6 @@ function flash_write(sector, address, buffer)
 {
     try{
 
-        // Adjust the probe speed to the maximum for direct write
-        if( savedProbeSpeed == 0)
-        {
-            local probeSpeed = itrfApi.getSpeed()
-            if(probeSpeed > maxFlashSpeed )
-            {
-                savedProbeSpeed = probeSpeed
-                itrfApi.setSpeed(maxFlashSpeed)
-            }
-            else
-            {
-                // We checked and don't changed the probe speed
-                savedProbeSpeed = -1
-            }
-        }
-
         // Check if the buffer size is multiple of 64bits
         // Flash loader works with multiple of 8 bytes.
         buffer.trim(8)
@@ -192,8 +175,15 @@ function flash_write(sector, address, buffer)
         // Set the PG bit of the FLASH control register (FLASH_CR)
         _n_throw( itrfApi.writeMem32(FLASH_BASE + FLASH_CR,  FLASH_CR_PG ) )
 
+        // Adjust the probe speed to the maximum for direct write
+        local probeSpeed = itrfApi.getSpeed()
+        itrfApi.setSpeed(maxFlashSpeed)
+
         // Program the flash with 32 bit width memory access
         _n_throw( itrfApi.writeBuf(address, buffer, 32) )
+
+        // Restore probe speed
+        itrfApi.setSpeed(probeSpeed)
 
         flash_check_busy(10000)
 
@@ -221,12 +211,6 @@ function flash_write(sector, address, buffer)
 function flash_done()
 {
     try{
-        // Restore the original probe speed if changed
-        if(savedProbeSpeed > 0)
-            itrfApi.setSpeed(savedProbeSpeed)
-
-        savedProbeSpeed = 0 // Init for next session
-
         // Write the CR register to lock (LOCK)
         _n_throw( itrfApi.readMem32(FLASH_BASE + FLASH_CR) )
         _n_throw( itrfApi.writeMem32(FLASH_BASE + FLASH_CR, itrfApi.value32 | FLASH_CR_LOCK) )
@@ -322,7 +306,7 @@ function flash_erase_chip()
         // (3) Wait until the BSY bit is reset in the FLASH_SR register
         local time = GetTickCount()
         do{
-            CursorAnimate()
+            AnimateCursor()
 
             // Check for time out of 30 seconds
             if(GetTickCount() - time > 3000)
@@ -330,6 +314,8 @@ function flash_erase_chip()
 
             _n_throw( itrfApi.readMem32(FLASH_BASE + FLASH_SR) )
         }while ( itrfApi.value32 & FLASH_SR_BSY)
+
+        AnimateDone()
 
         // Lock the flash again
         _n_throw( itrfApi.writeMem32(FLASH_BASE + FLASH_CR, FLASH_CR_LOCK ) )

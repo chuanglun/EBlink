@@ -75,7 +75,7 @@ const FLASH_REG_BASE_B1       0x52002100
 FLASH_ERROR <- (FLASH_WRPERR | FLASH_PGSERR | FLASH_STRBERR | FLASH_INCERR | FLASH_OPERR |
                       FLASH_RDPERR | FLASH_RDSERR | FLASH_SNECCERR | FLASH_DBECCERR)
 
-const MAX_FLASH_SPEED 10000 // 10MHz is max speed for direct programming (we think)
+maxFlashSpeed   <- 10000 // 10MHz is max speed for direct programming (we think)
 
 // Generic Flash Script errors
 require("stmicro/flash/errors.script")
@@ -87,6 +87,13 @@ require("stmicro/flash/errors.script")
 function flash_start()
 {
     local targetApi = ::TargetAPI()
+
+    // Override the maximum flash speed from cli
+    if (isScriptObject("FLASH_SPEED") && FLASH_SPEED>0)
+    {
+        maxFlashSpeed = FLASH_SPEED
+        printf("Flash speed set: %d KHz\n", maxFlashSpeed)
+    }
 
     try{
         // Be sure that the core is halted
@@ -211,7 +218,7 @@ function flash_write(sector, address, buffer)
 
         // Lower the probe speed
         local probeSpeed = itrfApi.getSpeed()
-        _n_throw(itrfApi.setSpeed(MAX_FLASH_SPEED))
+        _n_throw(itrfApi.setSpeed(maxFlashSpeed))
 
         // Write the buffer direct to flash with 32 bits access
         _n_throw( itrfApi.writeBuf(address, buffer, 32) )
@@ -326,7 +333,7 @@ function option_write(buffer)
 
         local time = GetTickCount();
         do{
-            CursorAnimate();
+            AnimateCursor();
 
             // Timeout of 1sec
             if(GetTickCount() - time > 1000)
@@ -335,6 +342,8 @@ function option_write(buffer)
             // Read the FLASH_OPTSR_CUR to get the busy flag
             _n_throw( itrfApi.readMem32(regbase + FLASH_OPTSR_CUR) )
         }while ( itrfApi.value32 &  OPT_BSY )
+
+        AnimateDone()
 
         _n_throw( itrfApi.readMem32(regbase + FLASH_OPTSR_CUR) )
 
@@ -492,7 +501,7 @@ function flash_check_busy(regbase, timeout)
     //Wait until QW bit are cleared in the corresponding FLASH_SR1/2
     local time = GetTickCount()
     do{
-        CursorAnimate()
+        AnimateCursor()
 
         // Timeout of 30sec (it can take quite long
         if(GetTickCount() - time > timeout)
@@ -500,6 +509,8 @@ function flash_check_busy(regbase, timeout)
 
         _n_throw( itrfApi.readMem32(regbase + FLASH_SR) )
     }while ( itrfApi.value32 &  (FLASH_QW|FLASH_BSY) )
+
+    AnimateDone()
 }
 
 
