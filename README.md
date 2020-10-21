@@ -77,23 +77,33 @@ __Project bucket list__
 ==== Interfaces
 
 
-name: CMSIS-DAP - ARM debug protocol driver 
-	
-	Usage -I cmsis-dap[,options]
+name: CMSIS-DAP(v2) - ARM debug protocol driver 
 
-        <not yet implemented>
+     Usage -I cmsis-dap[,options]
+
+        dr           : Disable reset at connection (hotplug)
+        speed=nnn    : Interface speed (default max possible)
+        swd          : use SWD (default)
+        jtag         : use Jtag
+        voltage=<vcc>   : Set the target voltage, default 3.3(V) 
+        serial=<serial> : Select probe explicit with serial#
+        device=<usb_bus>:<usb_addr> : Select V2 probe explicit on bus
+
+        e.g.  -I cmsis-dap,dr,speed=3000
+	
+	<currently under construction>
 
 
 name: STlink - STmicro V2/3 interface driver 
 	
-	Usage -I stlink[,options]
+     Usage -I stlink[,options]
 
         dr           : Disable reset at connection (same as cli --hotplug)
         speed=nnn    : Interface speed (default max possible)
         swd          : use SWD (default)
         jtag         : use Jtag
         speed=<speed>: Set the interface maximum speed
-        serial=<serial> : Select probe explicit on usb serial
+        serial=<serial> : Select probe explicit with serial#
         device=<usb_bus>:<usb_addr> : Select probe explicit on bus
 
         e.g.  -I stlink,dr,speed=3000
@@ -105,7 +115,7 @@ name: cortex-m
      
      Usage -T cortex-m[,options]
 
-        nu           : Disable stack unwind at exception
+        fu=[0..2]    : Fault unwind level; 0=off, 1=forced only, 2= active break(default)
         reset[=0..2] : Reset the target, 0(default)=system,1=core,2=jtag
         halt         : Halt target
         resume       : Resume target
