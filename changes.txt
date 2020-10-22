@@ -1,3 +1,10 @@
+Changes (9-10-2020) Release 3.8
+- Moded: New flash engine with background caching
+- Moded: Script buffer API simplidied and secure
+- Moded: A lot of scripts are simplified
+- Moded: Intel HEX reading optmized
+- Fixed: script stm32f2x/f3x memory map
+
 Changes (9-10-2020) Release 3.7
 - Fixed : Bug large page size >64KB
 
