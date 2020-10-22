@@ -102,7 +102,6 @@ function flash_start()
     try{
         // Be sure that the core is halted
         _n_throw( targetApi.halt() )
-        _n_throw( targetApi.reset(0) )
 
         // Wait for halt
         local time = GetTickCount();
