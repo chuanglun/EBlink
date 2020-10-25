@@ -41,7 +41,7 @@ const DBG_STANDBY   (1<<2)
 //
 //  Entry point of this script called by parent script
 //
-//      Remark: The itrfApi is a global object from parent
+//      Remark: The intrfApi is a global object from parent
 //
 function stm32_device(deviceId)
 {
@@ -52,18 +52,18 @@ function stm32_device(deviceId)
     local page_size = 0x800 // Default page size
 
     // Enable debug clocks: DBG_STANDBY & DBG_STOP & DBG_SLEEP
-    local result = itrfApi.writeMem32(DBGMCU_CR, DBG_STANDBY | DBG_STOP | DBG_SLEEP  )
+    local result = intrfApi.writeMem32(DBGMCU_CR, DBG_STANDBY | DBG_STOP | DBG_SLEEP  )
 
     // Stop watchdog counters during halt: DBGMCU_APB1_FZ = DBG_IWDG_STOP | DBG_WWDG_STOP
-    result = itrfApi.writeMem32(DBGMCU_APB1_FZ, 0x00001800)
+    result = intrfApi.writeMem32(DBGMCU_APB1_FZ, 0x00001800)
     if(result<0) return result
 
     // Get the flash size
-    result = itrfApi.readMem32(0x1ffff7cc)
+    result = intrfApi.readMem32(0x1ffff7cc)
     if(result<0) return result
 
     // Translate from Kbytes to bytes
-    flash_size = (itrfApi.value32  & 0xffff) *1024
+    flash_size = (intrfApi.value32  & 0xffff) *1024
 
     // Set the memory map according the device ID
       printf("STmicro family : STM32F3")

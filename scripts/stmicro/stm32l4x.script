@@ -40,7 +40,7 @@ hasDualBank <- false // Can be set by upper scripts is we have dual bank support
 //
 //  Entry point of this script called by parent script
 //
-//      Remark: The itrfApi is a global object from parent
+//      Remark: The intrfApi is a global object from parent
 //
 function stm32_device(deviceId)
 {
@@ -52,19 +52,19 @@ function stm32_device(deviceId)
     local ram_size
 
     // Enable debug clocks: DBG_STANDBY & DBG_STOP & DBG_SLEEP - RM0090 Page 1676/1705
-    result = itrfApi.writeMem32(0xE0042004, 7)
+    result = intrfApi.writeMem32(0xE0042004, 7)
 
     // Stop watchdog counters during halt: DBGMCU_APB1_FZ = DBG_IWDG_STOP | DBG_WWDG_STOP
-    result = itrfApi.writeMem32(0xE0042008, 0x00001800)
+    result = intrfApi.writeMem32(0xE0042008, 0x00001800)
 
     // Get the flash size in KB
-    result = itrfApi.readMem32(0x1fff75e0)
-    flash_size = (itrfApi.value32 &0xFFFF) *1024
+    result = intrfApi.readMem32(0x1fff75e0)
+    flash_size = (intrfApi.value32 &0xFFFF) *1024
 
     // Set the memory map according the device ID
       printf("STmicro family : STM32")
       switch(deviceId) {
-        case 0x415 : // CHIPID_STM32_L47/L48            
+        case 0x415 : // CHIPID_STM32_L47/L48
         case 0x461 : // CHIPID_STM32_L49X/L4A
             printf( deviceId== 0x415 ? "L47/L48xx\n" : "L49/L4Axx\n")
             if( (flash_size == (1024*1024)) & readDualBankOption(21) )
@@ -75,20 +75,20 @@ function stm32_device(deviceId)
             page_size = 0x800
             break
 
-        case 0x435 : 
+        case 0x435 :
             printf("L43/L44xx\n")
             ram_size = 0xC000
             page_size = 0x800
-            break            
-            
+            break
+
         case 0x462 :
-            printf("L45/L46xx\n")        
+            printf("L45/L46xx\n")
             ram_size = 0xC000
             page_size = 0x800
             break
-            
+
         case 0x464 :
-            printf("L41/L42xx\n")         
+            printf("L41/L42xx\n")
             ram_size = 0xC000
             page_size = 0x800
             break
@@ -141,8 +141,8 @@ function stm32_device(deviceId)
 //
 function readDualBankOption(bit)
 {
-     itrfApi.readMem32(FLASH_BASE+0x20)
-     return (itrfApi.value32 & (1<<bit) ? true: false)
+     intrfApi.readMem32(FLASH_BASE+0x20)
+     return (intrfApi.value32 & (1<<bit) ? true: false)
 }
 
 

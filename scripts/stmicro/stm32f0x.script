@@ -35,7 +35,7 @@ const DBG_STANDBY  (1<<2)
 //
 //  Entry point of this script called by parent script
 //
-//      Remark: The itrfApi is a global object from parent
+//      Remark: The intrfApi is a global object from parent
 //
 function stm32_device(deviceId)
 {
@@ -46,11 +46,11 @@ function stm32_device(deviceId)
     local page_size
     local ram_size
 
-    result = itrfApi.writeMem32(DBGMCU_CR, DBG_STANDBY  )
+    result = intrfApi.writeMem32(DBGMCU_CR, DBG_STANDBY  )
 
     // Get the flash size by reading the info register
-    result = itrfApi.readMem32(0x1ffff7cc)
-    flash_size = itrfApi.value32 & ~3
+    result = intrfApi.readMem32(0x1ffff7cc)
+    flash_size = intrfApi.value32 & ~3
     flash_size = (flash_size & 0xffff) * 1024
 
     printf("STmicro family : STM32F0")

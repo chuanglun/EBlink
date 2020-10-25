@@ -35,7 +35,7 @@ hasDualBank <- false // Can be set by upper scripts is we have dual bank support
 //
 //  Entry point of this script called by parent script
 //
-//      Remark: The itrfApi is a global object from parent
+//      Remark: The intrfApi is a global object from parent
 //
 function stm32_device(deviceId)
 {
@@ -47,15 +47,15 @@ function stm32_device(deviceId)
     local ram_size
 
     // Enable debug clocks: DBG_STANDBY & DBG_STOP & DBG_SLEEP - RM0090 Page 1676/1705
-    result = itrfApi.writeMem32(0xE0042004, 7)
+    result = intrfApi.writeMem32(0xE0042004, 7)
 
     // Stop watchdog counters during halt
     // DBGMCU_APB1_FZR1 |= DBG_IWDG_STOP | DBG_WWDG_STOP
-    result = itrfApi.writeMem32(0xE004203C, 0x00001800)
+    result = intrfApi.writeMem32(0xE004203C, 0x00001800)
 
     // Get the flash size by reading the info register
-    result = itrfApi.readMem32(0x1FFF75E0)
-    flash_size = itrfApi.value32 & 0xFFFF
+    result = intrfApi.readMem32(0x1FFF75E0)
+    flash_size = intrfApi.value32 & 0xFFFF
     flash_size = (flash_size & 0xffff) * 1024
 
     printf("STmicro family : STM32W")
@@ -65,7 +65,7 @@ function stm32_device(deviceId)
             page_size = 0x1000
             ram_size = 0x40000
             break
-            
+
         case 0x496 :
             printf("B3x\n")
             page_size = 0x1000
@@ -73,7 +73,7 @@ function stm32_device(deviceId)
             break
 
         case 0x497 :
-            printf("LEx\n")        
+            printf("LEx\n")
             page_size = 0x800
             ram_size = 0x40000
             break

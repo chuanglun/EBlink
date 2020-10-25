@@ -96,8 +96,8 @@ function flash_start()
     }
 
     // Check that we don't go faster than the user selected on the cli
-    if(maxFlashSpeed > itrfApi.getSpeed())
-        maxFlashSpeed = itrfApi.getSpeed()
+    if(maxFlashSpeed > intrfApi.getSpeed())
+        maxFlashSpeed = intrfApi.getSpeed()
 
     try{
         // Be sure that the core is halted
@@ -115,7 +115,7 @@ function flash_start()
         } while(targetApi.getState() != TARGET_HALTED )
 
         // Check voltage
-        if(itrfApi.targetVoltage() < 2.7)
+        if(intrfApi.targetVoltage() < 2.7)
             _n_throw(ERROR_VOLTAGE)
 
         return ERROR_OK
@@ -159,24 +159,24 @@ function flash_erase(sector, address)
         flash_unlock(regbase)
 
         // Not sure: We come out of reset with HSI 64 MHz. Adapt FLASH_ACR.
-        //_n_throw( itrfApi.writeMem32(regbase, 0) )
+        //_n_throw( intrfApi.writeMem32(regbase, 0) )
 
         // (3) Set the SER bit and select the sector out of the 8 in the main memory block) you wish to erase (SNB) in the FLASH_CR register
         // (4) Set the STRT bit in the FLASH_CR register also
-        _n_throw( itrfApi.writeMem32(regbase + FLASH_CR, (bnkSector<<8) | FLASH_SER  | FLASH_PG | FLASH_START ) )
+        _n_throw( intrfApi.writeMem32(regbase + FLASH_CR, (bnkSector<<8) | FLASH_SER  | FLASH_PG | FLASH_START ) )
 
         // (5) Wait for the QW1/2 bit and BSY1/2 to be cleared in the corresponding FLASH_SR1/2 register
         local time = GetTickCount();
         do{
-            _n_throw( itrfApi.readMem32(regbase + FLASH_SR) )
+            _n_throw( intrfApi.readMem32(regbase + FLASH_SR) )
 
             // Timeout of 5sec
             if(GetTickCount() - time > 5000)
               _n_throw( ERROR_TIMEOUT)
-        }while ( itrfApi.value32 &  (FLASH_QW | FLASH_BSY) )
+        }while ( intrfApi.value32 &  (FLASH_QW | FLASH_BSY) )
 
         // Check for errors
-        if(itrfApi.value32 & FLASH_ERROR )
+        if(intrfApi.value32 & FLASH_ERROR )
           _n_throw(ERROR_FLASH)
 
         // Lock the flash again
@@ -217,25 +217,25 @@ function flash_write(sector, address, buffer)
         flash_unlock(regbase)
 
         // Enable the program flag PG in flash_CR and 32bits parallelism
-        _n_throw( itrfApi.writeMem32(regbase+FLASH_CR, FLASH_PSIZE_32 | FLASH_PG ) )
+        _n_throw( intrfApi.writeMem32(regbase+FLASH_CR, FLASH_PSIZE_32 | FLASH_PG ) )
 
         // Lower the probe speed
-        local probeSpeed = itrfApi.getSpeed()
-        _n_throw(itrfApi.setSpeed(maxFlashSpeed))
+        local probeSpeed = intrfApi.getSpeed()
+        _n_throw(intrfApi.setSpeed(maxFlashSpeed))
 
         // Write the buffer direct to flash with 32 bits access
-        _n_throw( itrfApi.writeBuf(address, buffer, 32) )
+        _n_throw( intrfApi.writeBuf(address, buffer, 32) )
 
         // Restore probe speed
-        _n_throw( itrfApi.setSpeed(probeSpeed) )
+        _n_throw( intrfApi.setSpeed(probeSpeed) )
 
         // Check and clear (optional) all the error flags due to previous programming/erase
-        _n_throw( itrfApi.readMem32(regbase + FLASH_SR) )
-        if(itrfApi.value32 & FLASH_ERROR )
+        _n_throw( intrfApi.readMem32(regbase + FLASH_SR) )
+        if(intrfApi.value32 & FLASH_ERROR )
            _n_throw(ERROR_FLASH)
 
         // Disable the program flag  PG in flash_CR
-        _n_throw( itrfApi.writeMem32(regbase+ FLASH_CR, 0) )
+        _n_throw( intrfApi.writeMem32(regbase+ FLASH_CR, 0) )
 
         // Lock the flash again
         flash_lock(regbase)
@@ -285,54 +285,54 @@ function option_write(buffer)
     try{
         //------------- Unlock options  --------------
         // Read flash FLASH_OPTCR
-        _n_throw( itrfApi.readMem32(regbase + FLASH_OPTCR) )
+        _n_throw( intrfApi.readMem32(regbase + FLASH_OPTCR) )
 
         // Check if options are locked by the FLASH_OPTCR_OPTLOCK flag
-        if( itrfApi.value32 & OPT_LOCK  )
+        if( intrfApi.value32 & OPT_LOCK  )
         {
             // Write FLASH_OPTKEYR to unlock
-            _n_throw( itrfApi.writeMem32(regbase + FLASH_OPTKEYR, OPTKEY1) )
-            _n_throw( itrfApi.writeMem32(regbase + FLASH_OPTKEYR, OPTKEY2) )
+            _n_throw( intrfApi.writeMem32(regbase + FLASH_OPTKEYR, OPTKEY1) )
+            _n_throw( intrfApi.writeMem32(regbase + FLASH_OPTKEYR, OPTKEY2) )
 
 
             // Reread flash FLASH_OPTCR to check if we are unlocked
-            _n_throw( itrfApi.readMem32(regbase + FLASH_OPTCR) )
-            if( itrfApi.value32 & OPT_LOCK  )
+            _n_throw( intrfApi.readMem32(regbase + FLASH_OPTCR) )
+            if( intrfApi.value32 & OPT_LOCK  )
               _n_throw(ERROR_UNLOCK)
         }
 
         //-------------- Program the options ---------
         printf("FLASH_OPTSR  : 0x%x\n", buffer.un32(0))
-        _n_throw( itrfApi.writeMem32(regbase + 0x20, buffer.un32(0) ) )
+        _n_throw( intrfApi.writeMem32(regbase + 0x20, buffer.un32(0) ) )
 
         printf("FLASH_BOOT   : 0x%x\n", buffer.un32(4))
-        _n_throw( itrfApi.writeMem32(regbase + 0x44, buffer.un32(4) ) )
+        _n_throw( intrfApi.writeMem32(regbase + 0x44, buffer.un32(4) ) )
 
         printf("FLASH_PRAR_x1: 0x%x\n", buffer.un32(8))
-        _n_throw( itrfApi.writeMem32(regbase + 0x2C, buffer.un32(8) ) )
+        _n_throw( intrfApi.writeMem32(regbase + 0x2C, buffer.un32(8) ) )
 
         printf("FLASH_PRAR_x2: 0x%x\n", buffer.un32(12))
-        _n_throw( itrfApi.writeMem32(regbase + 0x12C, buffer.un32(12) ) )
+        _n_throw( intrfApi.writeMem32(regbase + 0x12C, buffer.un32(12) ) )
 
         printf("FLASH_SCAR_x1: 0x%x\n", buffer.un32(16))
-        _n_throw( itrfApi.writeMem32(regbase + 0x34, buffer.un32(16) ) )
+        _n_throw( intrfApi.writeMem32(regbase + 0x34, buffer.un32(16) ) )
 
         printf("FLASH_SCAR_x2: 0x%x\n", buffer.un32(20))
-        _n_throw( itrfApi.writeMem32(regbase + 0x134, buffer.un32(20) ) )
+        _n_throw( intrfApi.writeMem32(regbase + 0x134, buffer.un32(20) ) )
 
         printf("FLASH_WPSN_x1: 0x%x\n", buffer.un32(24))
-        _n_throw( itrfApi.writeMem32(regbase + 0x3C, buffer.un32(24) ) )
+        _n_throw( intrfApi.writeMem32(regbase + 0x3C, buffer.un32(24) ) )
 
         printf("FLASH_WPSN_x2: 0x%x\n", buffer.un32(28))
-        _n_throw( itrfApi.writeMem32(regbase + 0x13C, buffer.un32(28) ) )
+        _n_throw( intrfApi.writeMem32(regbase + 0x13C, buffer.un32(28) ) )
 
         //------------- Commit options  --------------
 
         // Remove OPT error flag in FLASH_OPTCCR before programming
-        _n_throw( itrfApi.writeMem32(regbase + FLASH_OPTCCR, OPT_OPTCHANGEERR) )
+        _n_throw( intrfApi.writeMem32(regbase + FLASH_OPTCCR, OPT_OPTCHANGEERR) )
 
         // Set the FLASH_OPTCR_OPTSTART in the FLASH_OPTCR
-        _n_throw( itrfApi.writeMem32(regbase + FLASH_OPTCR, OPT_START) )
+        _n_throw( intrfApi.writeMem32(regbase + FLASH_OPTCR, OPT_START) )
 
         local time = GetTickCount();
         do{
@@ -343,18 +343,18 @@ function option_write(buffer)
                 _n_throw( ERROR_TIMEOUT)
 
             // Read the FLASH_OPTSR_CUR to get the busy flag
-            _n_throw( itrfApi.readMem32(regbase + FLASH_OPTSR_CUR) )
-        }while ( itrfApi.value32 &  OPT_BSY )
+            _n_throw( intrfApi.readMem32(regbase + FLASH_OPTSR_CUR) )
+        }while ( intrfApi.value32 &  OPT_BSY )
 
         AnimateDone()
 
-        _n_throw( itrfApi.readMem32(regbase + FLASH_OPTSR_CUR) )
+        _n_throw( intrfApi.readMem32(regbase + FLASH_OPTSR_CUR) )
 
-        if(itrfApi.value32 & OPT_OPTCHANGEERR)
+        if(intrfApi.value32 & OPT_OPTCHANGEERR)
             _n_throw( ERROR_FLASH)
 
         // Relock the options bytes
-        _n_throw( itrfApi.writeMem32(regbase + FLASH_OPTCR, OPT_LOCK) )
+        _n_throw( intrfApi.writeMem32(regbase + FLASH_OPTCR, OPT_LOCK) )
 
         printf("Options bytes ready\n\n")
         return ERROR_OK
@@ -410,7 +410,7 @@ function flash_erase_bank(bank, regbase)
         flash_unlock(regbase)
 
         //  3. BER1 and  START1 to launch bank erase
-        _n_throw( itrfApi.writeMem32(regbase + FLASH_CR,  FLASH_BER | FLASH_START  | FLASH_PG ) )
+        _n_throw( intrfApi.writeMem32(regbase + FLASH_CR,  FLASH_BER | FLASH_START  | FLASH_PG ) )
 
         // 4. Then wait until QW bit are cleared in the corresponding FLASH_SR1/2
         flash_check_busy(regbase, 30000) // 30 seconds timeout
@@ -434,8 +434,8 @@ function flash_erase_bank(bank, regbase)
 //
 function flash_get_clear_status(regbase)
 {
-    _n_throw( itrfApi.readMem32(regbase + FLASH_SR) )
-    if( itrfApi.value32 & FLASH_ERROR )
+    _n_throw( intrfApi.readMem32(regbase + FLASH_SR) )
+    if( intrfApi.value32 & FLASH_ERROR )
         _n_throw(ERROR_FLASH)
 }
 
@@ -448,27 +448,27 @@ function flash_unlock(regbase)
     // Wait for flash not busy
     local time = GetTickCount();
     do{
-        _n_throw( itrfApi.readMem32(regbase + FLASH_SR) )
+        _n_throw( intrfApi.readMem32(regbase + FLASH_SR) )
 
         // Timeout of 1sec
         if(GetTickCount() - time > 1000)
             _n_throw(ERROR_TIMEOUT)
-    }while ( itrfApi.value32 &  FLASH_BSY )
+    }while ( intrfApi.value32 &  FLASH_BSY )
 
     // Read flash lock status in FLASH_CR
-    _n_throw( itrfApi.readMem32(regbase + FLASH_CR) )
+    _n_throw( intrfApi.readMem32(regbase + FLASH_CR) )
 
     // Check if it's locked by the FLASH_CR_LOCK flag
-    if( itrfApi.value32 & FLASH_LOCK )
+    if( intrfApi.value32 & FLASH_LOCK )
     {
         // Write flash KEYR
-        _n_throw( itrfApi.writeMem32(regbase + FLASH_KEYR, KEY1) )
-        _n_throw( itrfApi.writeMem32(regbase + FLASH_KEYR, KEY2) )
+        _n_throw( intrfApi.writeMem32(regbase + FLASH_KEYR, KEY1) )
+        _n_throw( intrfApi.writeMem32(regbase + FLASH_KEYR, KEY2) )
 
 
         // Read flash CR again to check FLASH_CR_LOCK if it's unlocked
-        _n_throw( itrfApi.readMem32(regbase + FLASH_CR) )
-        if( itrfApi.value32 & FLASH_LOCK )
+        _n_throw( intrfApi.readMem32(regbase + FLASH_CR) )
+        if( intrfApi.value32 & FLASH_LOCK )
             _n_throw(ERROR_UNLOCK)
     }
 }
@@ -479,8 +479,8 @@ function flash_unlock(regbase)
 //
 function flash_lock(regbase)
 {
-    _n_throw( itrfApi.writeMem32(regbase + FLASH_CR, FLASH_LOCK)  )
-    _n_throw( itrfApi.writeMem32(regbase + FLASH_OPTCR, OPT_LOCK) )
+    _n_throw( intrfApi.writeMem32(regbase + FLASH_CR, FLASH_LOCK)  )
+    _n_throw( intrfApi.writeMem32(regbase + FLASH_OPTCR, OPT_LOCK) )
 }
 
 
@@ -499,8 +499,8 @@ function flash_check_busy(regbase, timeout)
         if(GetTickCount() - time > timeout)
             _n_throw(ERROR_TIMEOUT)
 
-        _n_throw( itrfApi.readMem32(regbase + FLASH_SR) )
-    }while ( itrfApi.value32 &  (FLASH_QW|FLASH_BSY) )
+        _n_throw( intrfApi.readMem32(regbase + FLASH_SR) )
+    }while ( intrfApi.value32 &  (FLASH_QW|FLASH_BSY) )
 
     AnimateDone()
 }

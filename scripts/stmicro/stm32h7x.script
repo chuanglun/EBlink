@@ -92,7 +92,7 @@ const D3DBGCKEN     (1 << 22)
 //
 //  Entry point of this script called by parent script
 //
-//      Remark: The itrfApi is a global object from parent
+//      Remark: The intrfApi is a global object from parent
 //
 function stm32_device(deviceId)
 {
@@ -106,31 +106,31 @@ function stm32_device(deviceId)
     local flash_1bank
 
     // Enable debug clocks: DBG_STANDBY & DBG_STOP & DBG_SLEEP - RM0090 Page 1676/1705
-    itrfApi.readMem32(DBGMCU_CR)
-    result = itrfApi.writeMem32(DBGMCU_CR, itrfApi.value32 | DBGSLEEP_D1 | D1DBGCKEN)
+    intrfApi.readMem32(DBGMCU_CR)
+    result = intrfApi.writeMem32(DBGMCU_CR, intrfApi.value32 | DBGSLEEP_D1 | D1DBGCKEN)
 
     // Stop watchdog counters during halt: DBGMCU_APB3FZ2 |= WWDG1
-    itrfApi.readMem32(0xE00E1038)
-    result = itrfApi.writeMem32(0xE00E1038, itrfApi.value32 | 0x40)
+    intrfApi.readMem32(0xE00E1038)
+    result = intrfApi.writeMem32(0xE00E1038, intrfApi.value32 | 0x40)
 
     // Stop watchdog counters during halt: DBGMCU_APB1LFZ2 |= WWDG2
-    itrfApi.readMem32(0xE00E1040)
-    result = itrfApi.writeMem32(0xE00E1040, itrfApi.value32 | 0x800)
+    intrfApi.readMem32(0xE00E1040)
+    result = intrfApi.writeMem32(0xE00E1040, intrfApi.value32 | 0x800)
 
     // Stop watchdog counters during halt: DBGMCU_APB4FZ2 |= WDGLSD1 | WDGLSD2
-    itrfApi.readMem32(0xE00E1058)
-    result = itrfApi.writeMem32(0xE00E1058, itrfApi.value32 | 0xC0000)
+    intrfApi.readMem32(0xE00E1058)
+    result = intrfApi.writeMem32(0xE00E1058, intrfApi.value32 | 0xC0000)
 
     // If IWDG runs as HARDWARE watchdog (44.3.4) erase
     // will be aborted by the Watchdog and erase fails!
     // Setting IWDG_KR to 0xaaaa does not seem to help!*/
-    result = itrfApi.readMem32(0x52002020)
-    if( !(itrfApi.value32 & (1<<4) ) )
+    result = intrfApi.readMem32(0x52002020)
+    if( !(intrfApi.value32 & (1<<4) ) )
         printf("Hardware IWDG running. Expect failure. Set IWDG1_SW!\n")
 
     // Get the flash size by reading the info register
-    result = itrfApi.readMem32(0x1ff1e880)
-    flash_size = (itrfApi.value32 & 0xffff) * 1024
+    result = intrfApi.readMem32(0x1ff1e880)
+    flash_size = (intrfApi.value32 & 0xffff) * 1024
 
     printf("STmicro family : STM32H")
     switch(deviceId) {

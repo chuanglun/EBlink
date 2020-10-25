@@ -27,7 +27,7 @@ const mem_template = @@"
 //
 //  Entry point of this script called by parent script
 //
-//      Remark: The itrfApi is a global object from parent
+//      Remark: The intrfApi is a global object from parent
 //
 function stm32_device(deviceId)
 {
@@ -40,8 +40,8 @@ function stm32_device(deviceId)
 
 
     // Get the flash size by reading the info register
-    result = itrfApi.readMem32(0x1ffff7e0)
-    flash_size = itrfApi.value32 & 0xFFFF
+    result = intrfApi.readMem32(0x1ffff7e0)
+    flash_size = intrfApi.value32 & 0xFFFF
     flash_size = (flash_size & 0xffff) * 1024
 
     printf("STmicro family : STM32F")
