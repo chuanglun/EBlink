@@ -231,11 +231,15 @@ function checkBusy(timeout)
     // Wait until the BSY bit is reset in the FLASH_SR register
     local time = GetTickCount()
     do{
+        AnimateCursor()
+
         if(GetTickCount() - time > timeout)
             _n_throw(ERROR_TIMEOUT)
 
         _n_throw( intrfApi.readMem32(FLASH_BASE|FLASH_SR) )
     }while ( intrfApi.value32 & FLASH_SR_BSY )
+
+    AnimateDone()
 
     // Check for errors
     if( intrfApi.value32 & (FLASH_SR_NOTZERO | FLASH_SR_SIZERR | FLASH_SR_PGAERR |  FLASH_SR_WRPERR) )
