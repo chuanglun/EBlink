@@ -1,7 +1,7 @@
 # Cortex-M GDB server, flash tool e.g. STlink V2 & V3 support
 ## for Win32, Linux_x86_64 and Raspberry
 
-__Warning: Stop updating your stlink/v2 firmware if you want to keep using it for non-Stmicro mcu's.__
+_Warning: Stop updating your stlink/v2 firmware if you want to keep using it for non-STmicro mcu's._
 
 EBlink ARM Cortex-M debug tool with squirrel scripting device support
 
