@@ -3,7 +3,7 @@
 //                   stm32L1x stm32L0x
 //
 
-// Needed global script input: FLASH_BASE and FLASH_HP
+// Needed global script input: FLASH_BASE 
 
 const FLASH_TIMEOUT   2000 // Generic 2sec flash timeout
 
@@ -163,23 +163,11 @@ function flash_write(sector, address, buffer)
         local probeSpeed = intrfApi.getSpeed()
         intrfApi.setSpeed(maxFlashSpeed)
 
-        // Do we have to use half page writes, is defined at parent device script
-        if(FLASH_HP)
-        {
-            // Write halfpages, the buffer size is always the same as sector size (no sector trim)
-            local halfPageSize = buffer.getSize()/2
-            _n_throw( intrfApi.writeMem(address, buffer, 0, halfPageSize, 32 ) )
-            checkBusy(FLASH_TIMEOUT)
-            _n_throw( intrfApi.writeMem(address+halfPageSize, buffer, halfPageSize, halfPageSize, 32 ) )
-        }
-        else
-        {
-            for(local count = 0; count < buffer.getSize(); count += 4)
-            {
-                _n_throw( intrfApi.writeMem32(address, buffer.un32(count) ) )
-                address += 4
-            }
-        }
+        // Write halfpages, the buffer size is always the same as sector size (no sector trim)
+        local halfPageSize = buffer.getSize()/2
+        _n_throw( intrfApi.writeMem(address, buffer, 0, halfPageSize, 32 ) )
+        checkBusy(FLASH_TIMEOUT)
+        _n_throw( intrfApi.writeMem(address+halfPageSize, buffer, halfPageSize, halfPageSize, 32 ) )
 
         // Restore probe speed
         intrfApi.setSpeed(probeSpeed)

@@ -24,7 +24,6 @@ const mem_template = @@"
 
 // The flash parameters
 const FLASH_BASE 0x40023C00
-const FLASH_HP   false
 
 /////////////////////////////////////////////////////
 //
