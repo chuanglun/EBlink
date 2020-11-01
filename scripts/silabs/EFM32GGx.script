@@ -61,13 +61,13 @@ function flash_start()
 
         return ERROR_OK
     }
-    
+
     // Catch all the sector write errors
     catch(e){
        if(e < ERROR_NOTIFIED)
            errorf("Error unlocking flash! %s\n", flashError(e) )
        return ERROR_NOTIFIED
-    }    
+    }
 }
 
 
@@ -76,7 +76,7 @@ function flash_start()
 //   Erase sequence of one sector
 //
 function flash_erase(sector, address)
-{    
+{
     try{
         //MSC->ADDRB = address
         _n_throw( intrfApi.writeMem32(MSC_ADDRB, address))
@@ -92,7 +92,7 @@ function flash_erase(sector, address)
         do{
             if(GetTickCount() - time > 2000)
                 _n_throw(ERROR_TIMEOUT)
-            
+
             _n_throw( intrfApi.readMem32(MSC_STATUS))
         }while (intrfApi.value32 &  0x01 )
 
@@ -104,7 +104,7 @@ function flash_erase(sector, address)
        if(e < ERROR_NOTIFIED)
            errorf("ERROR: erasing sector %d failed! %s\n", sector, flashError(e) )
        return ERROR_NOTIFIED
-    }    
+    }
 }
 
 
@@ -121,7 +121,7 @@ function flash_write(sector, address, buffer)
         do{
             if(GetTickCount() - time > 2000)
                 _n_throw(ERROR_TIMEOUT)
-            
+
             _n_throw( intrfApi.readMem32(MSC_STATUS) )
         }while (intrfApi.value32 &  0x01 )
 
@@ -142,19 +142,19 @@ function flash_write(sector, address, buffer)
             // Initiate write with auto increment, 1 to WRITETRIG in MSC_WRITECMD
             _n_throw( intrfApi.writeMem32(MSC_WRITECMD, 0x10) )
             idx += 4
-        }   
+        }
 
         // End writing  MSC->WRITECMD = MSC_WRITECMD_WRITEEND
         _n_throw( intrfApi.writeMem32(MSC_WRITECMD, 0x04) )
         return ERROR_OK
     }
-    
+
     // Catch all the sector write errors
     catch(e){
        if(e < ERROR_NOTIFIED)
            errorf("ERROR: writing sector %d failed! %s\n", sector, flashError(e) )
        return ERROR_NOTIFIED
-    }    
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -169,7 +169,7 @@ function flash_done()
         do{
             if(GetTickCount() - time > 2000)
                 _n_throw(ERROR_TIMEOUT)
-            
+
             _n_throw( intrfApi.readMem32(MSC_STATUS) )
         }while (intrfApi.value32 &  0x01 )
 
@@ -182,11 +182,11 @@ function flash_done()
 
         return ERROR_OK
     }
-    
+
     // Catch all the sector write errors
     catch(e){
        return e
-    }    
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -230,7 +230,7 @@ function flash_erase_chip()
             do{
                 if(GetTickCount() - time > 2000)
                     _n_throw(ERROR_TIMEOUT)
-        
+
                 _n_throw( intrfApi.readMem32(MSC_STATUS))
             }while ( intrfApi.value32 &  0x01 )
         }
@@ -242,11 +242,11 @@ function flash_erase_chip()
         printf("Flash: -- chip erased --\n")
         return ERROR_OK
     }
-    
+
     // Catch all the sector write errors
     catch(e){
        if(e < ERROR_NOTIFIED)
            errorf("ERROR: Chip erasing\n")
        return ERROR_NOTIFIED
-    }    
+    }
 }
