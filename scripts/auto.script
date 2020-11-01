@@ -4,8 +4,7 @@
 //  connected cortex-m vendor.
 //
 //  All the called vendor specific scripts don't depend on this
-//  script (so we have some redundant code by purpose) and can also
-//  be called directly to skip vendor detection.
+//  script and can also be called directly to skip vendor detection.
 //
 
 /////////////////////////////////////////////////////
@@ -33,7 +32,7 @@ function main()
         {
             // Load the vendor script and go from there
             require("stm32-auto.script")
-            return main();
+            return set_target( probe.value32)
         }
     }
 
@@ -45,7 +44,7 @@ function main()
         {
             // Load the vendor script and go from there
             require("silabs-auto.script")
-            return main();
+            return set_target(probe.value32)
         }
     }
 

@@ -20,23 +20,8 @@ intrfApi <- InterfAPI()  // Global so that all included script files also have a
 //
 function main()
 {
-    local targetApi = :: TargetAPI() // Needed for resetting
-    local result
-
-    // Check if the right script API is supported
-    if( VERSION < 3.8)
-    {
-       errorf("Error:\n\nIncompatiable EBlink version %.1f\n\tPlease update\n", VERSION)
-       return -1
-    }
-
-    // If an IDE is used without hotplug capabilities then you could
-    // uncomment the next line to force a reset.
-    // Allowable  resets: ( SYSTEM_RESET, CORE_RESET, JTAG_RESET or USER_RESET)
-    //targetApi.reset(SYSTEM_RESET)
-
     // Default device ID register
-    result = intrfApi.readMem32(0xE0042000)
+    local result = intrfApi.readMem32(0xE0042000)
 
     //Otherwise.. try Corex M0 DBGMCU_IDCODE register address
     if( (result >=0) && (intrfApi.value32 == 0) )
@@ -58,7 +43,7 @@ function main()
     }
 
     // We have valid device ID which will be used to load the right scripts
-    return set_target( intrfApi.value32 & 0xfff )
+    return set_target( intrfApi.value32)
 }
 
 
@@ -68,6 +53,14 @@ function main()
 //
 function set_target(deviceId)
 {
+    // Check if the right script API is supported
+    if( VERSION < 3.8)
+    {
+       errorf("Error:\n\nIncompatiable EBlink version %.1f\n\tPlease update\n", VERSION)
+       return ERROR_NOTIFIED
+    }
+
+    deviceId = deviceId & 0xfff // Filter device ID part
     noticef("STmicro device : 0x%X\n", deviceId)
 
     switch(deviceId)

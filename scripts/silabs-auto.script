@@ -42,7 +42,6 @@ flashSize <- 0           // Global flash size, is also used for mass erase
 //
 function main()
 {
-    local devApi = ::DeviceAPI() // We only use the device class wrapper in this function
     local result
 
     // Check if the right script API is supported
@@ -50,11 +49,31 @@ function main()
     {
        errorf("Error:\nIncompatiable EBlink version %.1f\nPlease update EBlink\n", VERSION)
        return -1
-    }
+    }      
 
+    // Get the family ID and part number
+    result = intrfApi.readMem32(0x0FE081FC)
+    if(  (result < 0 ) || (intrfApi.value32 == 0) )
+    {
+        errorf("Error: can't access target device!\n")
+        return -1  // We have already throw an error so use -1 (otherwise < -1)
+    }
+    
+    return set_target(intrfApi.value32)
+}
+
+/////////////////////////////////////////////////////
+//
+//
+//
+function set_target(deviceId)
+{
+    local devApi = ::DeviceAPI() // We only use the device class wrapper in this function
+    local result
+    
     // Isolate the family ID and part number from the 32 bits register value
-    local famId     = (intrfApi.value32 >> 16) & 0xFF
-    local partValue = intrfApi.value32 & 0xFFFF
+    local famId     = (deviceId >> 16) & 0xFF
+    local partValue = deviceId & 0xFFFF
 
     // Now that we have the family ID, parse it and set the right target type
     // and include the script file with the right flashing routines
