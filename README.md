@@ -6,7 +6,8 @@ _Warning: Stop updating your stlink/v2 firmware if you want to keep using it for
 
 EBlink ARM Cortex-M debug tool with squirrel scripting device support
 
-[ Windows installer ](https://www.embitz.org) available with windows shell context menu.
+[ Windows installer ](https://www.embitz.org) available with windows shell context menu.  
+The installer set default script to "auto"(.script) so that all supported vendors are automaticlly detected (currently Silabs and STmicro).
 
 ![alt text](https://www.embitz.org/context3.png)  
 
