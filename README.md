@@ -1,9 +1,10 @@
 # Cortex-M tool e.g. STlink V2 & V3 support
 ## for Win32, Linux_x86_64 and Raspberry
-## Auto detect Silabs and STmicro MCU's
+## Already auto detects Silabs and STmicro MCU's
 
-_Warning: Stop updating your stlink/v2 firmware if you want to keep using it for non-STmicro mcu's.  
-          Firmware V2.J34.S7 is confirmed to work with Silabs. You can check firmware version with the EBlink option -v5._
+_Warning:  
+Stop updating your stlink/v2 firmware if you want to keep using it for non-STmicro mcu's.  
+Firmware V2.J34.S7 is confirmed to work with Silabs. You can check firmware version with the EBlink option -v5._
 
 EBlink ARM Cortex-M debug tool with squirrel scripting device support
 
