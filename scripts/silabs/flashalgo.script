@@ -1,40 +1,19 @@
 /////////////////////////////////////////////////////
 //
-//     The EFM32GGx flashing scripts according
-//     Silabs reference manual
+//      Generic Silabs flash routine
+//     According Silabs reference manual
+//
+//  Device specific defines mscBase and mscLockOff needed from parent script
 //
 
-/*
-    The offset register address is relative to the registers base address (0x400C0000).
 
-Offset Name Type Description
-0x000 MSC_CTRL RW Memory System Control Register
-0x004 MSC_READCTRL RW Read Control Register
-0x008 MSC_WRITECTRL RW Write Control Register
-0x00C MSC_WRITECMD W1 Write Command Register
-0x010 MSC_ADDRB RW Page Erase/Write Address Buffer
-0x018 MSC_WDATA RW Write Data Register
-0x01C MSC_STATUS R Status Register
-0x02C MSC_IF R Interrupt Flag Register
-0x030 MSC_IFS W1 Interrupt Flag Set Register
-0x034 MSC_IFC W1 Interrupt Flag Clear Register
-0x038 MSC_IEN RW Interrupt Enable Register
-0x03C MSC_LOCK RW Configuration Lock Register
-0x040 MSC_CMD W1 Command Register
-0x044 MSC_CACHEHITS R Cache Hits Performance Counter
-0x048 MSC_CACHEMISSES R Cache Misses Performance Counter
-0x050 MSC_TIMEBASE RW Flash Write and Erase Timebase
-0x054 MSC_MASSLOCK RW Mass Erase Lock Register
-*/
-
-
-const MSC_WRITECTRL 0x400C0008
-const MSC_WRITECMD  0x400C000C
-const MSC_ADDRB     0x400C0010
-const MSC_WDATA     0x400C0018
-const MSC_STATUS    0x400C001C
-const MSC_LOCK      0x400C003C
-const MSC_MASSLOCK  0x400C0054
+// Device generic
+const MSC_WRITECTRL 0x08
+const MSC_WRITECMD  0x0C
+const MSC_ADDRB     0x10
+const MSC_WDATA     0x18
+const MSC_STATUS    0x1C
+const MSC_MASSLOCK  0x54
 
 
 const MSC_UNLOCK_KEY  0x1B71
@@ -53,21 +32,21 @@ function flash_start()
         _n_throw( targetApi.halt() )
 
         // Unlock MSC
-        _n_throw( intrfApi.writeMem32(MSC_LOCK, MSC_UNLOCK_KEY) )
+        _n_throw( intrfApi.writeMem32(mscBase|mscLockOff, MSC_UNLOCK_KEY) )
 
         // Enable WREN in  MSC_WRITECTRL
-        _n_throw( intrfApi.readMem32(MSC_WRITECTRL) )
-        _n_throw( intrfApi.writeMem32(MSC_WRITECTRL, intrfApi.value32 | 0x01 ) )
+        _n_throw( intrfApi.readMem32(mscBase|MSC_WRITECTRL) )
+        _n_throw( intrfApi.writeMem32(mscBase|MSC_WRITECTRL, intrfApi.value32 | 0x01 ) )
 
         return ERROR_OK
     }
-
+    
     // Catch all the sector write errors
     catch(e){
        if(e < ERROR_NOTIFIED)
            errorf("Error unlocking flash! %s\n", flashError(e) )
        return ERROR_NOTIFIED
-    }
+    }    
 }
 
 
@@ -76,24 +55,24 @@ function flash_start()
 //   Erase sequence of one sector
 //
 function flash_erase(sector, address)
-{
+{    
     try{
         //MSC->ADDRB = address
-        _n_throw( intrfApi.writeMem32(MSC_ADDRB, address))
+        _n_throw( intrfApi.writeMem32(mscBase|MSC_ADDRB, address))
 
         // MSC->WRITECMD = MSC_WRITECMD_LADDRIM
-        _n_throw( intrfApi.writeMem32(MSC_WRITECMD, 0x01))
+        _n_throw( intrfApi.writeMem32(mscBase|MSC_WRITECMD, 0x01))
 
         //MSC->WRITECMD = MSC_WRITECMD_ERASEPAGE
-        _n_throw( intrfApi.writeMem32(MSC_WRITECMD, 0x02))
+        _n_throw( intrfApi.writeMem32(mscBase|MSC_WRITECMD, 0x02))
 
         //while ( MSC->STATUS & MSC_STATUS_BUSY )
         local time = GetTickCount()
         do{
             if(GetTickCount() - time > 2000)
                 _n_throw(ERROR_TIMEOUT)
-
-            _n_throw( intrfApi.readMem32(MSC_STATUS))
+            
+            _n_throw( intrfApi.readMem32(mscBase|MSC_STATUS))
         }while (intrfApi.value32 &  0x01 )
 
         return ERROR_OK
@@ -104,7 +83,7 @@ function flash_erase(sector, address)
        if(e < ERROR_NOTIFIED)
            errorf("ERROR: erasing sector %d failed! %s\n", sector, flashError(e) )
        return ERROR_NOTIFIED
-    }
+    }    
 }
 
 
@@ -121,15 +100,15 @@ function flash_write(sector, address, buffer)
         do{
             if(GetTickCount() - time > 2000)
                 _n_throw(ERROR_TIMEOUT)
-
-            _n_throw( intrfApi.readMem32(MSC_STATUS) )
+            
+            _n_throw( intrfApi.readMem32(mscBase|MSC_STATUS) )
         }while (intrfApi.value32 &  0x01 )
 
         // Write the destination address in MSC_ADDRB
-        _n_throw( intrfApi.writeMem32(MSC_ADDRB, address) )
+        _n_throw( intrfApi.writeMem32(mscBase|MSC_ADDRB, address) )
 
         // MSC->WRITECMD = MSC_WRITECMD_LADDRIM
-        _n_throw( intrfApi.writeMem32(MSC_WRITECMD, 0x01) )
+        _n_throw( intrfApi.writeMem32(mscBase|MSC_WRITECMD, 0x01) )
 
         // Write the flash content and use the auto address increment
         // of the MSC engine.
@@ -137,24 +116,24 @@ function flash_write(sector, address, buffer)
         while(idx < buffer.getSize() )
         {
             // Write word to MSC_DATA
-            _n_throw( intrfApi.writeMem32( MSC_WDATA, buffer.un32(idx) ) )
+            _n_throw( intrfApi.writeMem32( mscBase|MSC_WDATA, buffer.un32(idx) ) )
 
             // Initiate write with auto increment, 1 to WRITETRIG in MSC_WRITECMD
-            _n_throw( intrfApi.writeMem32(MSC_WRITECMD, 0x10) )
+            _n_throw( intrfApi.writeMem32(mscBase|MSC_WRITECMD, 0x10) )
             idx += 4
-        }
+        }   
 
         // End writing  MSC->WRITECMD = MSC_WRITECMD_WRITEEND
-        _n_throw( intrfApi.writeMem32(MSC_WRITECMD, 0x04) )
+        _n_throw( intrfApi.writeMem32(mscBase|MSC_WRITECMD, 0x04) )
         return ERROR_OK
     }
-
+    
     // Catch all the sector write errors
     catch(e){
        if(e < ERROR_NOTIFIED)
            errorf("ERROR: writing sector %d failed! %s\n", sector, flashError(e) )
        return ERROR_NOTIFIED
-    }
+    }    
 }
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -169,24 +148,24 @@ function flash_done()
         do{
             if(GetTickCount() - time > 2000)
                 _n_throw(ERROR_TIMEOUT)
-
-            _n_throw( intrfApi.readMem32(MSC_STATUS) )
+            
+            _n_throw( intrfApi.readMem32(mscBase|MSC_STATUS) )
         }while (intrfApi.value32 &  0x01 )
 
         // Disable flash writing WREN in MSC_WRITECTRL
         //intrfApi.readMem32(0x400E0008)
-        _n_throw( intrfApi.writeMem32(MSC_WRITECTRL, 0 ) )//intrfApi.value32 & 0xFFFFFFFE )
+        _n_throw( intrfApi.writeMem32(mscBase|MSC_WRITECTRL, 0 ) )//intrfApi.value32 & 0xFFFFFFFE )
 
         // Lock MSC
-        _n_throw( intrfApi.writeMem32(MSC_LOCK, 0x0 ))
+        _n_throw( intrfApi.writeMem32(mscBase|mscLockOff, 0x0 ))
 
         return ERROR_OK
     }
-
+    
     // Catch all the sector write errors
     catch(e){
        return e
-    }
+    }    
 }
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -204,34 +183,34 @@ function flash_erase_chip()
         _n_throw( flash_start() )
 
         // MSC->MASSLOCK = MSC_MASSLOCK_LOCKKEY_UNLOCK
-        _n_throw( intrfApi.writeMem32(MSC_MASSLOCK, MSC_MASS_KEY))
+        _n_throw( intrfApi.writeMem32(mscBase|MSC_MASSLOCK, MSC_MASS_KEY))
 
 
         // Erase first 512K block
         //MSC->WRITECMD = MSC_WRITECMD_ERASEMAIN0
-        _n_throw( intrfApi.writeMem32(MSC_WRITECMD, 0x100) )
+        _n_throw( intrfApi.writeMem32(mscBase|MSC_WRITECMD, 0x100) )
 
         //while ( MSC->STATUS & MSC_STATUS_BUSY )
         local time = GetTickCount()
         do{
             if(GetTickCount() - time > 2000)
                 _n_throw(ERROR_TIMEOUT)
-            _n_throw( intrfApi.readMem32(MSC_STATUS) )
+            _n_throw( intrfApi.readMem32(mscBase|MSC_STATUS) )
         }while ( intrfApi.value32 &  0x01 )
 
         // Second 512K block if this is available
         if( flashSize > 512 )
         {
             //MSC->WRITECMD = MSC_WRITECMD_ERASEMAIN1
-            _n_throw( intrfApi.writeMem32(0MSC_WRITECMD, 0x200) )
+            _n_throw( intrfApi.writeMem32(mscBase|MSC_WRITECMD, 0x200) )
 
             //while ( MSC->STATUS & MSC_STATUS_BUSY )
             time = GetTickCount()
             do{
                 if(GetTickCount() - time > 2000)
                     _n_throw(ERROR_TIMEOUT)
-
-                _n_throw( intrfApi.readMem32(MSC_STATUS))
+        
+                _n_throw( intrfApi.readMem32(mscBase|MSC_STATUS))
             }while ( intrfApi.value32 &  0x01 )
         }
 
@@ -242,11 +221,11 @@ function flash_erase_chip()
         printf("Flash: -- chip erased --\n")
         return ERROR_OK
     }
-
+    
     // Catch all the sector write errors
     catch(e){
        if(e < ERROR_NOTIFIED)
            errorf("ERROR: Chip erasing\n")
        return ERROR_NOTIFIED
-    }
+    }    
 }

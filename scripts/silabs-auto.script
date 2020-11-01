@@ -36,6 +36,8 @@ targetApi <- TargetAPI() // Global interface to the target class, our reset_post
 flashSize <- 0           // Global flash size, is also used for mass erase
 
 
+mscBase    <- 0x400E0000 // Default base address for flash MSC
+mscLockOff <- 0x40       // Default offset of the unlock register
 /////////////////////////////////////////////////////
 //
 //  The entry point for this script
@@ -84,124 +86,103 @@ function set_target(deviceId)
     {
     case 16 : // EFR32MG1P EFR32 Mighty Gecko Gen1 Device Family
         printf("Mighty Gecko - EFR32MG1P%d\n", partValue)
-        require("silabs/EFR32xG1.script")
         break
     case 17 : //  EFR32MG1B EFR32 Mighty Gecko Gen1 Device Family
         printf("Mighty Gecko Gen1 - EFR32MG1B%d\n", partValue)
-        require("silabs/EFR32xG1.script")
         break
     case 18 : //  EFR32MG1V EFR32 Mighty Gecko Gen1 Device Family
         printf("Mighty Gecko Gen1 -  EFR32MG1V%d\n", partValue)
-        require("silabs/EFR32xG1.script")
         break
     case 19 : //  EFR32BG1P EFR32 Blue Gecko Gen1 Device Family
         printf("Blue Gecko Gen1 - EFR32BG1P%d\n", partValue)
-        require("silabs/EFR32xG1.script")
         break
     case 20 : //  EFR32BG1B EFR32 Blue Gecko Gen1 Device Family
         printf("Blue Gecko Gen1 - EFR32BG1B%d\n", partValue)
-        require("silabs/EFR32xG1.script")
         break
     case 21 : //  EFR32BG1V EFR32 Blue Gecko Gen1 Device Family
         printf("Blue Gecko Gen1 - EFR32BG1V%d\n", partValue)
-        require("silabs/EFR32xG1.script")
         break
     case 25 : //  EFR32FG1P EFR32 Flex Gecko Gen1 Device Family
         printf("Flex Gecko Gen1 - EFR32FG1P%d\n", partValue)
-        require("silabs/EFR32xG1.script")
         break
     case 26 : //  EFR32FG1B EFR32 Flex Gecko Gen1 Device Family
         printf("Flex Gecko Gen1 - EFR32FG1B%d\n", partValue)
-        require("silabs/EFR32xG1.script")
         break
     case 27 : //  EFR32FG1V EFR32 Flex Gecko Gen1 Device Family
         printf("Flex Gecko Gen1 - EFR32FG1V%d\n", partValue)
-        require("silabs/EFR32xG1.script")
         break
     case 40 : //  EFR32MG13P EFR32 Mighty Gecko Family Series 1 Device Config 3
         printf("EFR32 Mighty Gecko Family Series 1 Config 3 - EFR32MG13P%d\n", partValue)
-        require("silabs/EFR32xG13.script")
         break
     case 41 : //  EFR32MG13B EFR32 Mighty Gecko Family Series 1 Device Config 3
         printf("EFR32 Mighty Gecko Family Series 1 Config 3 - EFR32MG13B%d\n", partValue)
-        require("silabs/EFR32xG13.script")
         break
     case 42 : //  EFR32MG13V EFR32 Mighty Gecko Family Series 1 Device Config 3
         printf("EFR32 Mighty Gecko Family Series 1 Config 3 - EFR32MG13V%d\n", partValue)
-        require("silabs/EFR32xG13.script")
         break
     case 43 : // EFR32BG13P EFR32 Blue Gecko Family Series 1 Device Config 3
         printf("EFR32 Blue Gecko Family Series 1 Config 3 - EFR32BG13P%d\n", partValue)
-        require("silabs/EFR32xG13.script")
         break
     case 44 : //  EFR32BG13B EFR32 Blue Gecko Family Series 1 Device Config 3
         printf("EFR32 Blue Gecko Family Series 1 Config 3 - EFR32BG13B%d\n", partValue)
-        require("silabs/EFR32xG13.script")
         break
     case 45 : // EFR32BG13V EFR32 Blue Gecko Family Series 1 Device Config 3
         printf("EFR32 Blue Gecko Family Series 1 Config 3 - EFR32BG13V%d\n", partValue)
-        require("silabs/EFR32xG13.script")
         break
     case 49 : // EFR32FG13P EFR32 Flex Gecko Family Series 1 Device Config 3
         printf("EFR32 Flex Gecko Family Series 1 Config 3 - EFR32FG13P%d\n", partValue)
-        require("silabs/EFR32xG13.script")
         break
     case 50 : // EFR32FG13B EFR32 Flex Gecko Family Series 1 Device Config 3
         printf("EFR32 Flex Gecko Family Series 1 Config 3 - EFR32FG13B%d\n", partValue)
-        require("silabs/EFR32xG13.script")
         break
     case 51 : // EFR32FG13V EFR32 Flex Gecko Family Series 1 Device Config 3
         printf("EFR32 Flex Gecko Family Series 1 Config 3 - EFR32FG13V%d\n", partValue)
-        require("silabs/EFR32xG13.script")
         break
     case 52 : //  EFR32MG14P EFR32 Mighty Gecko Family Series 1 Device Config 4
         printf("EFR32 Mighty Gecko Family Series 1 Config 4 - EFR32MG14P%d\n", partValue)
-        require("silabs/EFR32xG14.script")
         break
     case 53 : //  EFR32MG14B EFR32 Mighty Gecko Family Series 1 Device Config 4
         printf("EFR32 Mighty Gecko Family Series 1 Config 4 - EFR32MG14B%d\n", partValue)
-        require("silabs/EFR32xG14.script")
         break
     case 54 : //  EFR32MG14V EFR32 Mighty Gecko Family Series 1 Device Config 4
         printf("EFR32 Mighty Gecko Family Series 1 Config 4 - EFR32MG14V%d\n", partValue)
-        require("silabs/EFR32xG14.script")
         break
     case 55 : //  EFR32BG14P EFR32 Blue Gecko Family Series 1 Device Config 4
         printf("EFR32 Blue Gecko Family Series 1 Config 4 - EFR32BG14P%d\n", partValue)
-        require("silabs/EFR32xG14.script")
         break
     case 56 : //  EFR32BG14B EFR32 Blue Gecko Family Series 1 Device Config 4
         printf("EFR32 Blue Gecko Family Series 1 Config 4 - EFR32BG14B%d\n", partValue)
-        require("silabs/EFR32xG14.script")
         break
     case 57 : //  EFR32BG14V EFR32 Blue Gecko Family Series 1 Device Config 4
         printf("EFR32 Blue Gecko Family Series 1 Config 4 - EFR32BG14V%d\n", partValue)
-        require("silabs/EFR32xG14.script")
         break
     case 61 : //  EFR32FG14P EFR32 Flex Gecko Family Series 1 Device Config 4
         printf("EFR32 Flex Gecko Family Series 1 Config 4 - EFR32FG14P%d\n", partValue)
-        require("silabs/EFR32xG14.script")
         break
     case 62 : //  EFR32FG14B EFR32 Flex Gecko Family Series 1 Device Config 4
         printf("EFR32 Flex Gecko Family Series 1 Config 4 - EFR32FG14B%d\n", partValue)
-        require("silabs/EFR32xG14.script")
         break
     case 63 : //  EFR32FG14V EFR32 Flex Gecko Family Series 1 Device Config 4
         printf("EFR32 Flex Gecko Family Series 1 Config 4 - EFR32FG14V%d\n", partValue)
-        require("silabs/EFR32xG14.script")
-        break
+        break        
     case 71 : //  EFM32G EFM32 Gecko Device Family
         printf("Gecko - EFM32G%d\n", partValue)
+        mscBase    = 0x400C0000
+        mscLockOff = 0x3C
         break
     case 72 : //  EFM32GG EFM32 Giant Gecko Device Family
         printf("Giant Gecko - EFM32GG%d\n", partValue)
-        require("silabs/EFM32GGx.script")
+        mscBase    = 0x400C0000
+        mscLockOff = 0x3C
         break
     case 73 : //  EFM32TG EFM32 Tiny Gecko Device Family
         printf("Tiny Gecko - EFM32TG%d\n", partValue)
+        mscBase    = 0x40000000 
         break
     case 74 : //  EFM32LG EFM32 Leopard Gecko Device Family
         printf("Leopard Gecko - EFM32LG%d\n", partValue)
+        mscBase    = 0x400C0000
+        mscLockOff = 0x3C   
         break
     case 75 : //  EFM32WG EFM32 Wonder Gecko Device Family
         printf("Wonder Gecko - EFM32WG%d\n", partValue)
@@ -263,6 +244,9 @@ function set_target(deviceId)
 
     // Build the XML memory map and set it active.
     devApi.memmap( format( mem_template,  flashSize*1024, pageSize, ramSize*1024 ))
+
+    // Generic flash algorithm
+    require("silabs/flashalgo.script")
     return ERROR_OK
 }
 
