@@ -1,8 +1,11 @@
 /////////////////////////////////////////////////////
 //
-//     This is a virtual device and will try to detect
-//     which cortex-m vendor is connected
+//  This is a virtual device and will try to detect the
+//  connected cortex-m vendor.
 //
+//  All the called vendor specific scripts don't depend on this
+//  script (so we have some redundant code by purpose) and can also
+//  be called directly to skip vendor detection.
 //
 
 /////////////////////////////////////////////////////
@@ -15,42 +18,57 @@ function main()
     local result
 
     //============================================================
-    // ==== Siliabs  (Gecko's) cortex-M
-    result = probe.readMem32(0x0FE081FC)
-    if(  (result >= 0 ) && (probe.value32) )
+    // ==== STmicro  cortex-M
     {
-        require("silabs-auto.script")
-        return main();
+        // Walk through all the known STmicro CPU id's
+        // STmicro is really insane with this :(  (Silabs bravo!)
+        result = probe.readMem32(0xE0042000)      // Default
+        if( (result >=0) && (probe.value32 == 0) )
+            result = probe.readMem32(0x40015800)  // M0
+        if( (result >=0) && (probe.value32 == 0) )
+            result = probe.readMem32(0x5C001000)  // H7
+        if( (result >=0) && (probe.value32 == 0) )
+            result = probe.readMem32(0xE0044000)  // L5
+        if(  (result >= 0 ) && (probe.value32) )
+        {
+            // Load the vendor script and go from there
+            require("stm32-auto.script")
+            return main();
+        }
+    }
+
+    //============================================================
+    // ==== Siliabs  (Gecko's) cortex-M
+    {
+        result = probe.readMem32(0x0FE081FC)
+        if(  (result >= 0 ) && (probe.value32) )
+        {
+            // Load the vendor script and go from there
+            require("silabs-auto.script")
+            return main();
+        }
     }
 
     //============================================================
     // ==== ATmel  cortex-M
 
-//ToDo
+    // ToDo....
+    //    if( atmel)
+    //    {
+    //        require("atmel-auto.script")
+    //        return main();
+    //    }
 
     //============================================================
     // ==== NXP  cortex-M
 
-// ToDo
+    // ToDo....
+    //    if( nxp)
+    //    {
+    //        require("nxp-auto.script")
+    //        return main();
+    //    }
 
-    //============================================================
-    // ==== STmicro  cortex-M
-    {
-        // Walk through all the known STmicro CPU id's
-        // STmicro is really insane with this :(  (Silabs bravo!)
-        result = probe.readMem32(0xE0042000)
-        if( (result >=0) && (probe.value32 == 0) )
-            result = probe.readMem32(0x40015800)
-        if( (result >=0) && (probe.value32 == 0) )
-            result = probe.readMem32(0x5C001000)
-        if( (result >=0) && (probe.value32 == 0) )
-            result = probe.readMem32(0xE0044000)
-        if(  (result >= 0 ) && (probe.value32) )
-        {
-            require("stm32-auto.script")
-            return main();
-        }
-    }
 
     errorf("Error:\tCan't detect MCU vendor!\n\tIf reset is disabled (\"dr\" option), try with reset.")
     return ERROR_NOTIFIED  // We have already thrown an error so use -1 (otherwise < -1)
