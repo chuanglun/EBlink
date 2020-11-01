@@ -1,1 +1,1 @@
-eblink.exe -I stlink -S stm32-auto -P ../scripts/ -G
+eblink.exe -I stlink -S auto -P ../scripts/ -G
