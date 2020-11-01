@@ -14,52 +14,44 @@ function main()
     local probe = ::InterfAPI()
     local result
 
-
-    // Check if the right script API is supported
-    if( VERSION < 3.8)
-    {
-       errorf("Error:\nIncompatiable EBlink version %.1f\nPlease update EBlink\n", VERSION)
-       return -1
-    }
-
     //============================================================
     // ==== Siliabs  (Gecko's) cortex-M
     result = probe.readMem32(0x0FE081FC)
     if(  (result >= 0 ) && (probe.value32) )
     {
-        // Load the Silabs script and start from there
         require("silabs-auto.script")
         return main();
     }
-    
+
     //============================================================
-    // ==== ATmel  cortex-M  
-    
+    // ==== ATmel  cortex-M
+
 //ToDo
 
     //============================================================
-    // ==== NXP  cortex-M 
+    // ==== NXP  cortex-M
 
-// ToDo    
-    
+// ToDo
+
     //============================================================
-    // ==== STmicro  cortex-M    
-    {       
+    // ==== STmicro  cortex-M
+    {
+        // Walk through all the known STmicro CPU id's
+        // STmicro is really insane with this :(  (Silabs bravo!)
         result = probe.readMem32(0xE0042000)
         if( (result >=0) && (probe.value32 == 0) )
             result = probe.readMem32(0x40015800)
         if( (result >=0) && (probe.value32 == 0) )
             result = probe.readMem32(0x5C001000)
         if( (result >=0) && (probe.value32 == 0) )
-            result = probe.readMem32(0xE0044000)   
+            result = probe.readMem32(0xE0044000)
         if(  (result >= 0 ) && (probe.value32) )
         {
-            // Load the STmicro script and start from there
             require("stm32-auto.script")
-            return main();             
-        }            
-    }          
+            return main();
+        }
+    }
 
     errorf("Error:\tCan't detect MCU vendor!\n\tIf reset is disabled (\"dr\" option), try with reset.")
-    return -1  // We have already thrown an error so use -1 (otherwise < -1)    
+    return ERROR_NOTIFIED  // We have already thrown an error so use -1 (otherwise < -1)
 }
