@@ -2,8 +2,9 @@
 ## for Win32, Linux_x86_64 and Raspberry (auto detects Silabs and STmicro)
 
 _Warning:  
-Stop updating your stlink/v2 firmware if you want to keep using it for non-STmicro mcu's.  
-Firmware V2.J34.S7 is confirmed to work with Silabs. You can check firmware version with the EBlink option -v5._
+Stop updating your stlink/v2 firmware to the latest if you want to keep using it for non-STmicro mcu's.  
+Firmware V2.J34 is confirmed to work with e.g. Silabs. You can check firmware version with the EBlink option -v5.  
+Most updates are mass storage related which we don't use anyway._
 
 EBlink ARM Cortex-M debug tool with squirrel scripting device support
 
