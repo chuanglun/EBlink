@@ -17,6 +17,18 @@ function main()
     local result
 
     //============================================================
+    // ==== Siliabs  (Gecko's) cortex-M
+    {
+        result = probe.readMem32(0x0FE081FC)
+        if(  (result >= 0 ) && (probe.value32) )
+        {
+            // Load the vendor script and go from there
+            require("silabs-auto.script")
+            return set_target(probe.value32)
+        }
+    }
+
+    //============================================================
     // ==== STmicro  cortex-M
     {
         // Walk through all the known STmicro CPU id's
@@ -33,18 +45,6 @@ function main()
             // Load the vendor script and go from there
             require("stm32-auto.script")
             return set_target( probe.value32)
-        }
-    }
-
-    //============================================================
-    // ==== Siliabs  (Gecko's) cortex-M
-    {
-        result = probe.readMem32(0x0FE081FC)
-        if(  (result >= 0 ) && (probe.value32) )
-        {
-            // Load the vendor script and go from there
-            require("silabs-auto.script")
-            return set_target(probe.value32)
         }
     }
 
