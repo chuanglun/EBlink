@@ -147,10 +147,8 @@ function flash_erase(sector, address)
 
 /////////////////////////////////////////////////////////////////////////////////
 //
-//  The length is always equals to the page to be programmed in bytes because trim is set off.
-//  We don't use a flash loader here. We just write the pages word by word.
-//  Because every word needs to be transported by USB, we don't check the busy
-//  flag in between because we are not that fast.
+//  The length is always equals to the page to be programmed in bytes because trim is
+//  set off by parent script.
 //
 function flash_write(sector, address, buffer)
 {
@@ -166,7 +164,9 @@ function flash_write(sector, address, buffer)
         // Write halfpages, the buffer size is always the same as sector size (no sector trim)
         local halfPageSize = buffer.getSize()/2
         _n_throw( intrfApi.writeMem(address, buffer, 0, halfPageSize, 32 ) )
+
         checkBusy(FLASH_TIMEOUT)
+
         _n_throw( intrfApi.writeMem(address+halfPageSize, buffer, halfPageSize, halfPageSize, 32 ) )
 
         // Restore probe speed

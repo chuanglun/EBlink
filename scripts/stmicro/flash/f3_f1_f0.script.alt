@@ -149,8 +149,6 @@ function flash_erase(sector, address)
 /////////////////////////////////////////////////////////////////////////////////
 //
 //  Called by EBlink to write a sector.
-//  The length is always equals to the page to be programmed in bytes.
-//  Only whole pages are programmed driven by the cache engine of this GDB server.
 //
 function flash_write(sector, address, buffer)
 {
