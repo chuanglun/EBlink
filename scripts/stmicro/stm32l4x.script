@@ -77,19 +77,19 @@ function stm32_device(deviceId)
 
         case 0x435 :
             printf("L43/L44xx\n")
-            ram_size = 0xC000
+            ram_size = 0x10000
             page_size = 0x800
             break
 
         case 0x462 :
             printf("L45/L46xx\n")
-            ram_size = 0xC000
+            ram_size = 0x10000
             page_size = 0x800
             break
 
         case 0x464 :
             printf("L41/L42xx\n")
-            ram_size = 0xC000
+            ram_size = 0x10000
             page_size = 0x800
             break
 
