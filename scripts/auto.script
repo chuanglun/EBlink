@@ -1,4 +1,6 @@
+//! Auto
 /////////////////////////////////////////////////////
+//
 //
 //  This is a virtual device and will try to detect the
 //  connected cortex-m vendor.
