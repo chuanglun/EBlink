@@ -110,7 +110,7 @@ function stm32_device(deviceId)
     }
 
     // Inform the user
-    printf("Detected FLASH : 0x%X%s\nConfigured RAM : 0x%X\n", flash_size, (hasDualBank ? " - Dualbank" :""), sram_size)
+    printf("Detected FLASH : 0x%X%s\nConfigured RAM : 0x%X\n", flash_size, (hasDualBank ? " - Dualbank" :""), ram_size)
 
     // The user specified the size of flash memory
     if (isScriptObject("FLASH_SIZE") && FLASH_SIZE>0)
@@ -129,7 +129,7 @@ function stm32_device(deviceId)
     devApi.memmap(format( mem_template_L4, ram_size, flash_size, page_size))
 
     // Include flash loader script
-    require("stmicro/flash/wb_l4_gx.script")
+    require("stmicro/flash/wx_l4_gx.script")
 
     return ERROR_OK
 }
