@@ -191,7 +191,7 @@ function set_target(deviceId)
     default:
         printf("\n\nPlease report this ID so that we can add it.\n")
         errorf("Error unsupported STM32 ID: 0x%X\n", deviceId)
-        return -1  // We have already throw an error so use -1.
+        return ERROR_NOTIFIED  // We have already throw an error so use ERROR_NOTIFIED (= -1).
     }
 
     // Call our generic entry point of the device script we just loaded

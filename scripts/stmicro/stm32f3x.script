@@ -95,7 +95,7 @@ function stm32_device(deviceId)
 
         default:
             errorf("ERROR: Unsupported STM3232F3 device ID\n");
-            return -1;
+            return ERROR_NOTIFIED
     }
 
     // Inform the user

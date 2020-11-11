@@ -176,7 +176,7 @@ function stm32_device(deviceId)
       if(flash_size < (128*1024))
       {
           errorf("ERROR: Flash size at least 128KB")
-          return -1
+          return ERROR_NOTIFIED
       }
     }
 
