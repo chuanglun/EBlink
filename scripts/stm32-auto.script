@@ -114,12 +114,15 @@ function set_target(deviceId)
     case 0x411 : // CHIPID_STM32_F2
 
         // Fix chip_id for F4 rev A errata , Read CPU ID, as CoreID is the same for F2/F4
-        result = intrfApi.readMem32(0xE000ED00)
-        if ((intrfApi.value32  & 0xfff0) == 0xc240)
+        local result = intrfApi.readMem32(0xE000ED00)
+        if(result >=0)
         {
-            deviceId = 0x413
-            require("stmicro/stm32f4x.script")
-            break
+            if ((intrfApi.value32  & 0xfff0) == 0xc240)
+            {
+                deviceId = 0x413
+                require("stmicro/stm32f4x.script")
+                break
+            }
         }
 
         require("stmicro/stm32f2x.script")
