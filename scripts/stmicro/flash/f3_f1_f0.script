@@ -41,7 +41,6 @@ require("stmicro/flash/errors.script")
 /////////////////////////////////////////////////////////////////////////////////
 //
 //   Called by EBlink to initialize upcoming flash operations.
-//   Unlock the flash and preload the flash loader
 //
 function flash_start()
 {
