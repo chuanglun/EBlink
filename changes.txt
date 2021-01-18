@@ -1,3 +1,7 @@
+Changes (9-10-2020) Release 3.8(59)
+- Bugfix: flash write hex string conversion could be wrong
+- Added : Additional error info add wrong flash cli write parameters
+
 Changes (9-10-2020) Release 3.8
 - Moded: New flash engine with background caching
 - Moded: Script buffer API simplidied and secure
