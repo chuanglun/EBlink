@@ -8,7 +8,7 @@
 const mem_template = @@"
 <?xml version=\"1.0\"?>
 <memory-map>
-  <memory type=\"rom\" start=\"0x00000000\" length=\"0x100000\"/>
+  <memory type=\"rom\" start=\"0x00000000\" length=\"0x%X\"/>
   <memory type=\"ram\" start=\"0x10000000\" length=\"0x10000\"/>
   <memory type=\"ram\" start=\"0x20000000\" length=\"0x%X\"/>
  <!-- Sectors 0..3 page size 16kB -->
@@ -191,7 +191,8 @@ function stm32_device(deviceId)
         devApi.memmap( format(mem_template_2MB, ram_size) )
     else
         // Substract the first 128Kb (sector 0..4)
-        devApi.memmap( format( mem_template,  ram_size,
+        devApi.memmap( format( mem_template,  flash_size,
+                                              ram_size,
                                               flash_size - (128*1024) ) )
 
     // Include flash loader script
