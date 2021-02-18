@@ -67,7 +67,7 @@ function stm32_device(deviceId)
         case 0x415 : // CHIPID_STM32_L47/L48
         case 0x461 : // CHIPID_STM32_L49X/L4A
             printf( deviceId== 0x415 ? "L47/L48xx\n" : "L49/L4Axx\n")
-            if( (flash_size == (1024*1024)) & readDualBankOption(21) )
+            if( (flash_size == (1024*1024)) && readDualBankOption(21) )
             {
                 hasDualBank = true
             }
