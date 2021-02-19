@@ -15,34 +15,28 @@
 //
 function main()
 {
-    local probe = ::InterfAPI()
-    local result
+    local target = ::TargetAPI()
+    local probe  = ::InterfAPI()
+    local result = 0
+
+    // Check if the right script API is supported
+    if( VERSION < 3.9)
+    {
+       errorf("Error:\nIncompatiable EBlink version %.1f\nPlease update EBlink\n", VERSION)
+       return ERROR_NOTIFIED
+    }
 
     //============================================================
     // ==== ATmel  cortex-M
-    {
-        result = probe.readMem32(0x41002018)
-        if( (result >=0) && (probe.value32 == 0) )
-            result = probe.readMem32(0x400E0740)
-        if( (result >=0) && (probe.value32 == 0) )
-            result = probe.readMem32(0x400E0940)
-        if(  (result >= 0 ) && (probe.value32) )
+    {       
+        if(target.cpuType == 0) // Cortex-M0
+            result = probe.readMem32(0x41002018)
+                
+        if( (result >= 0 ) && (probe.value32) )
         {
             // Load the vendor script and go from there
             require("atmel-auto.script")
             return main()
-        }
-    }
-
-    //============================================================
-    // ==== Siliabs  (Gecko's) cortex-M
-    {
-        result = probe.readMem32(0x0FE081FC)
-        if(  (result >= 0 ) && (probe.value32) )
-        {
-            // Load the vendor script and go from there
-            require("silabs-auto.script")
-            return set_target(probe.value32)
         }
     }
 
@@ -65,6 +59,18 @@ function main()
             return set_target( probe.value32)
         }
     }
+    
+    //============================================================
+    // ==== Siliabs  (Gecko's) cortex-M
+    {
+        result = probe.readMem32(0x0FE081FC)
+        if(  (result >= 0 ) && (probe.value32) )
+        {
+            // Load the vendor script and go from there
+            require("silabs-auto.script")
+            return set_target(probe.value32)
+        }
+    }    
 
 
     //============================================================

@@ -1,3 +1,7 @@
+Changes (19-02-2021) Release 3.9(2)
+- Change: Connect strategy. Now connect under reset is tried if the first time fails
+- Added : Script traget API new variable cpuType. Holds number x of the Cortex-Mx.
+
 Changes (9-10-2020) Release 3.8(59)
 - Bugfix: flash write hex string conversion could be wrong
 - Added : Additional error info add wrong flash cli write parameters
