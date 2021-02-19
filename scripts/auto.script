@@ -19,6 +19,22 @@ function main()
     local result
 
     //============================================================
+    // ==== ATmel  cortex-M
+    {
+        result = probe.readMem32(0x41002018)
+        if( (result >=0) && (probe.value32 == 0) )
+            result = probe.readMem32(0x400E0740)
+        if( (result >=0) && (probe.value32 == 0) )
+            result = probe.readMem32(0x400E0940)
+        if(  (result >= 0 ) && (probe.value32) )
+        {
+            // Load the vendor script and go from there
+            require("atmel-auto.script")
+            return main()
+        }
+    }
+
+    //============================================================
     // ==== Siliabs  (Gecko's) cortex-M
     {
         result = probe.readMem32(0x0FE081FC)
@@ -50,15 +66,6 @@ function main()
         }
     }
 
-    //============================================================
-    // ==== ATmel  cortex-M
-
-    // ToDo....
-    //    if( atmel)
-    //    {
-    //        require("atmel-auto.script")
-    //        return main();
-    //    }
 
     //============================================================
     // ==== NXP  cortex-M
