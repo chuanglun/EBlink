@@ -4,16 +4,27 @@
 //
 //          _n_throw is a built-in function which throws an exception if argument < 0
 //
+//
 
+
+//----------------------------------
+//  Extern variables from upper scripts:
+//
+//  pageSize = The size of a page
+//
+//
+
+// Base addresses
 const USER_ROW      0x00804000  // User Row of Flash
 const PAC1          0x41000000  // Peripheral Access Control 1
 const DSU           0x41002000  // Device Service Unit
 const NVMCTRL       0x41004000  // Non-volatile memory controller
 
-const DSU_CTRLSTAT      0x100
-const DSU_ADDRESS       0x104
-const DSU_LENGTH        0x108
-const DSU_DID           0x118
+// DSU Register offsets
+const DSU_CTRLSTAT     0x0100
+const DSU_ADDRESS      0x0104
+const DSU_LENGTH       0x0108
+const DSU_DID          0x0118
 const DSU_PID          0x1000
 const DSU_CID          0x1010
 
@@ -28,6 +39,7 @@ const STATUSA_CRSTEXT   (1 << 9)
 const STATUSA_DONE      (1 << 8)
 const STATUSB_PROT      (1 << 16)
 
+// NVM Register offsets
 const NVMCTRL_CTRLA     0x00    // NVM control A register
 const NVMCTRL_CTRLB     0x04    // NVM control B register
 const NVMCTRL_PARAM     0x08    // NVM parameters register
@@ -35,7 +47,6 @@ const NVMCTRL_INTFLAG   0x14    // NVM Interrupt Flag Status & Clear
 const NVMCTRL_STATUS    0x18    // NVM status register
 const NVMCTRL_ADDR      0x1C    // NVM address register
 const NVMCTRL_LOCK      0x20    // NVM Lock section register
-
 
 // NVMCTRL commands.  See Table 20-4 in 42129F–SAM–10/2013
 const NVM_CMD_ER        0x02        // Erase Row
@@ -63,7 +74,7 @@ const CTRLA_CMD_SSB             0x0045
 const CTRLA_CMD_INVALL          0x0046
 
 // Interrupt Flag Register (INTFLAG)
-const NVMC_READY            (1 << 0)
+const NVMC_READY (1 << 0)
 
 maxFlashSpeed   <- 10000  // 10MHz is max speed for direct programming (we think)
 
@@ -152,8 +163,8 @@ function flash_erase(sector, address)
 function flash_write(sector, address, buffer)
 {
     local targetApi = :: TargetAPI() // Our interface to the target class
-    local length = buffer.getSize()
-    local offset = 0
+    local length = buffer.getSize()  // The number of bytes in the data buffer
+    local offset = 0                 // Buffer offset for writing
 
     try{
         // For direct flash writing we can't be too fast.
@@ -163,18 +174,17 @@ function flash_write(sector, address, buffer)
         while(length)
         {
             // Do we have a whole page length or less
-            local wrlen = ( length > 64 ? 64 : length)
+            local wrlen = ( length > pageSize ? pageSize : length)
 
             // Write page
             _n_throw( targetApi.writeMem(address, buffer, offset, wrlen) )
 
-            offset += wrlen
-            length -= wrlen
+            offset  += wrlen
+            length  -= wrlen
             address += wrlen
 
             // write page
             _n_throw(intrfApi.writeMem32(NVMCTRL + NVMCTRL_CTRLA, CTRLA_CMD_KEY | CTRLA_CMD_WRITEPAGE))
-
 
             // Wait for ready
             local time = GetTickCount()
@@ -242,7 +252,6 @@ function flash_erase_chip()
 
         // Erase all
         _n_throw(intrfApi.writeMem32(DSU + DSU_CTRLSTAT, CTRL_CHIP_ERASE))
-
 
         // Wait for ready
         local time = GetTickCount()

@@ -32,15 +32,15 @@ const DBGMCU_APB2_FZ   0x4001580C
 const DBG_STOP     (1<<1)
 const DBG_STANDBY  (1<<2)
 
-
 const SAMD_NVMCTRL       0x41004000 // Non-volatile memory controller
 const SAMD_NVMCTRL_PARAM 0x08       // NVM parameters register
 
-
+// Known families
 const SAMD_FAMILY_D     0x00
 const SAMD_FAMILY_L     0x01
 const SAMD_FAMILY_C     0x02
 
+// Known series
 const SAMD_SERIES_20    0x00
 const SAMD_SERIES_21    0x01
 const SAMD_SERIES_22    0x02
@@ -48,12 +48,17 @@ const SAMD_SERIES_10    0x02
 const SAMD_SERIES_11    0x03
 const SAMD_SERIES_09    0x04
 
+//------------------------------------
+//
+//  Per serie device ID's tables
 //  [0]id    [1]name    [2]Ram(kb)
 
+// Known SAMD09 parts
 SAMD09 <- [
     [ 0x0, "SAMD09D14A",  4 ],
     [ 0x7, "SAMD09C13A",  4 ] ]
 
+// Known SAMD10 parts
 SAMD10 <- [
     [ 0x0, "SAMD10D14AMU",  4 ],
     [ 0x1, "SAMD10D13AMU",  4 ],
@@ -77,6 +82,7 @@ SAMD11 <- [
     [ 0x8, "SAMD11C12A",   4 ],
     [ 0x9, "SAMD11D14AU",  4 ] ]
 
+// Known SAMD20 parts
 SAMD20 <- [
     [ 0x0, "SAMD20J18A", 32 ],
     [ 0x1, "SAMD20J17A", 16 ],
@@ -94,6 +100,7 @@ SAMD20 <- [
     [ 0xD, "SAMD20E15A",  4 ],
     [ 0xE, "SAMD20E14A",  2 ] ]
 
+// Known SAMD21 parts
 SAMD21 <- [
     [ 0x0, "SAMD21J18A", 32 ],
     [ 0x1, "SAMD21J17A", 16 ],
@@ -112,8 +119,8 @@ SAMD21 <- [
     [ 0xE, "SAMD21E14A",  2 ],
 
 
-    /* SAMR21 parts have integrated SAMD21 with a radio */
-    [ 0x18, "SAMR21G19A", 32 ], /* with 512k of serial flash */
+    // SAMR21 parts have integrated SAMD21 with a radio
+    [ 0x18, "SAMR21G19A", 32 ], // with 512k of serial flash
     [ 0x19, "SAMR21G18A", 32 ],
     [ 0x1A, "SAMR21G17A", 32 ],
     [ 0x1B, "SAMR21G16A", 16 ],
@@ -121,7 +128,7 @@ SAMD21 <- [
     [ 0x1D, "SAMR21E17A", 32 ],
     [ 0x1E, "SAMR21E16A", 16 ],
 
-    /* SAMD21 B Variants (Table 3-7 from rev I of datasheet) */
+    // SAMD21 B Variants (Table 3-7 from rev I of datasheet)
     [ 0x20, "SAMD21J16B",  8 ],
     [ 0x21, "SAMD21J15B",  4 ],
     [ 0x23, "SAMD21G16B",  8 ],
@@ -129,9 +136,9 @@ SAMD21 <- [
     [ 0x26, "SAMD21E16B",  8 ],
     [ 0x27, "SAMD21E15B",  4 ],
 
-    /* SAMD21 D and L Variants (from Errata)
-       http://ww1.microchip.com/downloads/en/DeviceDoc/
-       SAM-D21-Family-Silicon-Errata-and-DataSheet-Clarification-DS80000760D.pdf */
+    // SAMD21 D and L Variants (from Errata)
+    //   http://ww1.microchip.com/downloads/en/DeviceDoc/
+    //   SAM-D21-Family-Silicon-Errata-and-DataSheet-Clarification-DS80000760D.pdf
     [ 0x55, "SAMD21E16BU", 8 ],
     [ 0x56, "SAMD21E15BU", 4 ],
     [ 0x57, "SAMD21G16L",  8 ],
@@ -146,9 +153,9 @@ SAMD21 <- [
     [ 0x96, "SAMD21G17L", 16 ],
     [ 0x97, "SAMD21E17L", 16 ],
 
-    /* Known SAMDA1 parts.
-       SAMD-A1 series uses the same series identifier like the SAMD21
-       taken from http://ww1.microchip.com/downloads/en/DeviceDoc/40001895A.pdf (pages 14-17) */
+    // Known SAMDA1 parts.
+    //   SAMD-A1 series uses the same series identifier like the SAMD21
+    //   taken from http://ww1.microchip.com/downloads/en/DeviceDoc/40001895A.pdf (pages 14-17)
     [ 0x29, "SAMDA1J16A", 64, 8 ],
     [ 0x2A, "SAMDA1J15A", 32, 4 ],
     [ 0x2B, "SAMDA1J14A", 16, 4 ],
@@ -168,7 +175,7 @@ SAMD21 <- [
     [ 0x6B, "SAMDA1E15B", 32, 4 ],
     [ 0x6C, "SAMDA1E14B", 16, 4 ] ]
 
-/* Known SAML21 parts. */
+// Known SAML21 parts
 SAML21 <- [
     [ 0x00, "SAML21J18A", 32 ],
     [ 0x01, "SAML21J17A", 16 ],
@@ -191,14 +198,14 @@ SAML21 <- [
     [ 0x1B, "SAML21E16B",  8 ],
     [ 0x1C, "SAML21E15B",  4 ],
 
-    /* SAMR30 parts have integrated SAML21 with a radio */
+    // SAMR30 parts have integrated SAML21 with a radio
     [ 0x1E, "SAMR30G18A", 32 ],
     [ 0x1F, "SAMR30E18A", 32 ],
 
-    /* SAMR34/R35 parts have integrated SAML21 with a lora radio */
+    // SAMR34/R35 parts have integrated SAML21 with a lora radio
     [ 0x28, "SAMR34J18", 32 ] ]
 
-/* Known SAML22 parts. */
+// Known SAML22 parts
 SAML22 <- [
     [ 0x00, "SAML22N18A", 32 ],
     [ 0x01, "SAML22N17A", 16 ],
@@ -210,7 +217,7 @@ SAML22 <- [
     [ 0x0B, "SAML22G17A", 16 ],
     [ 0x0C, "SAML22G16A",  8 ] ]
 
-/* Known SAMC20 parts. */
+// Known SAMC20 parts
 SAMC20 <- [
     [ 0x00, "SAMC20J18A", 32 ],
     [ 0x01, "SAMC20J17A", 16 ],
@@ -227,6 +234,7 @@ SAMC20 <- [
     [ 0x20, "SAMC20N18A", 32 ],
     [ 0x21, "SAMC20N17A", 16 ] ]
 
+// Known SAMC21 parts
 SAMC21 <- [
     [ 0x00, "SAMC21J18A",  32 ],
     [ 0x01, "SAMC21J17A",  16 ],
@@ -243,7 +251,8 @@ SAMC21 <- [
     [ 0x20, "SAMC21N18A",  32 ],
     [ 0x21, "SAMC21N17A",  16 ] ]
 
-
+//---------------------------------------
+// All the supported devices table
 device <- [
   [SAMD_FAMILY_D, SAMD_SERIES_20, SAMD20],
   [SAMD_FAMILY_D, SAMD_SERIES_21, SAMD21],
@@ -255,6 +264,11 @@ device <- [
   [SAMD_FAMILY_C, SAMD_SERIES_20, SAMC20],
   [SAMD_FAMILY_C, SAMD_SERIES_21, SAMC21] ]
 
+// Global page size
+pageSize <- 0
+
+// Number of pages per sector (or row's according Atmel)
+const PAGES_PER_SEC 4
 
 /////////////////////////////////////////////////////
 //
@@ -264,28 +278,30 @@ device <- [
 //
 function atmel_device(deviceId)
 {
-    local devApi = ::DeviceAPI()
+    local devApi  = ::DeviceAPI()
     local devInfo = getDeviceInfo(deviceId);
 
+    // Check if we have a valid device info record
     if(devInfo == false)
     {
-        errorf("Error:\tAtmel device is missing in table\n")
+        errorf("ERROR: Atmel device [%x] is missing in table\n", deviceId)
         return ERROR_NOTIFIED
     }
 
+    // We get the ram size from the lookup table
     local ram_size = devInfo[2]*1024
 
     // Get the info about the flash
     local result = intrfApi.readMem32(SAMD_NVMCTRL + SAMD_NVMCTRL_PARAM)
     if(result <0)
-        return -2
+        return result
 
      // The PSZ field (bits 18:16) indicate the page size bytes as 2^(3+n)
      // so 0 is 8KB and 7 is 1024KB.
-     local page_size = (8 << ((intrfApi.value32 >> 16) & 0x7))
+     pageSize = (8 << ((intrfApi.value32 >> 16) & 0x7))
 
      // The NVMP field (bits 15:0) indicates the total number of pages
-     local flash_size = (intrfApi.value32 & 0xFFFF) * page_size
+     local flash_size = (intrfApi.value32 & 0xFFFF) * pageSize
 
     // Inform user about device type
     printf("Atmel family   : %s\n", devInfo[1])
@@ -307,14 +323,13 @@ function atmel_device(deviceId)
       printf("CLI set    RAM : 0x%X\n", ram_size)
     }
 
-
+    // Build the memory XML map and pass it to the EBlink device module
     devApi.memmap( format( mem_template,  flash_size,
-                                          (page_size *4),  // A row has 4 pages = 1 sector
+                                          (pageSize * PAGES_PER_SEC),
                                           ram_size) )
-
     // Flash loader script
     require("atmel/flash/samcd.script")
-    return 0
+    return ERROR_OK
 }
 
 
@@ -324,24 +339,29 @@ function atmel_device(deviceId)
 //
 function getDeviceInfo(deviceId)
 {
-   local family =  (((deviceId >> 23) & 0x1F))
-   local series =  (((deviceId >> 16) & 0x3F))
+   local family =  ((deviceId >> 23) & 0x1F)
+   local series =  ((deviceId >> 16) & 0x3F)
    local id     =  (deviceId & 0xFF)
 
+   // Walk through all the family/series combinations
    for( local f=0; f<device.len(); f++)
    {
        if( (device[f][0] == family ) &&
            (device[f][1] == series ) )
        {
+           // We found the family/serie, look for the device ID
            local idList = device[f][2]
            for( local i=0; i<idList.len(); i++)
            {
+               // ID is found, return the device info record
                if(idList[i][0] == id)
                    return idList[i]
            }
+           // We didn't found a device ID
            return false;
        }
    }
+   // We didn't found a family/serie match
    return false
 }
 
