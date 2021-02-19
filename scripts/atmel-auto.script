@@ -12,8 +12,8 @@
 
 intrfApi <- InterfAPI()  // Global so that all included script files also have access
 
-const SAMD_DSU			 0x41002000	// Device Service Unit 
-const SAMD_DSU_DID		 0x18		// Device ID register
+const SAMD_DSU      0x41002000  // Device Service Unit
+const SAMD_DSU_DID  0x18        // Device ID register
 
 /////////////////////////////////////////////////////
 //
@@ -30,7 +30,7 @@ function main()
     }
 
     //result = intrfApi.readMem32(0x400E0740)
-    //result = intrfApi.readMem32(0x400E0940)    
+    //result = intrfApi.readMem32(0x400E0940)
 
     // If we still haven't a valid device ID, inform user and quit
     errorf("Error:\tCan't access target device!\n\tIf reset is disabled (\"dr\" option), try with reset.")
@@ -48,8 +48,8 @@ function main()
 //        JTAG_RESET
 //        USER_RESET
 //
-const SAMD_DSU_CTRLSTAT		0x41002100
-const SAMD_STATUSA_CRSTEXT	(1 << 9)
+const SAMD_DSU_CTRLSTAT     0x41002100
+const SAMD_STATUSA_CRSTEXT  (1 << 9)
 function  reset_post(resetType)
 {
     // Check if there is an user defined post reset hook, the user
@@ -60,17 +60,17 @@ function  reset_post(resetType)
 
     local targetApi = :: TargetAPI() // Our interface to the target class
 
-    // Exit extended reset 
+    // Exit extended reset
     intrfApi.readMem32(SAMD_DSU_CTRLSTAT)
     if( intrfApi.value32 & SAMD_STATUSA_CRSTEXT)
     {
-        // Write bit to clear from extended reset 
+        // Write bit to clear from extended reset
         intrfApi.writeMem32(SAMD_DSU_CTRLSTAT, SAMD_STATUSA_CRSTEXT);
-    }    
-    
-    
+    }
+
+
     // We don't use this if the reset is a user_script type. In that
-    // case, the user is responsible for the initialization.    
+    // case, the user is responsible for the initialization.
     if( resetType != USER_RESET )
     {
         // Set the Stack pointer according the Vector table entry
