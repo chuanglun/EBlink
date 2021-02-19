@@ -1,5 +1,5 @@
 # Cortex-M tool e.g. STlink V2 & V3 support
-## for Win32, Linux_x86_64 and Raspberry (auto detects Silabs and STmicro)
+## for Win32, Linux_x86_64 and Raspberry (auto detects Silabs, STmicro and Atmel)
 
 _Warning:  
 Stop updating your stlink/v2 firmware to the latest if you want to keep using it for non-STmicro mcu's.  
