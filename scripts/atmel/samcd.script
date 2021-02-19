@@ -304,7 +304,7 @@ function atmel_device(deviceId)
      local flash_size = (intrfApi.value32 & 0xFFFF) * pageSize
 
     // Inform user about device type
-    printf("Atmel family   : %s\n", devInfo[1])
+    printf("Atmel device   : %s\n", devInfo[1])
 
     // Inform the user
     printf("Detected FLASH : 0x%X\nConfigured RAM : 0x%X\n", flash_size, ram_size)
