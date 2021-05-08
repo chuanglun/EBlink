@@ -25,7 +25,7 @@ __Project bucket list__
 - if you need a CLI memory reader to read particular memory locations (also on running targets) and print them at stdout
 - if you need a CLI programmer to modify particular in-place flash locations (checksum, serials etc)
 - for easy complex custom board reset strategies or memory maps with special options
-- for faster debug sessions because of the EBlink flash cache (e.g. only modified sectors are rewritten)
+- for faster debug sessions and flash operations because of the EBlink flash cache
 - for using easy auto configuration scripts e.g. custom flashing of ext. EEprom's etc
 - as a remote (wifi) GDB server e.g. Raspberry (lightweight)
 - very fast and easy to use standalone flash tool (program, verify, compare or dump)
