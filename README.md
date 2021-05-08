@@ -134,9 +134,9 @@ name: cortex-m
 	
 	Usage -F [options]
 
-        erase        : Chip erase the flash
+        erase        : Chip erase the flash (before upload)
         verify       : Verify flash after upload
-        run          : Start image
+        run          : Start image (ater upload)
 		
         read=<byte length>@<address>
                      : Read memory location at address with a given length and print as hex string.
