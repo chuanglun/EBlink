@@ -78,7 +78,7 @@ __Project bucket list__
         EBlink -I stlink -S stm32-auto -G
         EBlink -I stlink -S stm32-auto -G -D FLASH_SIZE=1024 -D RAM_SIZE=16
         EBlink -I stlink,dr,speed=3000 -S silabs-auto -F erase,verify,run,file=mytarget.elf
-        EBlink -I cmsis-dap -T cortex-m,nu -S stm32-auto -G port=4242,nc,s -S myReset.scr
+        EBlink -I cmsis-dap -T cortex-m,fu=0 -S stm32-auto -G port=4242,nc,s -S myReset.scr
 
 
 ==== Interfaces
@@ -127,7 +127,7 @@ name: cortex-m
         halt         : Halt target
         resume       : Resume target
 	
-        e.g.  -T cortex-m,nu
+        e.g.  -T cortex-m,fu=1
               -T cortex-m,reset,resume
 
 ==== Flash loader
