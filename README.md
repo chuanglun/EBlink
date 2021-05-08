@@ -136,7 +136,7 @@ name: cortex-m
 
         erase        : Chip erase the flash (before upload)
         verify       : Verify flash after upload
-        run          : Start image (ater upload)
+        run          : Start image (after upload)
 		
         read=<byte length>@<address>
                      : Read memory location at address with a given length and print as hex string.
@@ -160,17 +160,17 @@ name: cortex-m
 		                            Default     = Binary file format
 
         e.g. -F file=test.elf
-	     -F dump=0x1000@0x08000000:myDump.hex
              -F run,file=test.hex		
              -F read=0x4@0x0800000A,read=12@0x0800000C			 
              -F run,verify,write=DEAD@0x08000004
              -F run,file=test.hex,write=45FECA1245@0x80000004,write=EBAB@0x08000100
              -F erase,verify,run,file=test.srec
+	         -F dump=0x1000@0x08000000:myDump.hex             
              -F erase
              -F run			 
 
         Default (without erase) only modified sectors are (re)flashed.
-	Multiple writes and reads are allowed and is done after any file upload.
+	    Multiple writes and reads are allowed and is done after any file upload.
 
 
 ==== GDB server
