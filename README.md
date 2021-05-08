@@ -160,6 +160,7 @@ name: cortex-m
 		                            Default     = Binary file format
 
         e.g. -F file=test.elf
+	     -F dump=0x1000@0x08000000:myDump.hex
              -F run,file=test.hex		
              -F read=0x4@0x0800000A,read=12@0x0800000C			 
              -F run,verify,write=DEAD@0x08000004
