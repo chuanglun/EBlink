@@ -34,13 +34,14 @@ __Project bucket list__
 - Integrated target stack frame UNWIND in case of exception with message box popup in windows.
 - GDB server with flash caching, with EmBitz live variables/expression support!
 - Full Semi-hosting support
+- Execute (user) script functions from CLI e.g. option bytes reading/writing etc.
 - Supports Hotplug for Embitz 1.1 [see issue](https://github.com/EmBitz/EBlink/issues/3#issue-518281157) and 2.0 (monitor command "IsRunning" for target state query)
 - Inplace memory (flash or ram) modifications of any length byte array from the command line (e.g. serials or checksum programming)
 - Any length byte array memory reading also on running target from the command line (automated testing)
 - Core control (halt, reset and resume) from the command line (automated testing)
 - Stand alone command line flashing tool (elf, ihex and srec)  for production
 - Dump memory (also on running target) to file in Intel hex or binary format
-- Compare flash against a srec, ihex or elf file.
+- Compare flash against a srec, ihex or elf (auto detect) file.
 - All device related functions by c-like squirrel scripting e.g. flash or ext. EEprom algorithms, device reset strategy etc etc 
 - Ready for multiple interfaces
 
@@ -69,10 +70,11 @@ __Project bucket list__
 	-S <file>,    --script <file>		Add a device script file
 	-P <path>,    --path <path>		Add a search path for scripts
 	-D <def>,     --define <def>		Add a script global define "name=value"
+    -E <func>,    --execute <func>	Execute script function(s) from cli e.g. "setopt(WRREG, 5);lcdwr(\"foo\")"    
 	-F <options>, --flash <options>		Run image flashing
 	-G [options], --gdb <options>		Launch GDB server
 	
-	--script and --interf are mandatory, normally combined with --flash or/and --gdb
+	Multiple --script, --path, --execute and --define are allowed and --interf is mandatory
 
        e.g.
         EBlink -I stlink -S stm32-auto -G
@@ -134,43 +136,34 @@ name: cortex-m
 	
 	Usage -F [options]
 
-        erase        : Chip erase the flash (before upload)
+        erase        : Chip erase the flash
         verify       : Verify flash after upload
-        run          : Start image (after upload)
-		
-        read=<byte length>@<address>
-                     : Read memory location at address with a given length and print as hex string.
-					   Use verbose level 0 for minimal print info."
-		
+        run          : Start target
+
         write=<hex byte(s)>@<address>
-                     : Modify flash location at address with a given byte array
-					 
-        file=<file>  : Load the file, <file>.hex  = Intel HEX format
-                                      <file>.srec = Motorola srec file format
+                     : Modify flash location at address with a given hex byte array
 
-                                      Default     = ELF file format
-									  
-        cmp=<file>   : Compare Flash with file, <file>.hex  = Intel HEX format
-                                      <file>.srec = Motorola srec file format
+        read=<length>@<address>
+                     : returns hex byte array of memory location at address with a given length
+                       use verbose level 0 to filter all unnecessary info.
 
-                                      Default     = ELF file format		
-
-        dump=<length>@<address>:<file> 
+        file=<file>  : Load the file,  <file>. Valid formats: ELF, IHEX or SREC (auto detect)
+        cmp=<file>   : Memory compare, <file>. Valid formats: ELF, IHEX or SREC (auto detect)
+        dump=<length>@<address>:<file>
                      : Dump memory to file, <file>.hex  = Intel HEX format
-		                            Default     = Binary file format
+                                            Default     = Binary format
 
         e.g. -F file=test.elf
-             -F run,file=test.hex		
-             -F read=0x4@0x0800000A,read=12@0x0800000C			 
-             -F run,verify,write=DEAD@0x08000004
-             -F run,file=test.hex,write=45FECA1245@0x80000004,write=EBAB@0x08000100
-             -F erase,verify,run,file=test.srec
-	         -F dump=0x1000@0x08000000:myDump.hex             
+             -F run,file=test.hex
+             -F read=4@0x80000004,-F read=4@0x80000008
+             -F write=DEAD@80000004
+             -F run,file=test.hex,write=45FECA1245@0x80000004,write=DEAD@0x80000100
+             -F erase,verify,run,file=test.s
              -F erase
-             -F run			 
+             -F run
 
         Default (without erase) only modified sectors are (re)flashed.
-	    Multiple writes and reads are allowed and is done after any file upload.
+        Multiple reads and writes are allowed and is done after any file upload
 
 
 ==== GDB server

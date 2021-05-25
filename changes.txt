@@ -1,3 +1,8 @@
+Changes (25-05-2021) Release 4.0(6)
+- Change: File format is now auto detect and not extension driven
+- Added : Script function execution from cli for user defined operations like option bytes.
+          e.g. -E myFunc(5) -E "test_func(\"myString\",67)"
+
 Changes (19-02-2021) Release 3.9(2)
 - Change: Connect strategy. Now connect under reset is tried if the first time fails
 - Added : Script traget API new variable cpuType. Holds number x of the Cortex-Mx.
