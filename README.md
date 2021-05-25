@@ -70,7 +70,7 @@ __Project bucket list__
 	-S <file>,    --script <file>		Add a device script file
 	-P <path>,    --path <path>		Add a search path for scripts
 	-D <def>,     --define <def>		Add a script global define "name=value"
-    -E <func>,    --execute <func>	Execute script function(s) from cli e.g. "setopt(WRREG, 5);lcdwr(\"foo\")"    
+    	-E <func>,    --execute <func>		Execute script function(s) from cli e.g. "setopt(WRREG, 5);lcdwr(\"foo\")"    
 	-F <options>, --flash <options>		Run image flashing
 	-G [options], --gdb <options>		Launch GDB server
 	
