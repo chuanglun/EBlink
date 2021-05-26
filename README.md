@@ -41,7 +41,7 @@ __Project bucket list__
 - Core control (halt, reset and resume) from the command line (automated testing)
 - Stand alone command line flashing tool (auto detect ELF, IHEX and SREC) for production
 - Dump memory (also on running target) to file in Intel hex or binary format
-- Compare flash against a SREC, IHEX or ELF file.
+- Compare MCU flash against a ELF, IHEX or SREC file.
 - All device related functions by c-like squirrel scripting e.g. flash or ext. EEprom algorithms, device reset strategy etc etc 
 - Ready for multiple interfaces
 
