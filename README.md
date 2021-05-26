@@ -39,9 +39,9 @@ __Project bucket list__
 - Inplace memory (flash or ram) modifications of any length byte array from the command line (e.g. serials or checksum programming)
 - Any length byte array memory reading also on running target from the command line (automated testing)
 - Core control (halt, reset and resume) from the command line (automated testing)
-- Stand alone command line flashing tool (elf, ihex and srec)  for production
+- Stand alone command line flashing tool (auto detect ELF, IHEX and SREC) for production
 - Dump memory (also on running target) to file in Intel hex or binary format
-- Compare flash against a srec, ihex or elf (auto detect) file.
+- Compare flash against a SREC, IHEX or ELF file.
 - All device related functions by c-like squirrel scripting e.g. flash or ext. EEprom algorithms, device reset strategy etc etc 
 - Ready for multiple interfaces
 
