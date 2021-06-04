@@ -19,22 +19,28 @@ const SAMD_DSU_DID  0x18        // Device ID register
 //
 //  EBlink called Entry point
 //
-function main()
+function main( errorOnNotFound = true )
 {
     // Default device ID register
     local result = intrfApi.readMem32(SAMD_DSU + SAMD_DSU_DID)
     if( (result >=0) && (intrfApi.value32 != 0) )
     {
         require("atmel/samcd.script")
-        return atmel_device(intrfApi.value32)
+        return atmel_device(intrfApi.value32, errorOnNotFound)
     }
 
     //result = intrfApi.readMem32(0x400E0740)
     //result = intrfApi.readMem32(0x400E0940)
 
     // If we still haven't a valid device ID, inform user and quit
-    errorf("Error:\tCan't access target device!\n\tIf reset is disabled (\"dr\" option), try with reset.")
-    return ERROR_NOTIFIED  // We have already thrown an error so use -1 (otherwise < -1)
+    if(errorOnNotFound)
+    {    
+        errorf("Error:\tCan't access target device!\n\tIf reset is disabled (\"dr\" option), try with reset.")
+        return ERROR_NOTIFIED  // We have already thrown an error so use -1 (otherwise < -1)
+    }
+        
+    // Device not found signaled to parent script    
+    return -100;
 }
 
 
