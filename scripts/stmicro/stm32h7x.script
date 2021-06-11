@@ -3,6 +3,58 @@
 //                   STM32H7x
 //
 
+
+//============== Debug registers and flags ==============
+const DBGMCU_CR       0x5c001004
+const DBGMCU_APB3FZ1  0x5c001034
+const DBGMCU_APB1LFZ1 0x5c00103C
+const DBGMCU_APB2FZ1  0x5c00104C
+const DBGMCU_APB4FZ1  0x5c001054
+
+// DBGMCU_CR
+const DBGSLEEP_D1   (1 << 0)
+const DBGSTOP_D1    (1 << 1)
+const DBGSTBY_D1    (1 << 2)
+const TRACE_CLKEN   (1 << 20)
+const D1DBGCKEN     (1 << 21)
+const D3DBGCKEN     (1 << 22)
+const TRGO_EN       (1 << 28)
+
+// DBGMCU_APB3FZ1
+const WWDG1_FRZ     (1 << 6)
+
+// DBGMCU_APB1LFZ1
+const DBG_TIM2      (1 << 0)
+const DBG_TIM3      (1 << 1)
+const DBG_TIM4      (1 << 2)
+const DBG_TIM5      (1 << 3)
+const DBG_TIM6      (1 << 4)
+const DBG_TIM7      (1 << 5)
+const DBG_TIM12     (1 << 6)
+const DBG_TIM13     (1 << 7)
+const DBG_TIM14     (1 << 8)
+const DBG_LPTIM1    (1 << 9)
+const DBG_I2C1      (1 << 21)
+const DBG_I2C2      (1 << 22)
+const DBG_I2C3      (1 << 23)
+
+// DBGMCU_APB2FZ1
+const DBG_TIM1      (1 << 0)
+const DBG_TIM8      (1 << 1)
+const DBG_TIM15     (1 << 16)
+const DBG_TIM16     (1 << 17)
+const DBG_TIM17     (1 << 18)
+const DBG_HRTIM     (1 << 29)
+
+// DBGMCU_APB4FZ1
+const DBG_I2C4      (1 << 7)
+const DBG_LPTIM2    (1 << 9)
+const DBG_LPTIM3    (1 << 10)
+const DBG_LPTIM4    (1 << 11)
+const DBG_LPTIM5    (1 << 12)
+const DBG_RTC       (1 << 16)
+const DBG_IIWDG1    (1 << 18) // Stop watchdog in debug
+
 /////////////////////////////////////////////////////
 //
 //   Memory map template of this device(s)
@@ -78,15 +130,6 @@ const mem_template_2MB = @@"
 
 hasSecondBank <- false  // Global boolean used by flash script
 
-const DBGMCU_CR     0x5c001004
-
-const DBGSLEEP_D1   (1 << 0)
-const DBGSTOP_D1    (1 << 1)
-const DBGSTBY_D1    (1 << 2)
-const DBGSTOP_D3    (1 << 7)
-const DBGSTBY_D3    (1 << 8)
-const D1DBGCKEN     (1 << 21)
-const D3DBGCKEN     (1 << 22)
 
 /////////////////////////////////////////////////////
 //
@@ -105,21 +148,13 @@ function stm32_device(deviceId)
     local string_2MB
     local flash_1bank
 
-    // Enable debug clocks: DBG_STANDBY & DBG_STOP & DBG_SLEEP - RM0090 Page 1676/1705
+    // Enable debug clocks
     intrfApi.readMem32(DBGMCU_CR)
-    result = intrfApi.writeMem32(DBGMCU_CR, intrfApi.value32 | DBGSLEEP_D1 | D1DBGCKEN)
+    result = intrfApi.writeMem32(DBGMCU_CR, intrfApi.value32 | DBGSTBY_D1 | D1DBGCKEN | D3DBGCKEN)
 
-    // Stop watchdog counters during halt: DBGMCU_APB3FZ2 |= WWDG1
-    intrfApi.readMem32(0xE00E1038)
-    result = intrfApi.writeMem32(0xE00E1038, intrfApi.value32 | 0x40)
-
-    // Stop watchdog counters during halt: DBGMCU_APB1LFZ2 |= WWDG2
-    intrfApi.readMem32(0xE00E1040)
-    result = intrfApi.writeMem32(0xE00E1040, intrfApi.value32 | 0x800)
-
-    // Stop watchdog counters during halt: DBGMCU_APB4FZ2 |= WDGLSD1 | WDGLSD2
-    intrfApi.readMem32(0xE00E1058)
-    result = intrfApi.writeMem32(0xE00E1058, intrfApi.value32 | 0xC0000)
+    // Stop watchdog counters during halt: DBGMCU_APB4FZ1 |= DBG_IIWDG1
+    intrfApi.readMem32(DBGMCU_APB4FZ1)
+    result = intrfApi.writeMem32(DBGMCU_APB4FZ1, intrfApi.value32 | DBG_IIWDG1)
 
     // If IWDG runs as HARDWARE watchdog (44.3.4) erase
     // will be aborted by the Watchdog and erase fails!
