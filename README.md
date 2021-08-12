@@ -31,7 +31,7 @@ __Project bucket list__
 - very fast and easy to use standalone flash tool (program, verify, compare or dump)
   
 ### EBlink features:
-- **MultiCore support** with full support Live variables, EBmonitor etc. STM32H7x5 auto detected.
+- **_MultiCore support_**  _Currently STM32H7x5 - dual core auto detected, no additional configuration needed_.
 - Integrated target stack frame UNWIND in case of exception with message box popup in windows.
 - GDB (**MultiCore**) server with flash caching, with EmBitz live variables/expression support!
 - Full Semi-hosting support
