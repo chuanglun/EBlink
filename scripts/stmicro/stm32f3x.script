@@ -126,6 +126,41 @@ function stm32_device(deviceId)
     return ERROR_OK
 }
 
+/////////////////////////////////////////////////////////////////////////////////
+//
+// Additional commands after reset (optional) called by EBlink
+//
+// resetType:
+//        SYSTEM_RESET
+//        CORE_RESET
+//        JTAG_RESET
+//        USER_RESET
+//
+function  reset_post(resetType)
+{
+    // Check if there is an user defined post reset hook, the user
+    // can add his own reset strategy with -S <myscript> as last
+    // defined script on the cli.
+    if (isScriptObject("reset_post_hook"))
+        return reset_post_hook(resetType);
 
+    local targetApi = :: TargetAPI() // Our interface to the target class
+
+    // We don't use this if the reset is a user_script type. In that
+    // case, the user is responsible for the initialization.
+    //
+    if( resetType != USER_RESET )
+    {
+        // Set the Stack pointer according the Vector table entry
+        intrfApi.readMem32(0x08000000)
+        targetApi.writeReg("SP", intrfApi.value32)
+
+        // Set the Program pointer according the Vector table entry
+        intrfApi.readMem32(0x08000004)
+        targetApi.writeReg("PC", intrfApi.value32)
+    }
+
+    return ERROR_OK
+}
 
 

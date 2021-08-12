@@ -31,6 +31,7 @@ __Project bucket list__
 - very fast and easy to use standalone flash tool (program, verify, compare or dump)
   
 ### EBlink features:
+- **Multi-Core support** with full support Live variables, EBmonitor etc. STM32H7x5 auto detected.
 - Integrated target stack frame UNWIND in case of exception with message box popup in windows.
 - GDB server with flash caching, with EmBitz live variables/expression support!
 - Full Semi-hosting support
@@ -86,23 +87,6 @@ __Project bucket list__
 ==== Interfaces
 
 
-name: CMSIS-DAP(v2) - ARM debug protocol driver 
-
-     Usage -I cmsis-dap[,options]
-
-        dr           : Disable reset at connection (hotplug)
-        speed=nnn    : Interface speed (default max possible)
-        swd          : use SWD (default)
-        jtag         : use Jtag
-        voltage=<vcc>   : Set the target voltage, default 3.3(V) 
-        serial=<serial> : Select probe explicit with serial#
-        device=<usb_bus>:<usb_addr> : Select V2 probe explicit on bus
-
-        e.g.  -I cmsis-dap,dr,speed=3000
-	
-	<currently under construction>
-
-
 name: STlink - STmicro V2/3 interface driver 
 	
      Usage -I stlink[,options]
@@ -111,6 +95,7 @@ name: STlink - STmicro V2/3 interface driver
         speed=nnn    : Interface speed (default max possible)
         swd          : use SWD (default)
         jtag         : use Jtag
+        ap=nn        : Select target DAP_AP port (default 0)
         speed=<speed>: Set the interface maximum speed
         serial=<serial> : Select probe explicit with serial#
         device=<usb_bus>:<usb_addr> : Select probe explicit on bus
@@ -118,7 +103,6 @@ name: STlink - STmicro V2/3 interface driver
         e.g.  -I stlink,dr,speed=3000
 
 ==== Targets
-
 
 name: cortex-m
      
@@ -165,15 +149,16 @@ name: cortex-m
         Default (without erase) only modified sectors are (re)flashed.
         Multiple reads and writes are allowed and is done after any file upload
 
-
-==== GDB server
+==== Services
      
+name: GDB-target
      Usage -G [options]
 
-        s            : Shutdown after disconnect
-        nc           : Don't use EBlink flash cache
-        port=ppp     : Select different TCP port, default 2331
         address=x.x.x.x : Select different listen address, default 0.0.0.0
+        port=ppp        : Select different TCP port, default (2331 + DAP_AP)
+        ap=n            : Select the DAP_AP port, default 0
+        s               : Shutdown after disconnect
+        nc              : Don't use EBlink flash cache
 
         e.g.  -G s,nc
         
