@@ -39,7 +39,7 @@ __Project bucket list__
 - Supports Hotplug for Embitz 1.1 [see issue](https://github.com/EmBitz/EBlink/issues/3#issue-518281157) and 2.0 (monitor command "IsRunning" for target state query)
 - Inplace memory (flash or ram) modifications of any length byte array from the command line (e.g. serials or checksum programming)
 - Any length byte array memory reading also on running target from the command line (automated testing)
-- Core control (halt, reset and resume) from the command line (automated testing) also on **MultiCore**
+- **MultiCore** Core control (halt, reset and resume) from the command line (automated testing) 
 - Stand alone command line flashing tool (auto detect ELF, IHEX and SREC) for production
 - Dump memory (also on running target) to file in Intel hex or binary format
 - Compare MCU flash against a ELF, IHEX or SREC file.
