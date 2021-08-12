@@ -84,10 +84,10 @@ __Project bucket list__
         EBlink -I cmsis-dap -T cortex-m,fu=0 -S stm32-auto -G port=4242,nc,s -S myReset.scr
 
 
-==== Interfaces
+==== **Interfaces**
 
 
-name: STlink - STmicro V2/3 interface driver 
+name: ***STlink*** - STmicro V2/3 interface driver 
 	
      Usage -I stlink[,options]
 
@@ -102,9 +102,9 @@ name: STlink - STmicro V2/3 interface driver
 
         e.g.  -I stlink,dr,speed=3000
 
-==== Targets
+==== **Targets**
 
-name: cortex-m
+name: ***cortex-m***
      
      Usage -T cortex-m[,options]
 
@@ -116,7 +116,7 @@ name: cortex-m
         e.g.  -T cortex-m,fu=1
               -T cortex-m,reset,resume
 
-==== Flash loader
+==== **Flash loader**
 	
 	Usage -F [options]
 
@@ -149,9 +149,10 @@ name: cortex-m
         Default (without erase) only modified sectors are (re)flashed.
         Multiple reads and writes are allowed and is done after any file upload
 
-==== Services
+==== **Services**
      
-name: GDB-target
+name: ***GDB-target***
+
      Usage -G [options]
 
         address=x.x.x.x : Select different listen address, default 0.0.0.0
