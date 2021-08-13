@@ -1,3 +1,6 @@
+Changes (13-08-2021) Release 4.0(16)
+- Fix: MultiCore didn't work for STlink/V3 and Jtag version > 6
+
 Changes (12-08-2021) Release 4.0(15)
 - Added : Service manager used for Multi-core and ITM etc
 
