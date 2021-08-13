@@ -91,12 +91,11 @@ name: ***STlink*** - STmicro V2/3 interface driver
 	
      Usage -I stlink[,options]
 
-        dr           : Disable reset at connection (same as cli --hotplug)
-        speed=nnn    : Interface speed (default max possible)
-        swd          : use SWD (default)
-        jtag         : use Jtag
-        ap=nn        : Select target DAP_AP port (default 0)
-        speed=<speed>: Set the interface maximum speed
+        dr              : Disable reset at connection (same as cli --hotplug)
+        speed=<speed>   : Interface speed (default max possible)
+        swd             : use SWD (default)
+        jtag            : use Jtag
+        ap=<port>       : Select target DAP_AP port (default 0)        
         serial=<serial> : Select probe explicit with serial#
         device=<usb_bus>:<usb_addr> : Select probe explicit on bus
 
@@ -155,11 +154,11 @@ name: ***GDB-target***
 
      Usage -G [options]
 
-        address=x.x.x.x : Select different listen address, default 0.0.0.0
-        port=ppp        : Select different TCP port, default (2331 + DAP_AP)
-        ap=n            : Select the DAP_AP port, default 0
-        s               : Shutdown after disconnect
-        nc              : Don't use EBlink flash cache
+        address=<x.x.x.x> : Select different listen address, default 0.0.0.0
+        port=<tcp port>   : Select different TCP port, default (2331 + DAP_AP)
+        ap=<port>         : Select the DAP_AP port, default 0
+        s                 : Shutdown after disconnect
+        nc                : Don't use EBlink flash cache
 
         e.g.  -G s,nc
         
