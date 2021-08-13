@@ -185,41 +185,7 @@ function set_target(deviceId)
     case 0x450 : // CHIPID_STM32H74/5
     case 0x480 : // CHIPID_STM32H7A/B
     case 0x483 : // CHIPID_STM32H72/3
-        // Dual core H74x/H75x
-        if(deviceId == 0x450)
-        {
-            // Check if we need a dual core H7 script
-            // This can be enable/disabled by user on cli and otherwise it is auto detected
-            if(isScriptObject("DUAL_CORE"))
-            {
-                // Check user dual core override
-                // -D DUAL_CORE(=1)  enables  dual core  '=1' is optional default defined's are 1
-                // -D DUAL_CORE=0    disables dual core
-                if(DUAL_CORE)
-                    require("stmicro/stm32h7x_dual.script")
-                else
-                    require("stmicro/stm32h7x.script")
-            }
-            else
-            {
-                // No explicit user Dual Core choice, auto detect second core
-                // Set interface to dap-ap port 3
-                local curAp = intrfApi.setDapAp(3)
-                // Read the core ID
-                if (intrfApi.readMem32(0xE000ED00) >=0)
-                {
-                    // Check if we have a valid ID at this dap-ap
-                    if(intrfApi.value32 == 0)
-                        require("stmicro/stm32h7x.script")
-                    else
-                        require("stmicro/stm32h7x_dual.script")
-                }
-                // Restore the original interface dap-ap port
-                intrfApi.setDapAp(curAp)
-            }
-        }
-        else // Default single core
-           require("stmicro/stm32h7x.script")
+        require("stmicro/stm32h7x.script")
         break
 
 
