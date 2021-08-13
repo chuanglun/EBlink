@@ -14,6 +14,10 @@ The installer set EB_DEFAULT_SCRIPT to "auto"(.script) so that all supported ven
 
 ![alt text](https://www.embitz.org/context3.png)  
 
+```diff
+- For MultiCore with STlink/V3 the jtag version must be below J7. For now all the firmwares below 2.37.26 will work e.g. 2.36.26.
+```
+
 __Project bucket list__
 - _Flash-breakpoints_ to increase the number of allowable breakpoints. Now we don't use external loaders anymore this is in reach as soon as we have a good ARM instruction emulator. Together with the speed of e.g. STlinkV3 and small page-size devices, this will be very convenient.
 - Complete _CMIS-DAP(v2)_, this is for 40% ready
