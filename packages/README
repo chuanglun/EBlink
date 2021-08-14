@@ -1,0 +1,19 @@
+Install: sudo apt install ./eblink-debian-amd64.deb
+Remove:  sudo dpkg  --remove eblink-debian-amd64
+
+
+The installer will also add the udev rules for the stlink.
+
+The following environment variables are set and are avaibale after linux restart:
+
+    EB_DEFAULT_PROBE=stlink
+    EB_DEFAULT_SCRIPT=auto
+
+So you can from every terminal launch EBlink with just "eblink -G"  of flash file from any folder with "eblink -F file=test.elf" etc
+IF you need a particular script file you can just overrule the environment by "eblink -Ssilabs-auto -G"
+
+Target control:   "eblink -Tcortex-m,halt", "eblink -Tcortex-m,reset=2" or "eblink -Tcortex-m,resume"
+
+The package remove will delete all the EBlink related stuff.
+    
+Have fun.
