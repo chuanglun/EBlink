@@ -25,10 +25,9 @@ You can launch GDB server from every terminal EBlink with just **_eblink -G_**
 
     GDB launch:     eblink -G
     Flash file:     eblink -F file=test.elf
-    Target control: eblink -Tcortex-m,halt, eblink -Tcortex-m,reset=2 or eblink -Tcortex-m,resume
+    Target control: eblink -T cortex-m,halt, eblink -T cortex-m,reset=2 or eblink -T cortex-m,resume
     etc (check eblink -h )  
 
-IF you need a particular script file you can just overrule the environment by **_eblink -Ssilabs-auto -G_**  
+IF you need a particular script file you can just overrule the environment by **_eblink -S silabs-auto -G_**  
 or **_eblink -I stlink,speed=1000 -G nc_** etc.
     
-Have fun.
