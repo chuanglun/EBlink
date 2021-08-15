@@ -20,7 +20,7 @@ The following environment variables are active after linux reboot:
     EB_DEFAULT_PROBE=stlink
     EB_DEFAULT_SCRIPT=auto
 
-You can from every terminal launch EBlink with just **_eblink -G_**  
+You can launch GDB server from every terminal EBlink with just **_eblink -G_**  
 
 
     GDB launch:     eblink -G
