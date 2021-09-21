@@ -4,8 +4,8 @@ This package will install everything needed to start using EBlink with STlink(c)
 Dependencies: none
 
 
-    Install: sudo apt install ./eblink-debian-amd64.deb  or   ./eblink-debian-armhf.deb
-    Remove:  sudo dpkg  --remove eblink-debian-amd64     or  eblink-debian-armhf
+    Install: sudo apt install ./eblink-debian-amd64.deb  or  sudo apt install ./eblink-debian-armhf.deb
+    Remove:  sudo dpkg  --remove eblink-debian-amd64     or  sudo dpkg  --remove eblink-debian-armhf
 
 Installed files:
 
