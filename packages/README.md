@@ -3,15 +3,17 @@
 This package will install everything needed to start using EBlink with STlink(c) on a fresh machine.  
 Dependencies: none
 
-**_AMD64_**
+**AMD64**
+    
     Install: sudo apt install ./eblink-debian-amd64.deb
     Remove:  sudo dpkg  --remove eblink-debian-amd64
     
-**_RaspberryPi_**
+**RaspberryPi**
+
     Install: sudo apt install ./eblink-debian-armhf.deb
     Remove:  sudo dpkg  --remove eblink-debian-armhf
 
-Installed files:
+**Installed files**
 
     /usr/bin/eblink                     // Executable  
     /usr/share/eblink                   // Scripts folder  
@@ -19,7 +21,7 @@ Installed files:
     /etc/udev/rules.d/80-eblink.rules   // The STlink device registrations  
 
 
-The following environment variables are active after linux reboot:
+The following environment variables are active <u>after linux reboot</u>:
 
     EB_DEFAULT_PROBE=stlink
     EB_DEFAULT_SCRIPT=auto
