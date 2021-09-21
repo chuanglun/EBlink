@@ -35,5 +35,5 @@ You can launch EBlink from every terminal with just **_eblink -G_**
     etc (check eblink -h )  
 
 IF you need a particular script file you can just overrule the environment by **_eblink -S silabs-auto -G_**  
-or **_eblink -I stlink,speed=1000 -G nc_** etc.
+or if other interface options are needed **_eblink -I stlink,speed=1000 -G_** etc.
     
