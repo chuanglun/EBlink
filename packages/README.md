@@ -26,6 +26,8 @@ The following environment variables are active <u>after linux reboot</u>:
     EB_DEFAULT_PROBE=stlink
     EB_DEFAULT_SCRIPT=auto
 
+**Usage**
+
 You can launch EBlink from every terminal with just **_eblink -G_**  
 
 
