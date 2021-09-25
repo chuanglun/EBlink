@@ -1,6 +1,6 @@
-# Ready to go Debian package AMD64 / ARMHF(RaspberryPi)
+# Ready to go Debian packages AMD64 / ARMHF(RaspberryPi)
 
-This package will install everything needed to start using EBlink with STlink(c) on a fresh machine.  
+These packages will install everything needed to start using EBlink with STlink(c) on a fresh machine.  
 Dependencies: none
 
 **AMD64**
