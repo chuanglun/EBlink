@@ -28,17 +28,17 @@ The following environment variables are active <u>after linux reboot</u>:
 
 **Usage**
 
-You can launch EBlink from every terminal, e.g. to launch GDB server **_eblink -G_**  
+You can launch EBlink from every terminal, e.g. to launch GDB server **_./eblink -G_**  
 
 Examples:
 
-    GDB launch:     eblink -G
-    Flash file:     eblink -F file=test.elf (file is relative to the terminal's CWD)
-    Target halt:    eblink -T cortex-m,halt  
-    Target reset:   eblink -T cortex-m,reset=2    reset types: 0(default)=system,1=core,2=jtag
-    Target resume:  eblink -T cortex-m,resume
-    etc (check "eblink -h" )  
+    GDB launch:     ./eblink -G
+    Flash file:     ./eblink -F file=test.elf (file is relative to the terminal's CWD)
+    Target halt:    ./eblink -T cortex-m,halt  
+    Target reset:   ./eblink -T cortex-m,reset=2    reset types: 0(default)=system,1=core,2=jtag
+    Target resume:  ./eblink -T cortex-m,resume
+    etc (check "./eblink -h" )  
 
-IF you need a particular script file you can just overrule the environment by **_eblink -S silabs-auto -G_**  
-or if other interface options are needed **_eblink -I stlink,speed=1000 -G_** etc.
+IF you need a particular script file you can just overrule the environment by **_./eblink -S silabs-auto -G_**  
+or if other interface options are needed **_./eblink -I stlink,speed=1000 -G_** etc.
     
