@@ -15,7 +15,7 @@ The installer set environment variable EB_DEFAULT_SCRIPT to "auto"(.script) so t
 ![alt text](https://www.embitz.org/context3.png)  
 
 __Project bucket list__
-- _Flash-breakpoints_ to increase the number of allowable breakpoints. Now we don't use external loaders anymore this is in reach as soon as we have a good ARM instruction emulator. Together with the speed of e.g. STlinkV3 and small page-size devices, this will be very convenient.
+- _Flash-breakpoints_ to increase the number of allowable breakpoints. Now we don't use external loaders anymore this is in reach as soon as we have ARMulator incoperated. Together with the speed of e.g. STlinkV3 and small page-size devices, this will be very convenient.
 - Complete _CMIS-DAP(v2)_, this is for 40% ready
 - Implement _SWO_ and _ITM_
    
