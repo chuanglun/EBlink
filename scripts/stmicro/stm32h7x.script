@@ -220,7 +220,7 @@ function stm32_device(deviceId)
 
             default:
                 printf("\n\n")
-                errorf("Error:\tUnsupported DualCore device 0x%X\n\tPlease report!\n", deviceId)
+                errorf("Error:\tUnsupported device 0x%X\n\tPlease report!\n", deviceId)
                 _n_throw(ERROR_NOTIFIED)
         }
 
