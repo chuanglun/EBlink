@@ -65,31 +65,31 @@ function stm32_device(deviceId)
     // Translate from Kbytes to bytes
     flash_size = (intrfApi.value32  & 0xffff) *1024
 
-    // Set the memory map according the device ID
-      printf("STmicro family : STM32F3")
+    // Set the memory map argument(s) according the device ID
+      local deviceStr
       switch(deviceId) {
         case 0x422 : // CHIPID_STM32_F3
-            printf("02/3xB/C\n")
+            deviceStr = "02/3xB/C"
             ram_size = 0xa000
             break
 
         case 0x432 : // CHIPID_STM32_F37x
-            printf("7x\n")
+            deviceStr = "7x"
             ram_size = 0xa000
             break
 
         case 0x438 : // CHIPID_STM32_F334
-            printf("3x\n")
+            deviceStr = "3x"
             ram_size = 0x3000
             break
 
         case 0x439 : // CHIPID_STM32_F3_SMALL
-            printf("02x6/8\n")
+            deviceStr = "02x6/8"
             ram_size = 0xa000
             break
 
         case 0x446 : // CHIPID_STM32_F303_HIGH
-            printf("03xD/E\n")
+            deviceStr = "03xD/E"
             ram_size = 0x10000
             break
 
@@ -97,6 +97,9 @@ function stm32_device(deviceId)
             errorf("ERROR: Unsupported STM3232F3 device ID\n");
             return ERROR_NOTIFIED
     }
+
+    // Inform user of the device found
+    printf("STmicro family : STM32F3%s\n", deviceStr)
 
     // Inform the user
     printf("Detected FLASH : 0x%X\nConfigured RAM : 0x%X\n", flash_size, ram_size)

@@ -136,30 +136,33 @@ function stm32_device(deviceId)
     // Additional memory block
     local addMem = ""
 
-    printf("STmicro family : STM32F")
+    local deviceStr
     switch(deviceId) {
         case 0x449 :
-            printf("74x/75x\n")
+            deviceStr = "74x/75x"
             if(flash_size>0x100000)
                 addMem = mem_template_2MB
             ram_size = 0x50000
             break
 
         case 0x451 :
-            printf("76x/77x\n")
+            deviceStr = "76x/77x"
             if(flash_size>0x100000)
                 addMem = mem_template_2MB
             ram_size = 0x80000
             break
 
         case 0x452 :
-            printf("72x/73x\n")
+            deviceStr = "72x/73x"
             memMap = mem_template_F73
             if( flash_size > 0x8000 )
                 addMem = mem_template_F72
             ram_size = 0x80000
             break
     }
+
+    // Inform user of the device found
+    printf("STmicro family : STM32F%s\n", deviceStr)
 
     // Inform the user
     printf("Detected FLASH : 0x%X\nConfigured RAM : 0x%X\n", flash_size, ram_size)

@@ -84,31 +84,30 @@ function stm32_device(deviceId)
     flash_size = intrfApi.value32 & ~3
     flash_size = (flash_size & 0xffff) * 1024
 
-
-    printf("STmicro family : STM32G")
+    local deviceStr
     switch(deviceId)
     {
     case 0x460 :
-            printf("07/08xx\n")
+            deviceStr = "07/08xx"
             page_size = 0x800
             sram_size = 0x9000 // 36Kbyte
             break
 
     case 0x466 :
-            printf("03/04xx\n")
+            deviceStr = "03/04xx"
             page_size = 0x800
             sram_size = 0x2000 // 8Kbyte
             break
 
     case 0x468 :
-            printf("43/44xx\n")
+            deviceStr = "43/44xx"
             page_size = 0x800
             cram_size = 0x2800 // 10K
             sram_size = 0x8000 // 32K
             break
 
     case 0x469 :
-            printf("47/48xx\n")
+            deviceStr = "47/48xx"
             page_size = 0x1000  // 4K single bank
             cram_size = 0x8000  // 32K
             sram_size = 0x20000 // 128K
@@ -120,6 +119,9 @@ function stm32_device(deviceId)
             }
             break
     }
+
+    // Inform user of the device found
+    printf("STmicro family : STM32G%s\n", deviceStr)
 
     // Inform the user
     printf("Detected FLASH : 0x%X%s\nConfigured RAM : 0x%X\n", flash_size, (hasDualBank ? " - Dualbank" :""), sram_size)

@@ -62,11 +62,11 @@ function stm32_device(deviceId)
     flash_size = (intrfApi.value32 &0xFFFF) *1024
 
     // Set the memory map according the device ID
-      printf("STmicro family : STM32")
+      local deviceStr
       switch(deviceId) {
         case 0x415 : // CHIPID_STM32_L47/L48
         case 0x461 : // CHIPID_STM32_L49X/L4A
-            printf( deviceId== 0x415 ? "L47/L48xx\n" : "L49/L4Axx\n")
+            deviceStr = ( deviceId == 0x415 ? "L47/L48xx" : "L49/L4Axx")
             if( (flash_size == (1024*1024)) && readDualBankOption(21) )
             {
                 hasDualBank = true
@@ -76,26 +76,26 @@ function stm32_device(deviceId)
             break
 
         case 0x435 :
-            printf("L43/L44xx\n")
+            deviceStr = "L43/L44xx"
             ram_size = 0x10000
             page_size = 0x800
             break
 
         case 0x462 :
-            printf("L45/L46xx\n")
+            deviceStr = "L45/L46xx"
             ram_size = 0x10000
             page_size = 0x800
             break
 
         case 0x464 :
-            printf("L41/L42xx\n")
+            deviceStr = "L41/L42xx"
             ram_size = 0x10000
             page_size = 0x800
             break
 
         case 0x470 : // CHIPID_STM32_L4R/L4S
         case 0x471 : // CHIPID_STM32_L4P5/L4Q5x
-            printf( deviceId== 0x470 ? "L4R/L4Sxx\n" : "L4P5/L4Q5x\n")
+            deviceStr = ( deviceId == 0x470 ? "L4R/L4Sxx" : "L4P5/L4Q5x")
             page_size = 0x2000
             if( (flash_size == (1024*1024)) & readDualBankOption(21) )
             {
@@ -106,8 +106,13 @@ function stm32_device(deviceId)
             break
 
         default:
-        break
+            printf("\n")
+            errorf("Error:\tUnsupported device 0x%X\n\tPlease report!\n", deviceId)
+            _n_throw(ERROR_NOTIFIED)
     }
+
+    // Inform user of the device found
+    printf("STmicro family : STM32%s\n", deviceStr)
 
     // Inform the user
     printf("Detected FLASH : 0x%X%s\nConfigured RAM : 0x%X\n", flash_size, (hasDualBank ? " - Dualbank" :""), ram_size)

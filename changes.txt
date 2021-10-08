@@ -1,3 +1,8 @@
+Changes (8-10-2021) Release 4.2
+- Fix: interface speed set by script could silently fails
+- Fix: Std Pipe flushing (needed for EmBitz integration)
+- Mod: Script printing for more readable trace output
+
 Changes (20-09-2021) Release 4.1(18)
 - Fix: numap NULL ptr at interface options
 

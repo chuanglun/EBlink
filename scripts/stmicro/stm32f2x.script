@@ -21,7 +21,7 @@ const mem_template = @@"
   <!-- Sectors 4 64KB each -->
  <memory type=\"flash\" start=\"0x08010000\" length=\"0x10000\">
   <property name=\"blocksize\">0x10000</property>
- </memory> 
+ </memory>
   <!-- Sectors 5.. 128KB each -->
  <memory type=\"flash\" start=\"0x08020000\" length=\"0x%x\">
   <property name=\"blocksize\">0x20000</property>
@@ -57,18 +57,21 @@ function stm32_device(deviceId)
     // Get the flash size by reading the info register
     result = intrfApi.readMem32(0x1fff7a22)
     if(result <0) return result;
-        
-    flash_size = intrfApi.value32 >>16    
+
+    flash_size = intrfApi.value32 >>16
     flash_size = (flash_size & 0xffff) * 1024
 
-    printf("STmicro family : STM32F")
+    local deviceStr
     switch(deviceId) {
         case 0x411 : // CHIPID_STM32_F2
-            printf("2xx\n")
+            deviceStr = "2xx"
             ram_size = 0x20000
             break
 
     }
+
+    // Inform user of the device found
+    printf("STmicro family : STM32F%s\n", deviceStr)
 
     // Inform the user
     printf("Detected FLASH : 0x%X\nConfigured RAM : 0x%X\n", flash_size, ram_size)

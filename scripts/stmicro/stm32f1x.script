@@ -44,35 +44,35 @@ function stm32_device(deviceId)
     flash_size = intrfApi.value32 & 0xFFFF
     flash_size = (flash_size & 0xffff) * 1024
 
-    printf("STmicro family : STM32F")
+    local deviceStr
     switch(deviceId) {
         case 0x410 : // CHIPID_STM32_F1_MEDIUM
-            printf("1x medium-density\n")
+            deviceStr = "1x medium-density"
             flash_size = 0x20000 // Override, chip has bug!!!
             page_size = 0x400
             ram_size = 0x5000
             break
 
         case 0x412 : // CHIPID_STM32_F1_LOW
-            printf("1x low-density\n")
+            deviceStr =  "1x low-density"
             page_size = 0x400
             ram_size = 0x2800
             break
 
         case 0x414 : // CHIPID_STM32_F1_HIGH
-            printf("1x high-density\n")
+            deviceStr =  "1x high-density"
             page_size = 0x800
             ram_size = 0x10000
             break
 
         case 0x418 : // CHIPID_STM32_F1_CONN
-            printf("1x connectivity\n")
+            deviceStr =  "1x connectivity"
             page_size = 0x800
             ram_size = 0x10000
             break
 
         case 0x420 : // CHIPID_STM32_F1_VL_MEDIUM_LOW
-            printf("100xx low/medium-density value line\n")
+            deviceStr =  "100xx low/medium-density value line"
             //medium and low devices have the same chipID ram size depends on flash size.
             //STM32F100xx datasheet Doc ID 16455 Table 2
             page_size = 0x400
@@ -83,18 +83,21 @@ function stm32_device(deviceId)
             break
 
         case 0x428 : // CHIPID_STM32_F1_VL_HIGH
-            printf("100xx high-density value line\n")
+            deviceStr =  "100xx high-density value line"
             page_size = 0x800
             ram_size = 0x8000
             break
 
         case 0x430 : // CHIPID_STM32_F1_XL
-            printf("1 XL-density (dual flash banks)\n")
+            deviceStr =  "1x XL-density (dual flash banks)"
             page_size = 0x800
             ram_size = 0x18000
             break
 
     }
+
+    // Inform user of the device found
+    printf("STmicro family : STM32F%s\n", deviceStr)
 
     // Inform the user
     printf("Detected FLASH : 0x%X\nConfigured RAM : 0x%X\n", flash_size, ram_size)

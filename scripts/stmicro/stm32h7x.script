@@ -197,32 +197,33 @@ function stm32_device(deviceId)
 
         flash_size = (intrfApi.value32 & 0xffff) * 1024
 
-        // Inform user of the device found
-        printf("STmicro family : STM32H")
+        local deviceStr
         switch(deviceId) {
             case 0x450 :
-                printf("74x/75x")
+                deviceStr = "74x/75x"
                 if( hasDualCore = checkDualCore(CM4_AP) )
-                    printf(" - DualCore (CM7/CM4)")
-                printf("\n")
+                    deviceStr += " - DualCore (CM7/CM4)"
                 ram_size = 0x80000
                 break
 
             case 0x480 :
-                printf("7Ax/7Bx\n")
+                deviceStr = "7Ax/7Bx"
                 ram_size = 0x80000
                 break
 
             case 0x483 :
-                printf("72x/73x\n")
+                deviceStr = "72x/73x"
                 ram_size = 0x80000
                 break
 
             default:
-                printf("\n\n")
+                printf("\n")
                 errorf("Error:\tUnsupported device 0x%X\n\tPlease report!\n", deviceId)
                 _n_throw(ERROR_NOTIFIED)
         }
+
+        // Inform user of the device found
+        printf("STmicro family : STM32H%s\n", deviceStr)
 
         // Inform the user
         printf("Detected FLASH : 0x%X\nConfigured RAM : 0x%X\n", flash_size, ram_size)

@@ -95,7 +95,14 @@ function flash_start()
         flash_unlock()
 
         // Check the voltage and set the right flash strategy
-        voltage = intrfApi.targetVoltage();
+        if (isScriptObject("VCC_VOLTAGE") && VCC_VOLTAGE>0)
+        {
+            voltage = VCC_VOLTAGE
+            printf("CLI vcc voltage: %f \n", voltage)
+        }
+        else
+            voltage = intrfApi.targetVoltage()
+
         if(voltage  < 1.8)
         {
            _n_throw(ERROR_VOLTAGE)

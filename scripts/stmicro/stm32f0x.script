@@ -53,41 +53,44 @@ function stm32_device(deviceId)
     flash_size = intrfApi.value32 & ~3
     flash_size = (flash_size & 0xffff) * 1024
 
-    printf("STmicro family : STM32F0")
+    local deviceStr
     switch(deviceId) {
         case 0x440 : // CHIPID_F0
-            printf("5x\n")
+            deviceStr = "5x"
             page_size = 0x400
             ram_size = 0x2000
             break
 
         case 0x442 : // CHIPID_F09X
-            printf("9x\n")
+            deviceStr = "9x"
             page_size = 0x800
             ram_size = 0x8000
             break
 
         case 0x444 : // CHIPID_STM32_F0_SMALL
-            printf("3x\n")
+            deviceStr "3x"
             page_size = 0x400
             ram_size = 0x1000
             break
 
         case 0x445 : // CHIPID_STM32_F04
-            printf("4x\n")
+            deviceStr = "4x"
             page_size = 0x400
             ram_size = 0x1800
             break
 
         case 0x448 : // STM32_CHIPID_F0_CAN
-            printf("7x\n")
+            deviceStr = "7x"
             page_size = 0x800
             ram_size = 0x4000
             break
     }
 
+    // Inform user of the device found
+    printf("STmicro family : STM32F0%s\n", deviceStr)
+
     // Inform the user
-      printf("Detected FLASH : 0x%X\nConfigured RAM : 0x%X\n", flash_size, ram_size)
+    printf("Detected FLASH : 0x%X\nConfigured RAM : 0x%X\n", flash_size, ram_size)
 
     // The user specified the size of flash memory
     if (isScriptObject("FLASH_SIZE") && FLASH_SIZE>0)

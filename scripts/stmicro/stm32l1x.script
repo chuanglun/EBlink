@@ -44,32 +44,32 @@ function stm32_device(deviceId)
     // Enable debug clocks: DBG_STANDBY & DBG_STOP & DBG_SLEEP - RM0090 Page 1676/1705
     // result = intrfApi.writeMem32(0x40015804, 6)
 
-    printf("STmicro family : STM32L1xx ")
+    local deviceStr
     switch(deviceId)
     {
         case 0x416 :
-            printf("Cat.1 - Low/Medium Density)\n")
+            deviceStr = "Cat.1 - Low/Medium Density)"
             page_size  = 0x100
             ram_size   = 0x4000
             fsize_addr = 0x1FF8004C
             break
 
         case 0x427 :
-            printf("(Cat.3 - Medium+ Density)\n")
+            deviceStr = "(Cat.3 - Medium+ Density)"
             page_size  = 0x100
             ram_size   = 0x8000
             fsize_addr = 0x1FF800CC
             break
 
         case 0x429 :
-            printf("(Cat.2)\n")
+            deviceStr = "(Cat.2)"
             page_size  = 0x100
             ram_size   = 0x8000
             fsize_addr = 0x1FF8004C
             break
 
         case 0x436 :
-            printf("(Cat.4/Cat.3 - Medium+/High Density)\n")
+            deviceStr = "(Cat.4/Cat.3 - Medium+/High Density)"
             // Get the flash size by reading the info register
             result = intrfApi.readMem32(0x1ff800cc)
             flash_size = intrfApi.value32 & ~3
@@ -87,12 +87,20 @@ function stm32_device(deviceId)
             break
 
         case 0x437 :
-            printf("(Cat.5/Cat.6)\n")
+            deviceStr = "(Cat.5/Cat.6)"
             page_size  = 0x100
             ram_size   = 80 * 1024
             fsize_addr = 0x1FF800CC
             break
+
+        default:
+            printf("\n")
+            errorf("Error:\tUnsupported device 0x%X\n\tPlease report!\n", deviceId)
+            _n_throw(ERROR_NOTIFIED)
     }
+
+    // Inform user of the device found
+    printf("STmicro family : STM32L1xx %s\n", deviceStr)
 
     // Get the flash size by reading the info register
     result = intrfApi.readMem32(fsize_addr)
