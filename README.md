@@ -9,7 +9,7 @@ Most updates are mass storage related which we don't use anyway._
 
 EBlink ARM Cortex-M debug tool with squirrel scripting device support
 
-Windows installer available with windows shell context menu in packages section.
+[ Windows installer ](https://github.com/EmBitz/EBlink/tree/master/packages) available with windows shell context menu.  
 The installer set environment variable EB_DEFAULT_SCRIPT to "auto"(.script) so that all supported vendors are automaticlly detected (currently Silabs, STmicro and Atmel).
 
 ![alt text](https://www.embitz.org/context3.png)  
