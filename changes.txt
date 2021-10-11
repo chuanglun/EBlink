@@ -1,3 +1,7 @@
+Changes (11-10-2021) Release 4.3
+- Fix: Binary filedump missing address increment
+- Mod: Flasher user info
+
 Changes (8-10-2021) Release 4.2
 - Fix: interface speed set by script could silently fails
 - Fix: Std Pipe flushing (needed for EmBitz integration)
