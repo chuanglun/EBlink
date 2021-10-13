@@ -44,8 +44,7 @@ or if other interface options are needed **_./eblink -I stlink,speed=1000 -G_** 
 
 # Ready to go Windows installer
 
-The published installer will install not only EBlink with all the scripts but also the 32/64 bit shell context menu which makes it possible to flash files from the windows explorer context menu.
-The installer will restart windows explorer to make the context menu's available!!!
+The published installer will not only install EBlink with all the scripts but also the 32/64 bit shell context menu handler which makes it possible e.g. to flash files from the windows explorer context menu. The installer will restart windows explorer to make the context menu's available!!!
 
 After installation there is an EBlink uninstall in the windows "Remove applications" section which will cleanup all EBlink related stuff.
     
