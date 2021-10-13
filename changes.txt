@@ -1,3 +1,6 @@
+Changes (11-10-2021) Release 4.3-[25]
+- Fix: high CPU power use
+
 Changes (11-10-2021) Release 4.3
 - Fix: Binary filedump missing address increment
 - Mod: Flasher user info
