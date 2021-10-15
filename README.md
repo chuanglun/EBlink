@@ -52,11 +52,11 @@ __Project bucket list__
 
 2) By default, the "Connection under reset" for the stlink interface is enabled. For hotplugging use the CLI option --hotplug (-H) or the stlink interface swith "dr" (Disable Reset) e.g. -I stlink,dr  Both options are the same but set at different levels.
 
+3) From EBlink version 4.4 and above, this GDB server can be used for CubeMX IDE in either STlink GDB-server mode or OpenOCD. Be sure that Live variables are unchecked. Just launch EBlink from the context menu and keep it running to have full benefit of flash caching in CubeMX IDE.
 
 #### ISSUES
 - If flash is empty but was started by e.g. powerup, a target exception is detected and an UNWIND is happening after first GDB launch because the exception flags of the MCU are set. This is not a bug but by design. Just ignore!
 - Non STmicro devices (e.g. Silabs, NXP) are only working with STlink-V2.
-- From EBlink version 4.4 this GDB server can be used for CubeMX IDE in either STlink GDB-server mode or OpenOCD. Be sure that Live variables are unchecked.
 
 ## EBlink - usage:
 
