@@ -1,3 +1,6 @@
+Changes (15-10-2021) Release 4.4-[27]
+- Fix: GDB step-over not working after resume
+
 Changes (15-10-2021) Release 4.4-[26]
 - Fix: EBlink is now compatible with STlink GDB-server and OpenOCD for CubeMX use.
        Uncheck the live variables checkboxes of these GDB server drivers.

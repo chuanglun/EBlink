@@ -1,6 +1,6 @@
-539cb7d359af4129ae21781653f44f36 *linux\eblink
-6f3f7dd3bfdf59986d7cd5212c025396 *Raspberry\eblink
-3b664adef2813f608099ada8c3bc419e *packages\EBlinkInstaller4.4(26).exe
-ebec5dee17dadb9fe38bac3d7db95975 *win32\eblink.exe
-7d992cdf741c6d53eff4390492790c17 *packages\eblink-debian-amd64.deb
-8399fc59ab837cecf613d9d46cf2b4da *packages\eblink-debian-armhf.deb
+d55f6a6cbf29eb94d1a9f7a3a0b4c681 *linux\eblink
+6fb0d98bd6569d2951fb0729d68f8788 *Raspberry\eblink
+aa4720672c3bcb9563719e2015c850af *packages\EBlinkInstaller4.4(27).exe
+52245395e96beb2ae229270ee3b6b507 *win32\eblink.exe
+b5f76a4ed11b2cb1e34cbc2fa335c23c *packages\eblink-debian-amd64.deb
+bec37c58d1e0e4530d907781394f60a0 *packages\eblink-debian-armhf.deb
