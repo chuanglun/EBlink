@@ -1,4 +1,4 @@
-Changes (15-10-2021) Release 4.4-[28]
+Changes (17-10-2021) Release 4.4-[28]
 - Fix: Trying to free non-object at shutdown
 
 Changes (15-10-2021) Release 4.4-[27]
