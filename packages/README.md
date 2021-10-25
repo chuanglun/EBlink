@@ -47,4 +47,20 @@ or if other interface options are needed **_./eblink -I stlink,speed=1000 -G_** 
 The published installer will not only install EBlink with all the script files but also the 32/64 bit shell context menu handler which makes it possible e.g. to flash files from the windows explorer context menu. The installer will restart windows explorer to make the context menu's available!!!
 
 After installation there is an EBlink uninstall in the windows "Remove applications" section which will cleanup all EBlink related stuff.
+
+**Usage from command prompt**
+
+You can launch EBlink from every command prompt after installation, e.g. to launch GDB server **_eblink -G_**  
+
+Examples:
+
+    GDB launch:     eblink -G
+    Flash file:     eblink -F file=test.elf      (file location is relative to the command prompt CWD)
+    Target halt:    eblink -T cortex-m,halt  
+    Target reset:   eblink -T cortex-m,reset=2    reset types: 0(default)=system,1=core,2=jtag
+    Target resume:  eblink -T cortex-m,resume
+    etc (check "eblink -h" )  
+
+IF you need a particular script file you can just overrule the environment by **_eblink -S silabs-auto -G_**  
+or if other interface options are needed **_eblink -I stlink,speed=1000 -G_** etc.
     
