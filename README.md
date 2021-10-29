@@ -37,6 +37,7 @@ __Project bucket list__
 - GDB (**MultiCore**) server with flash caching, with EmBitz live variables/expression support!
 - Full Semi-hosting support
 - Execute (user) script functions from CLI e.g. option bytes reading/writing etc.
+- Execute (user) script functions from GDB terminal with the "monitor exec_script" command e.g. Special setups on GDB connect or on user request during runtime.
 - Supports Hotplug current Embitz 2.0 (monitor command "IsRunning" for target state query)
 - Inplace memory (flash or ram) modifications of any length byte array from the command line (e.g. serials or checksum programming)
 - Any length byte array memory reading also on running target from the command line (automated testing)
