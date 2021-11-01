@@ -87,6 +87,12 @@ function stm32_device(deviceId)
     local deviceStr
     switch(deviceId)
     {
+    case 0x456 :
+            deviceStr = "05/06xx"
+            page_size = 0x800
+            sram_size = 0x4800 // 18Kbyte
+            break
+
     case 0x460 :
             deviceStr = "07/08xx"
             page_size = 0x800

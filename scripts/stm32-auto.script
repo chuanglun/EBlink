@@ -85,8 +85,9 @@ function set_target(deviceId)
         break
 
     // Cortex M0+
-    case 0x460 : // STM32G07xxx/08xxx
     case 0x466 : // STM32G03xxx/04xxx
+    case 0x456 : // STM32G05xxx/06xxx
+    case 0x460 : // STM32G07xxx/08xxx
         require("stmicro/stm32gx.script")
         break
 
