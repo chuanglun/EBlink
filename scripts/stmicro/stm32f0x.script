@@ -68,7 +68,7 @@ function stm32_device(deviceId)
             break
 
         case 0x444 : // CHIPID_STM32_F0_SMALL
-            deviceStr "3x"
+            deviceStr = "3x"
             page_size = 0x400
             ram_size = 0x1000
             break
