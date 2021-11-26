@@ -1,4 +1,5 @@
 #install udev rules
-sudo cp 49-stlink* /etc/udev/rules.d/
+sudo cp 80-eblink.rules /etc/udev/rules.d/
 #and restart udev
 sudo udevadm control --reload
+

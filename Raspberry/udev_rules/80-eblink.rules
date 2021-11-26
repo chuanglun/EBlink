@@ -21,6 +21,11 @@ SUBSYSTEMS=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="3752", \
 SUBSYSTEMS=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="3753", \
     MODE:="0666", \
     SYMLINK+="stlinkv3_%n"
+
+# STLink V3 no mass storage
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="3754", \
+    MODE:="0666", \
+    SYMLINK+="stlinkv3_%n"
     
 # STLink V3SET 
 SUBSYSTEMS=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="374d", \
@@ -41,3 +46,4 @@ SUBSYSTEMS=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="374f", \
 # idea of write permission for everybody, you can replace MODE:="0666" with
 # OWNER:="yourusername" to create the device owned by you, or with
 # GROUP:="somegroupname" and mange access using standard unix groups.
+

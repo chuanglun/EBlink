@@ -1,3 +1,7 @@
+Changes (26-11-2021) Release 4.5-[4]
+- Added : STlink V3 without mass storage device (0x3754)
+- Fix:    stm32f0 script
+
 Changes (27-10-2021) Release 4.4-[31]
 - Mod: EBlink will close on windows hibernation
 

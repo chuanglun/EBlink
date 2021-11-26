@@ -386,7 +386,12 @@ function checkDualCore(dap_ap)
     // Check if the read was successful
     if(intrfApi.result < ERROR_OK)
         return false
-
+    
+    // Not sure this is right but if the CM4 is invisible because disabled by CM7 then
+    // the upper byte is not zero but the lower 3 bytes are zero.
+    if( intrfApi.value32 && !(intrfApi.value32 & 0xFFFFFF))
+        printf("DualCore status: Disabled (single core mode)\n")
+    
     // cpuID of non-zero is valid core
-    return (intrfApi.value32 ? true : false)
+    return (intrfApi.value32 & 0xFFFFFF ? true : false)
 }
