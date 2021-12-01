@@ -56,7 +56,7 @@ function stm32_device(deviceId)
     local deviceStr
     switch(deviceId) {
         case 0x440 : // CHIPID_F0
-            deviceStr = "5x"
+            deviceStr = "5x/F030x8"
             page_size = 0x400
             ram_size = 0x2000
             break
